@@ -1,0 +1,12 @@
+{
+  "schema": "aibast-public-api-index/1",
+  "sources": [
+    {
+      "fetched_at": "2026-10-09T20:09:59Z",
+      "id": "copilot-credit-rates",
+      "page": "https://microsoft.github.io/copilot-studio-estimator/",
+      "path": "api/public/copilot-credit-rates.json",
+      "title": "Copilot Studio credit rates (Microsoft Copilot Studio estimator)"
+    }
+  ]
+}

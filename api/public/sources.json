@@ -1,0 +1,15 @@
+{
+  "schema": "aibast-public-api-sources/1",
+  "about": "Public content this library republishes as a static API: each source is fetched from its own public page, one named value is read out of it exactly, and the result is written to api/public/<id>.json with where it came from. Add a source here; scripts/build_public_api.py does the rest.",
+  "sources": [
+    {
+      "id": "copilot-credit-rates",
+      "title": "Copilot Studio credit rates (Microsoft Copilot Studio estimator)",
+      "page": "https://microsoft.github.io/copilot-studio-estimator/",
+      "file": "https://microsoft.github.io/copilot-studio-estimator/multi-agent-calculations.js",
+      "extract": {"kind": "js-object", "symbol": "CREDIT_RATES"},
+      "units": {"credit_usd": 0.01, "rates": "Copilot credits per unit named by each key"},
+      "disclaimer": "Informational planning estimate from Microsoft's Copilot Studio estimator. Not a price quote, billing, or a guarantee; actual consumption and cost may vary."
+    }
+  ]
+}
