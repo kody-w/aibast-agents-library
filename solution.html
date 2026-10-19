@@ -411,6 +411,7 @@ function render(sol, agent, sols) {
     <div class="chips">
       ${chip('Industries', sol.industries)}
       ${chip('Personas', sol.personas)}
+      ${chip('Who uses it', (sol.work_style || []).map(w => w === 'frontline' ? 'Frontline' : w))}
       ${chip('Featured tools', sol.featured_tools)}
     </div>
     <div class="assets">

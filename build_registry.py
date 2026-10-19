@@ -630,6 +630,10 @@ def build_registry():
                 "executive_summary": sol.get("executive_summary"),
                 "industries": sol.get("industries", []),
                 "personas": sol.get("personas", []),
+                # Who uses it and where they work (e.g. "frontline" for people
+                # in the field, on a store floor or on a shift rather than at
+                # a desk). A list so other work styles can be added later.
+                "work_style": sol.get("work_style", []),
                 "featured_tools": featured_tools,
                 "agent_requirements": slide.get("agent_requirements", []),
                 "capabilities": actions or sol.get("capabilities", []),
