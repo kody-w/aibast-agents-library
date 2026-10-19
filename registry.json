@@ -856,6 +856,7 @@
           "Sales Director",
           "Customer Success Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "SharePoint",
@@ -1499,6 +1500,7 @@
           "Account Executive",
           "Sales Director"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "SharePoint",
@@ -2001,6 +2003,7 @@
           "Sales Leader",
           "Bid Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams",
@@ -2254,6 +2257,7 @@
         "executive_summary": "Automate lead scoring and qualification to accelerate pipeline generation, improve conversion rates, and drive proactive sales.",
         "industries": [],
         "personas": [],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -2506,6 +2510,7 @@
         "executive_summary": "Automates competitive deal analysis to uncover root causes, improve win rates, and guide strategic sales enablement.",
         "industries": [],
         "personas": [],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -2766,6 +2771,7 @@
           "Digital Marketing Lead",
           "Growth Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams",
@@ -3000,6 +3006,7 @@
           "CRM Manager",
           "Marketing Leader"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Outlook",
@@ -3232,6 +3239,7 @@
           "Digital Engagement Manager",
           "Contact Center Supervisor"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Outlook"
@@ -3511,6 +3519,7 @@
           "Clienteling Specialists",
           "Retail Managers"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Outlook"
@@ -3744,6 +3753,7 @@
           "Sustainability Lead",
           "Data Analyst"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "SharePoint",
@@ -3985,6 +3995,7 @@
           "Sustainability Lead",
           "Data Analyst"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "SharePoint",
@@ -4235,6 +4246,9 @@
           "Design Technician",
           "Standards Engineer",
           "Field Engineering Lead"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Microsoft SharePoint",
@@ -4491,6 +4505,9 @@
           "Authorized Person",
           "Crew Lead",
           "Operations Manager"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Microsoft Teams",
@@ -4752,8 +4769,18 @@
         "sharepoint_list_name": "Field Service Dispatch Agent",
         "slot": 23,
         "executive_summary": "Automates field service scheduling and coordination to reduce response times, optimize resource use, and improve customer satisfaction.",
-        "industries": [],
-        "personas": [],
+        "industries": [
+          "Energy and Utilities",
+          "Manufacturing"
+        ],
+        "personas": [
+          "Field Operations Manager",
+          "Dispatch Coordinator",
+          "Service Director"
+        ],
+        "work_style": [
+          "frontline"
+        ],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -5032,6 +5059,9 @@
           "Field Dispatch Supervisor",
           "Regulatory Reporting Manager"
         ],
+        "work_style": [
+          "frontline"
+        ],
         "featured_tools": [
           "Dynamics 365 Field Service",
           "Azure IoT Hub",
@@ -5157,6 +5187,7 @@
           "Sustainability Lead",
           "Data Analyst"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "SharePoint",
@@ -5410,6 +5441,7 @@
           "Sustainability Lead",
           "Data Analyst"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "SharePoint",
@@ -5672,6 +5704,7 @@
           "SIU Teams",
           "Operations Leaders"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -5947,6 +5980,7 @@
           "Relationship Manager",
           "Compliance Officer"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics365 for ERP",
           "SharePoint",
@@ -6188,6 +6222,7 @@
           "Retention Specialists",
           "Customer Success Teams"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -6450,6 +6485,7 @@
           "Financial Advisors",
           "Compliance Officers"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft 365",
@@ -6716,6 +6752,7 @@
           "SIU Investigators",
           "Risk Leaders"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -6979,6 +7016,7 @@
           "Processors",
           "Underwriters"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -7235,6 +7273,7 @@
           "Head of Corporate Development",
           "Research Analyst"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams",
           "Microsoft Excel"
@@ -7495,6 +7534,7 @@
           "Reconciliation Analyst",
           "Head of Payments Operations"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams",
           "Power Automate",
@@ -7775,6 +7815,7 @@
           "Portfolio Manager",
           "Paraplanner"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics365 for CRM",
           "Microsoft Teams",
@@ -8042,6 +8083,7 @@
           "Compliance Managers",
           "Trading Desk Supervisors"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams"
         ],
@@ -8296,6 +8338,7 @@
           "Financial Controller",
           "Finance Director"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Excel",
           "Microsoft Teams"
@@ -8553,6 +8596,7 @@
           "Underwriter",
           "Risk Analyst"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -8842,6 +8886,7 @@
           "Relationship Managers",
           "Advisory Directors"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Outlook"
@@ -9095,6 +9140,7 @@
           "Escalation Manager",
           "Quality Analyst"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365 for CRM, SharePoint, Microsoft Teams, Outlook"
         ],
@@ -9325,6 +9371,7 @@
           "Sales Operations Manager",
           "Enablement Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -9592,6 +9639,7 @@
           "Finance Director",
           "Department Approver"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -9825,6 +9873,7 @@
           "Finance Director",
           "Category Buyer"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -10076,6 +10125,7 @@
           "Care Coordinators",
           "Clinical Operation Leads"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -10368,6 +10418,7 @@
           "Surgeons",
           "Anesthesia teams"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365"
         ],
@@ -10598,6 +10649,7 @@
           "Scheduling Coordinators",
           "Patient Access Reps"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 36",
           "SharePoint"
@@ -10871,6 +10923,7 @@
           "Nurse Case Managers",
           "Radiology Schedulers"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams"
         ],
@@ -11103,6 +11156,9 @@
           "Employees",
           "Managers",
           "HR Operations Staff"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Outlook",
@@ -11356,6 +11412,9 @@
           "Employee",
           "Benefits Specialist",
           "HR Operations Staff"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Microsoft Teams",
@@ -11631,6 +11690,7 @@
           "Supplier Quality Managers",
           "Program Compliance Reviewers"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams",
           "SharePoint",
@@ -11897,6 +11957,7 @@
           "Inventory Managers",
           "Procurement Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -12135,6 +12196,9 @@
           "Maintenance Manager",
           "Production Supervisor",
           "Operation Leader"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Dynamics 365",
@@ -12378,6 +12442,7 @@
           "Sales Operations Managers",
           "Product Configuration Analysts"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Outlook",
           "Microsoft Teams",
@@ -12653,6 +12718,7 @@
           "Account Manager",
           "Operations Leader"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -12895,6 +12961,7 @@
           "Production Engineer",
           "Operations Director"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365 for ERP",
           "Power BI",
@@ -13131,6 +13198,7 @@
           "Procurement Manager",
           "Supply Chain Director"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -13371,6 +13439,7 @@
           "Warranty Administrators",
           "Dealer Sales Staff"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams",
           "Dynamics 365 Field Service",
@@ -13627,6 +13696,7 @@
           "Client Success Leaders",
           "Account Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams",
@@ -13870,6 +13940,7 @@
           "Attorneys",
           "Executives"
         ],
+        "work_style": [],
         "featured_tools": [
           "SharePoint",
           "Microsoft Word"
@@ -14101,6 +14172,7 @@
           "Resource Manager",
           "Finance Director"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -14343,6 +14415,7 @@
           "Enterprise Architecture Lead",
           "Review Board Coordinator"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams",
           "Microsoft Word"
@@ -14600,6 +14673,7 @@
           "Branch Managers",
           "Sales Operations Analysts"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Teams",
           "Dynamics 365 Sales",
@@ -14856,6 +14930,7 @@
           "Finance VP",
           "Billing Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "SharePoint",
@@ -15102,6 +15177,9 @@
           "Store Managers",
           "Category Managers"
         ],
+        "work_style": [
+          "frontline"
+        ],
         "featured_tools": [
           "Dynamics 365 Commerce",
           "Microsoft Teams"
@@ -15330,6 +15408,7 @@
           "Marketing Director",
           "Campaign Manager"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -15556,6 +15635,9 @@
           "Customer Service Agents",
           "Quality Teams",
           "Loss Prevention Teams"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Dynamics 365, Outlook,",
@@ -15785,6 +15867,9 @@
           "Store Associate",
           "Sales Manager",
           "Floor Specialist"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Dynamics 365",
@@ -16018,6 +16103,9 @@
           "Receiving Supervisor",
           "Claims Team Lead",
           "Category Manager"
+        ],
+        "work_style": [
+          "frontline"
         ],
         "featured_tools": [
           "Microsoft Teams",
@@ -16288,6 +16376,7 @@
         "executive_summary": "Detects and manages supply chain risks to defend against disruptions, protect revenue, and maintain operational continuity.",
         "industries": [],
         "personas": [],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -16600,6 +16689,7 @@
           "Budget Analysts",
           "Department Directors"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Word",
           "SharePoint",
@@ -16859,6 +16949,7 @@
           "Plan Reviewers",
           "Inspectors"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365 Customer Service",
           "Microsoft Teams",
@@ -17104,6 +17195,7 @@
           "Correspondence Team Lead",
           "Knowledge Owner"
         ],
+        "work_style": [],
         "featured_tools": [
           "Microsoft Outlook",
           "Microsoft SharePoint",
@@ -17362,6 +17454,7 @@
           "Billing Specialist",
           "Assistance Coordinator"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams",
@@ -17661,6 +17754,7 @@
           "Customer Success Managers",
           "Sales Leadership"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
@@ -17963,6 +18057,7 @@
           "Engineering Lead",
           "Director of Product"
         ],
+        "work_style": [],
         "featured_tools": [
           "Dynamics 365",
           "Microsoft Teams"
