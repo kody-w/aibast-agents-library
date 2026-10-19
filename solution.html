@@ -212,6 +212,23 @@ a.asset { background: var(--accent); color: var(--cp-accent-fg); border-color: v
 a.asset:hover, a.asset:focus-visible { background: var(--cp-accent-hover); border-color: var(--cp-accent-hover);
   color: var(--cp-accent-fg); text-decoration: none; }
 
+.who { margin-top: 14px; font-size: .95rem; color: var(--text); }
+.who b { font-weight: 700; }
+.badge { display: inline-block; font-size: .72rem; font-weight: 700; border-radius: var(--cp-radius-pill);
+  padding: 2px 10px; margin-left: 6px; background: var(--cp-accent-soft); color: var(--text); border: 1px solid var(--accent); vertical-align: 1px; }
+.actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-block; font-weight: 700; font-size: .92rem; border-radius: var(--cp-radius-sm); padding: 10px 18px;
+  border: 1px solid var(--accent); text-decoration: none; }
+.btn.primary { background: var(--accent); color: var(--cp-accent-fg); }
+.btn.primary:hover { background: var(--cp-accent-hover); border-color: var(--cp-accent-hover); text-decoration: none; }
+.btn.secondary { background: var(--surface); color: var(--text); border-color: var(--border-hover); }
+.btn.secondary:hover { border-color: var(--text); text-decoration: none; }
+.have { font-size: .8rem; color: var(--text-muted); }
+details.builders { margin-top: 44px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+details.builders > summary { cursor: pointer; padding: 16px 20px; font-weight: 700; font-size: .95rem; list-style-position: inside; }
+details.builders > summary span { font-weight: 400; color: var(--text-muted); font-size: .82rem; margin-left: 6px; }
+details.builders .inner { padding: 0 20px 22px; }
+details.builders .section:first-child { margin-top: 6px; }
 .section { margin-top: 38px; }
 .section > h2 { font-size: 1.15rem; font-weight: 780; margin-bottom: 4px; }
 .section > .sub { font-size: .82rem; color: var(--text-muted); margin-bottom: 14px; }
@@ -311,11 +328,9 @@ footer { margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--border
 <body>
 
 <header>
-  <div class="logo"><div class="logo-mark">AIB</div> Industry Solution</div>
+  <div class="logo"><div class="logo-mark">AIB</div> AIBAST Agents Library</div>
   <div class="header-right">
-    <a class="nav-link" href="index.html">All solutions</a>
-    <a class="nav-link" href="index.html">Home</a>
-    <a class="nav-link primary" id="src-link" href="https://github.com/microsoft/aibast-agents-library" target="_blank" rel="noopener">Source</a>
+    <a class="nav-link" href="index.html">All agents</a>
   </div>
 </header>
 
@@ -368,13 +383,14 @@ function md(src) {
   return out;
 }
 
-let SAMPLE = null, activeOp = null;
+let SAMPLE = null, activeOp = null, COURSE = null;
 
 async function init() {
   const id = new URLSearchParams(location.search).get('id');
-  const [solDoc, reg] = await Promise.all([
+  const [solDoc, reg, academy] = await Promise.all([
     getJSON(['solutions.json', SITE + 'solutions.json']),
     getJSON(['registry.json', SITE + 'registry.json']),
+    getJSON(['academy.json', SITE + 'academy.json']),
   ]);
   if (!solDoc) { document.getElementById('root').innerHTML = '<div class="empty">Could not load <code>solutions.json</code>.</div>'; return; }
 
@@ -386,45 +402,46 @@ async function init() {
 
   // samples/ is not part of the Pages artifact; the raw file is the only copy, so it stays the source here.
   if (sol.sample_output) SAMPLE = await getJSON([RAW + '/' + sol.sample_output]);
+  COURSE = (academy?.courses || []).find(c => c.agent === sol.repo_agent) || null;
   render(sol, agent, sols);
+}
+
+/* One plain sentence about who the agent is for, instead of a row of labelled chips. */
+function whoLine(sol) {
+  const people = sol.personas || [], inds = sol.industries || [];
+  const frontline = (sol.work_style || []).includes('frontline');
+  if (!people.length && !inds.length && !frontline) return '';
+  const parts = [];
+  if (people.length) parts.push(`For <b>${people.map(esc).join(', ')}</b>`);
+  if (inds.length) parts.push(`${parts.length ? 'in' : 'In'} ${inds.map(esc).join(', ')}`);
+  return `<p class="who">${parts.join(' ')}${frontline ? '<span class="badge">Frontline</span>' : ''}</p>`;
 }
 
 function render(sol, agent, sols) {
   const file = agent?._file;
-  if (file) document.getElementById('src-link').href = `${BLOB}/${encodeURI(file)}`;
   document.title = `${sol.advertised_display || sol.advertised_name} — AIBAST Agents Library`;
 
   const ops = SAMPLE?.operations || [];
   const capRows = (sol.capability_map || sol.capabilities.map(c => ({ advertised: c, operation: null })));
-  const chip = (label, arr) => arr && arr.length
-    ? `<span class="chip k">${label}</span>` + arr.map(x => `<span class="chip">${esc(x)}</span>`).join('') : '';
 
   document.getElementById('root').innerHTML = `
   <div class="crumb"><a href="index.html">Agent Library</a> › ${esc(sol.industries?.[0] || 'Solution')}</div>
 
   <div class="hero">
-    <div class="slot">AIBAST Agents Library · advertised solution #${esc(sol.slot)}</div>
     <h1>${esc(sol.advertised_display || sol.advertised_name)}</h1>
     <p class="summary">${esc(sol.executive_summary)}</p>
-    ${sol.sharepoint_list_name && sol.sharepoint_list_name !== (sol.advertised_display || sol.advertised_name)
-      ? `<div class="alias">Listed on the AIBAST SharePoint as <b>${esc(sol.sharepoint_list_name)}</b>.</div>` : ''}
-    <div class="chips">
-      ${chip('Industries', sol.industries)}
-      ${chip('Personas', sol.personas)}
-      ${chip('Who uses it', (sol.work_style || []).map(w => w === 'frontline' ? 'Frontline' : w))}
-      ${chip('Featured tools', sol.featured_tools)}
+    ${whoLine(sol)}
+    <div class="actions">
+      <a class="btn primary" href="request-info.html">${sol.demo_video ? 'Get the one-pager and demo video' : 'Get the one-pager'}</a>
+      ${COURSE ? `<a class="btn secondary" href="academy.html#course/${esc(COURSE.slug)}">Try it step by step</a>` : ''}
+      ${ops.length ? '<a class="btn secondary" href="#see-it">See what it returns</a>' : ''}
     </div>
-    <div class="assets">
-      ${sol.onepager ? '<span class="asset">✓ Published one-pager</span>' : ''}
-      ${sol.demo_video ? '<span class="asset">✓ Demo video filmed</span>' : ''}
-      ${agent ? '<span class="asset">✓ Agent implemented</span>' : ''}
-      <a class="asset" href="request-info.html">Request the one-pager and demo video →</a>
-    </div>
+    <div class="have" style="margin-top:12px">${[sol.onepager ? 'One-pager' : '', sol.demo_video ? 'demo video' : '', agent ? 'working agent' : ''].filter(Boolean).join(' · ')}${sol.onepager || sol.demo_video || agent ? ' available' : ''}</div>
   </div>
 
   <div class="section">
-    <h2>The scenario the field was shown</h2>
-    <div class="sub">Straight from the published one-pager.</div>
+    <h2>The customer story</h2>
+    <div class="sub">From the published one-pager.</div>
     <div class="story">
       <div class="col situation"><h3>Situation</h3><ul>${(sol.customer_scenario || []).map(x => `<li>${esc(x)}</li>`).join('') || '<li>—</li>'}</ul></div>
       <div class="col helped"><h3>How the agent helped</h3><ul>${(sol.capabilities || []).map(x => `<li>${esc(x)}</li>`).join('') || '<li>—</li>'}</ul></div>
@@ -432,7 +449,18 @@ function render(sol, agent, sols) {
     </div>
   </div>
 
-  <div class="section">
+  ${ops.length ? `<div class="section" id="see-it">
+    <h2>What it actually returns</h2>
+    <div class="sub">Real output from the agent, captured ${esc(SAMPLE.captured)}. Not a mockup — this is the string the Brainstem hands back.</div>
+    <div class="tabs" id="op-tabs">${ops.map((o, i) =>
+      `<button class="tab${i === 0 ? ' active' : ''}" data-op="${esc(o.operation)}">${esc(o.operation)}</button>`).join('')}</div>
+    <div class="output" id="op-output"></div>
+  </div>` : ''}
+
+  <details class="builders">
+  <summary>Details for builders <span>how to run it, the source, and where it came from</span></summary>
+  <div class="inner">
+  ${sol.capability_map ? `<div class="section">
     <h2>Promise to implementation</h2>
     <div class="sub">Every advertised capability, and the agent operation that delivers it.</div>
     <table>
@@ -443,22 +471,15 @@ function render(sol, agent, sols) {
         <td>${r.operation && ops.some(o => o.operation === r.operation) ? '<span class="ok">delivered</span>' : '<span style="color:var(--text-muted)">not mapped</span>'}</td>
       </tr>`).join('')}</tbody>
     </table>
-  </div>
-
-  ${ops.length ? `<div class="section">
-    <h2>What it actually returns</h2>
-    <div class="sub">Real output from the agent, captured ${esc(SAMPLE.captured)}. Not a mockup — this is the string the Brainstem hands back.</div>
-    <div class="tabs" id="op-tabs">${ops.map((o, i) =>
-      `<button class="tab${i === 0 ? ' active' : ''}" data-op="${esc(o.operation)}">${esc(o.operation)}</button>`).join('')}</div>
-    <div class="output" id="op-output"></div>
   </div>` : ''}
+
 
   <div class="section">
     <h2>Run it</h2>
     <div class="sub">Drop the file into a running Brainstem; agents reload from disk on the next request.</div>
     ${file ? `<div class="cmd" onclick="copyCmd(this)">curl -fsSL ${RAW}/${encodeURI(file)} -o ${AGENT_DIR}/${esc(file.split('/').pop())}</div>` : ''}
-    <p class="note" style="margin-top:12px">Then ask it, in the Brainstem chat:
-      ${ops.slice(1, 3).map(o => `<br>&nbsp;&nbsp;· <i>&ldquo;Run ${esc(o.operation)} on ${esc(agent?.display_name || '')}&rdquo;</i>`).join('')}</p>
+    ${ops.length > 1 ? `<p class="note" style="margin-top:12px">Then ask it, in the Brainstem chat:
+      ${ops.slice(1, 3).map(o => `<br>&nbsp;&nbsp;· <i>&ldquo;Run ${esc(o.operation)} on ${esc(agent?.display_name || '')}&rdquo;</i>`).join('')}</p>` : ''}
   </div>
 
   <div class="section">
@@ -470,8 +491,13 @@ function render(sol, agent, sols) {
       <dt>Source file</dt><dd>${file ? `<a href="${BLOB}/${encodeURI(file)}" target="_blank" rel="noopener">${esc(file)}</a>` : '—'}</dd>
       <dt>Version / size</dt><dd>${esc(agent?.version || '—')} · ${num(agent?._lines)} lines</dd>
       <dt>Data plane</dt><dd>Static synthetic data shaped to the real sources — no live endpoint required.</dd>
+      <dt>Industries / personas</dt><dd>${esc((sol.industries || []).join(', ') || '—')} · ${esc((sol.personas || []).join(', ') || '—')}</dd>
+      <dt>Featured tools</dt><dd>${esc((sol.featured_tools || []).join(', ') || '—')}</dd>
     </dl>
+    ${file ? `<p class="note" style="margin-top:12px"><a href="${BLOB}/${encodeURI(file)}" target="_blank" rel="noopener">View the source on GitHub</a></p>` : ''}
   </div>
+  </div>
+  </details>
 
   <footer>
     Advertised catalog in <a href="solutions.json">solutions.json</a> ·
