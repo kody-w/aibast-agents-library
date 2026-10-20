@@ -53,6 +53,12 @@ __manifest__ = {
 ORGAN_NAME = "@aibast-agents-library/offline-runner"
 DEFAULT_REGISTRY_URL = "https://microsoft.github.io/aibast-agents-library/registry.json"
 DEFAULT_RAW_BASE = "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/"
+# Each published registry's files live on its own repository's branch: production on microsoft/main, the
+# staging ring on kody-w/staging. Any other registry address serves its files beside itself.
+RAW_BASES = {
+    "https://microsoft.github.io/aibast-agents-library/": DEFAULT_RAW_BASE,
+    "https://kody-w.github.io/aibast-agents-library/": "https://raw.githubusercontent.com/kody-w/aibast-agents-library/staging/",
+}
 STATE_FILE = "runner.json"
 
 
@@ -179,8 +185,8 @@ class OfflineModeAgent(BasicAgent):
         """Download the organ's files and check each against the registry. Nothing is
         written here; any mismatch raises before a byte reaches the disk."""
         registry_url = os.getenv("OFFLINE_REGISTRY_URL") or DEFAULT_REGISTRY_URL
-        raw_base = os.getenv("OFFLINE_RAW_BASE") or (
-            DEFAULT_RAW_BASE if registry_url == DEFAULT_REGISTRY_URL else urljoin(registry_url, "."))
+        site = urljoin(registry_url, ".")
+        raw_base = os.getenv("OFFLINE_RAW_BASE") or RAW_BASES.get(site, site)
         registry = json.loads(_http_get(registry_url))
         organ = next((o for o in registry.get("organs", []) if o.get("name") == ORGAN_NAME), None)
         if not organ or not organ.get("_files"):
