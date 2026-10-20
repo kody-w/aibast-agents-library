@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "generated_at": "2026-10-08T14:45:39.255365+00:00",
   "stats": {
-    "total_agents": 88,
+    "total_agents": 89,
     "publishers": 1,
     "categories": 12,
     "total_stacks": 66,
@@ -16,8 +16,8 @@
     "curated_copy_solutions": 65,
     "solution_onepagers": 65,
     "solution_demo_videos": 61,
-    "total_lines": 48200,
-    "total_kb": 2420.5,
+    "total_lines": 48566,
+    "total_kb": 2438.5,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -65,7 +65,7 @@
     "tier_counts": {
       "verified": 85,
       "pilot": 1,
-      "community": 2
+      "community": 3
     }
   },
   "stacks": [
@@ -18247,6 +18247,37 @@
         "Synthetic data",
         "Production pattern"
       ]
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/aibast-registry",
+      "version": "1.0.0",
+      "display_name": "AIBAST Registry",
+      "description": "Finds and installs AIBAST library agents by chat: search by what they do, install one (checked against the registry before it is saved), list or remove what it installed.",
+      "author": "AIBAST",
+      "tags": [
+        "registry",
+        "install",
+        "search",
+        "agent-library"
+      ],
+      "category": "general",
+      "quality_tier": "community",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/templates/aibast_registry_agent.py",
+      "_size_kb": 18.0,
+      "_lines": 366,
+      "_sha256": "0dec9c98ec692a3b6f27aec93ef7349eb34fb570d270223424f36f8d8d989944",
+      "_install_prefix": "aibast_registry__",
+      "_install_filename": "aibast_registry__0dec9c98ec69_agent.py",
+      "_stack": null,
+      "_stack_vertical": null,
+      "_synthetic_data": false,
+      "_catalog_kind": "template",
+      "_readiness": []
     },
     {
       "schema": "rapp-agent/1.0",
