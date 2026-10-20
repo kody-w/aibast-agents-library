@@ -511,6 +511,14 @@ def test_switch_on_plan_build_send_off_leaves_the_kernel_running(rig):
         time.sleep(0.1)
     else:
         raise AssertionError("send page still open after the press")
+    page_pid = None
+    for _ in range(300):  # and its process ends too (10/20: a non-daemon timer kept it alive 15 minutes)
+        out = subprocess.run(["pgrep", "-f", str(rig["organ"] / "send_to_studio.py")], capture_output=True, text=True)
+        page_pid = out.stdout.split()
+        if not page_pid:
+            break
+        time.sleep(0.1)
+    assert not page_pid, f"send page process still running: {page_pid}"
     _kernel_ok(rig)
 
     (rig["organ"] / "studio_organ.py").write_text("# edited\n", encoding="utf-8")

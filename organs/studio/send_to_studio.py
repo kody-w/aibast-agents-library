@@ -136,7 +136,9 @@ def confirm_page(workspace, publish, port_file, ttl=900):
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Page)
     Path(port_file).write_text(json.dumps({"port": server.server_port, "pid": os.getpid()}), encoding="utf-8")
-    threading.Timer(ttl, server.shutdown).start()
+    timer = threading.Timer(ttl, server.shutdown)
+    timer.daemon = True  # the process ends when the page closes, not 15 minutes later
+    timer.start()
     try:
         server.serve_forever()
     finally:

@@ -549,11 +549,11 @@ html[data-theme="dark"] {
           </div>
           <div class="step">
             <h3>What it contacts</h3>
-            <p>GitHub sign-in, GitHub Copilot, and this library on GitHub for updates. Nothing else, unless you add an agent file that calls another site, just as a tool you add to Copilot would. Two bundled agents reach out only when you ask: Hacker News reads public stories, and Learn New writes new agent files using your GitHub Copilot CLI and can prepare (not send) a submission to the public agent registry.</p>
+            <p>GitHub sign-in, GitHub Copilot, and this library on GitHub for updates. Nothing else, unless you add an agent file that calls another site, just as a tool you add to Copilot would. Two bundled agents reach out only when you ask: Hacker News reads public stories, and Learn New writes new agent files using your GitHub Copilot CLI and can prepare (not send) a submission to the public agent registry. The AIBAST one-liner also adds the AIBAST Registry agent: when you ask, it finds and installs agents from this library and checks every file against the library first. Two add-ons switch on and off by chat: offline mode answers with a model on your own computer and makes no outside calls, and Send to Copilot Studio prepares your agents for Copilot Studio and sends nothing until you press Send on a page on your computer.</p>
           </div>
           <div class="step">
             <h3>Where it keeps things, and how to clear them</h3>
-            <p>Everything is under <code>~/.brainstem</code>. Memories are in <code>src/rapp_brainstem/.brainstem_data/</code>; your sign-in is in <code>src/rapp_brainstem/.env</code>, readable by you only. The installer also adds one line to your shell profile so the <code>brainstem</code> command is on your PATH. Nothing is sent anywhere for storage. To clear your memories, delete the <code>.brainstem_data</code> folder. To remove everything, delete <code>~/.brainstem</code> and <code>~/.local/bin/brainstem</code>.</p>
+            <p>Everything is under <code>~/.brainstem</code>. Memories are in <code>src/rapp_brainstem/.brainstem_data/</code>; your sign-in is in <code>src/rapp_brainstem/.env</code>, readable by you only. The installer also adds one line to your shell profile so the <code>brainstem</code> command is on your PATH. Nothing is sent anywhere for storage. To clear your memories, delete the <code>.brainstem_data</code> folder. Add-ons you switch on live in <code>~/.brainstem/organs</code> and are deleted when you switch them off. To remove everything, delete <code>~/.brainstem</code> and <code>~/.local/bin/brainstem</code>.</p>
           </div>
         </div>
       </details>
