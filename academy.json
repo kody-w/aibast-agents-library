@@ -2301,8 +2301,12 @@
       "industry": "Energy",
       "journey_stage": "Serve",
       "personas": [
+        "Control Room Operator",
         "Dispatch Coordinator",
+        "Emergency Duty Manager",
         "Field Operations Manager",
+        "Operations Analyst",
+        "Reliability Engineer",
         "Service Director"
       ],
       "platforms": [

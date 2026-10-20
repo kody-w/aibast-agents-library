@@ -600,9 +600,6 @@
     "Production Supervisor",
     "Operation Leader"
    ],
-   "work_style": [
-    "frontline"
-   ],
    "featured_tools": [
     "Dynamics 365 ERP",
     "Dynamics 365 CcaaS",
@@ -871,9 +868,6 @@
     "Store Associate",
     "Sales Manager",
     "Floor Specialist"
-   ],
-   "work_style": [
-    "frontline"
    ],
    "featured_tools": [
     "Dynamics 365 CRM",
@@ -1324,9 +1318,6 @@
     "Inventory Planners",
     "Store Managers",
     "Category Managers"
-   ],
-   "work_style": [
-    "frontline"
    ],
    "featured_tools": [
     "Dynamics 365 Commerce",
@@ -1791,9 +1782,6 @@
     "Quality Teams",
     "Loss Prevention Teams"
    ],
-   "work_style": [
-    "frontline"
-   ],
    "featured_tools": [
     "Dynamics 365 CRM",
     "Dynamics 365 CcaaS",
@@ -2005,9 +1993,6 @@
     "Managers",
     "HR Operations Staff"
    ],
-   "work_style": [
-    "frontline"
-   ],
    "featured_tools": [
     "Microsoft Outlook",
     "Microsoft Teams"
@@ -2192,18 +2177,8 @@
    "canonical_name": "Field Service Dispatch Agent",
    "repo_agent": "@aibast-agents-library/field-service-dispatch",
    "executive_summary": "Automates field service scheduling and coordination to reduce response times, optimize resource use, and improve customer satisfaction.",
-   "industries": [
-    "Energy and Utilities",
-    "Manufacturing"
-   ],
-   "personas": [
-    "Field Operations Manager",
-    "Dispatch Coordinator",
-    "Service Director"
-   ],
-   "work_style": [
-    "frontline"
-   ],
+   "industries": [],
+   "personas": [],
    "featured_tools": [],
    "customer_scenario": [
     "Manual dispatch coordination caused delays and confusion",
@@ -2311,9 +2286,6 @@
     "Control Room Operator",
     "Field Dispatch Supervisor",
     "Regulatory Reporting Manager"
-   ],
-   "work_style": [
-    "frontline"
    ],
    "featured_tools": [
     "Dynamics 365 Field Service",
@@ -2658,9 +2630,6 @@
     "Standards Engineer",
     "Field Engineering Lead"
    ],
-   "work_style": [
-    "frontline"
-   ],
    "featured_tools": [
     "Microsoft Copilot Studio",
     "Microsoft SharePoint",
@@ -2707,9 +2676,6 @@
     "Authorized Person",
     "Crew Lead",
     "Operations Manager"
-   ],
-   "work_style": [
-    "frontline"
    ],
    "featured_tools": [
     "Microsoft Copilot Studio",
@@ -2811,9 +2777,6 @@
     "Claims Team Lead",
     "Category Manager"
    ],
-   "work_style": [
-    "frontline"
-   ],
    "featured_tools": [
     "Microsoft Copilot Studio",
     "Microsoft Teams",
@@ -2861,9 +2824,6 @@
     "Employee",
     "Benefits Specialist",
     "HR Operations Staff"
-   ],
-   "work_style": [
-    "frontline"
    ],
    "featured_tools": [
     "Microsoft Copilot Studio",

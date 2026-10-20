@@ -105,35 +105,6 @@ jobs:
             echo "::error::installed Brainstem never answered /health/public"; tail -50 "$RUNNER_TEMP/server.log"; exit 1
           fi
 
-      - name: Smoke the AIBAST one-liner wrapper (bash)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          set -euo pipefail
-          export HOME="$RUNNER_TEMP/ring-home"
-          # Exactly as a user pastes it (piped), after the plain install above: AIBAST RAPP, the work
-          # twin, installs beside it in its own folder and must leave the personal Brainstem untouched.
-          personal_env_before="$(cat "$HOME/.brainstem/src/rapp_brainstem/.env" 2>/dev/null || true)"
-          curl -fsSL "$BASE_URL/aibast-install.sh" | bash -s -- --no-launch
-          twin="$HOME/.aibast-rapp/.brainstem"
-          agent="$twin/src/rapp_brainstem/agents/aibast_registry_agent.py"
-          test -f "$agent"
-          curl -fsSL "$BASE_URL/registry.json" | python -c '
-          import hashlib, json, sys
-          e = next(a for a in json.load(sys.stdin)["agents"] if a["name"] == "@aibast-agents-library/aibast-registry")
-          got = hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest()
-          assert got == e["_sha256"], (got, e["_sha256"]); print("registry agent sha ok", got[:12])' "$agent"
-          grep -Fxq "AIBAST_REGISTRY_URL=$BASE_URL/registry.json" "$twin/src/rapp_brainstem/.env"
-          grep -Fxq "PORT=7272" "$twin/src/rapp_brainstem/.env"
-          grep -Fxq "OFFLINE_PORT=7273" "$twin/src/rapp_brainstem/.env"
-          test "$(git -C "$twin/src" rev-parse HEAD:rapp_brainstem)" = "$(git rev-parse HEAD:rapp_brainstem)"
-          test -x "$HOME/.local/bin/aibast-rapp"
-          # The personal Brainstem is untouched: no work agent, the same .env, its own command.
-          test ! -e "$HOME/.brainstem/src/rapp_brainstem/agents/aibast_registry_agent.py"
-          test "$(cat "$HOME/.brainstem/src/rapp_brainstem/.env" 2>/dev/null || true)" = "$personal_env_before"
-          grep -q '/.brainstem"' "$HOME/.local/bin/brainstem"
-          echo "AIBAST RAPP installed beside the personal Brainstem; personal untouched"
-
       - name: Smoke the published one-liner (PowerShell)
         if: runner.os == 'Windows'
         shell: powershell
@@ -177,35 +148,6 @@ jobs:
           }
           Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
           if (-not $healthy) { Get-Content (Join-Path $env:RUNNER_TEMP 'server.err') -Tail 50; throw 'installed Brainstem never answered /health/public' }
-
-      - name: Smoke the AIBAST one-liner wrapper (PowerShell)
-        if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $env:USERPROFILE = Join-Path $env:RUNNER_TEMP 'ring-home'
-          $personalAgent = Join-Path $env:USERPROFILE '.brainstem\src\rapp_brainstem\agents\aibast_registry_agent.py'
-          $personalEnv = Join-Path $env:USERPROFILE '.brainstem\src\rapp_brainstem\.env'
-          $personalEnvBefore = if (Test-Path $personalEnv) { Get-Content $personalEnv -Raw } else { '' }
-          & ([scriptblock]::Create((Invoke-RestMethod "$env:BASE_URL/aibast-install.ps1"))) --no-launch *>&1 | Write-Host
-          $kernel = Join-Path $env:USERPROFILE '.aibast-rapp\.brainstem\src\rapp_brainstem'
-          $agent = Join-Path $kernel 'agents\aibast_registry_agent.py'
-          if (-not (Test-Path $agent)) { throw 'AIBAST Registry agent missing after the wrapper' }
-          $entry = (Invoke-RestMethod "$env:BASE_URL/registry.json").agents | Where-Object { $_.name -eq '@aibast-agents-library/aibast-registry' }
-          $got = (Get-FileHash $agent -Algorithm SHA256).Hash.ToLower()
-          if ($got -ne $entry._sha256) { throw "registry agent sha $got != $($entry._sha256)" }
-          $envText = Get-Content (Join-Path $kernel '.env')
-          foreach ($line in @("AIBAST_REGISTRY_URL=$env:BASE_URL/registry.json", 'PORT=7272', 'OFFLINE_PORT=7273')) {
-            if (-not ($envText -contains $line)) { throw "work twin .env lacks $line" }
-          }
-          if (-not (Test-Path (Join-Path $env:USERPROFILE '.local\bin\aibast-rapp.cmd'))) { throw 'aibast-rapp command missing' }
-          $twinBin = Join-Path $env:USERPROFILE '.aibast-rapp\.local\bin'
-          if (([Environment]::GetEnvironmentVariable('Path', 'User') -split ';') -contains $twinBin) { throw 'work twin launcher folder left on PATH' }
-          # The personal Brainstem is untouched.
-          if (Test-Path $personalAgent) { throw 'work agent landed in the personal Brainstem' }
-          $personalEnvAfter = if (Test-Path $personalEnv) { Get-Content $personalEnv -Raw } else { '' }
-          if ($personalEnvAfter -ne $personalEnvBefore) { throw 'personal .env changed' }
-          Write-Host "registry agent sha ok $($got.Substring(0,12)); AIBAST RAPP installed beside the personal Brainstem"
 
   incident:
     # Files (or closes) an incident issue so a broken public one-liner is

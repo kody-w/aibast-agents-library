@@ -473,7 +473,7 @@ html[data-theme="dark"] {
     <div class="comment" id="install-comment"># Your local learning platform. Installs everything.</div>
     <div class="prompt">
       <span class="dollar">$</span>
-      <span id="install-cmd">curl -fsSL https://microsoft.github.io/aibast-agents-library/aibast-install.sh | bash</span>
+      <span id="install-cmd">curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</span>
       <span class="copy-icon" id="copy-icon">⧉</span>
     </div>
   </div>
@@ -499,8 +499,8 @@ html[data-theme="dark"] {
         <div class="step">
           <h3>Run the one-liner</h3>
           <p>This is the only step. It installs Python, clones the repo, sets up a venv, authenticates, and launches.</p>
-          <div class="cmd" id="brainstem-cmd" onclick="copyCmd(event, this)">curl -fsSL https://microsoft.github.io/aibast-agents-library/aibast-install.sh | bash</div>
-          <p style="margin-top:6px;font-size:12px;color:var(--cp-text-muted);">Windows: <code id="brainstem-win-cmd" style="cursor:pointer" onclick="copyCmd(event, this)">irm https://microsoft.github.io/aibast-agents-library/aibast-install.ps1 | iex</code></p>
+          <div class="cmd" id="brainstem-cmd" onclick="copyCmd(event, this)">curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash</div>
+          <p style="margin-top:6px;font-size:12px;color:var(--cp-text-muted);">Windows: <code id="brainstem-win-cmd" style="cursor:pointer" onclick="copyCmd(event, this)">irm https://microsoft.github.io/aibast-agents-library/install.ps1 | iex</code></p>
         </div>
       </div>
       <div class="install-download" id="install-download" style="margin-top:12px">
@@ -515,45 +515,18 @@ html[data-theme="dark"] {
             <div class="cmd" onclick="copyCmd(event, this)">gh auth login</div>
           </div>
           <div class="step">
-            <h3>2. Start AIBAST RAPP</h3>
-            <p>The server starts on port 7272 with a chat UI, health endpoint, and agent auto-discovery. A personal Brainstem, if you have one, keeps port 7071 and the <code>brainstem</code> command.</p>
-            <div class="cmd" onclick="copyCmd(event, this)">aibast-rapp</div>
+            <h3>2. Start the brainstem</h3>
+            <p>The server starts on port 7071 with a chat UI, health endpoint, and agent auto-discovery.</p>
+            <div class="cmd" onclick="copyCmd(event, this)">brainstem</div>
           </div>
           <div class="step">
             <h3>3. Talk to it</h3>
-            <p>Open <code>localhost:7272</code> in your browser, or hit the API directly.</p>
-            <div class="cmd" onclick="copyCmd(event, this)">curl -s localhost:7272/health | python3 -m json.tool</div>
+            <p>Open <code>localhost:7071</code> in your browser, or hit the API directly.</p>
+            <div class="cmd" onclick="copyCmd(event, this)">curl -s localhost:7071/health | python3 -m json.tool</div>
           </div>
           <div class="step">
             <h3>4. Make it yours</h3>
             <p>Write a <code>soul.md</code> to define its personality. Drop <code>*_agent.py</code> files into the agents folder to give it skills. Point <code>SOUL_PATH</code> and <code>AGENTS_PATH</code> in <code>.env</code> to your private files.</p>
-          </div>
-          <div class="step">
-            <h3>5. Offline mode (optional)</h3>
-            <p>Run your Brainstem on a model on your own computer, with no internet. Install <a href="https://ollama.com/download">Ollama</a>, then download a small model:</p>
-            <div class="cmd" onclick="copyCmd(event, this)">ollama pull qwen3:4b</div>
-            <p style="margin-top:8px">Add the <strong>Offline Mode</strong> agent from the library to your agents folder, then tell your Brainstem <em>"turn on offline mode"</em>. It opens a second chat at <code>localhost:7273</code> that uses the same agents, soul, and memory. Say <em>"turn off offline mode"</em> to stop it and remove its files. AIBAST RAPP keeps running the whole time, and offline mode never sends your chat to the cloud.</p>
-          </div>
-        </div>
-      </details>
-      <details id="brainstem-data" style="margin-top:12px;overflow-wrap:anywhere">
-        <summary style="color:var(--cp-text-muted);font-size:13px;cursor:pointer;user-select:none">Your data — same shape as GitHub Copilot</summary>
-        <div class="steps">
-          <div class="step">
-            <h3>It works like GitHub Copilot CLI</h3>
-            <p>You sign in with your own GitHub account, and your GitHub Copilot license is the only AI it calls. Like Copilot CLI and Copilot in VS Code, it runs on your machine and keeps its history in your user folder. The one difference is the chat page: a local server that listens on <code>127.0.0.1</code> only, so nothing else on your network can reach it.</p>
-          </div>
-          <div class="step">
-            <h3>What to put in</h3>
-            <p>The same rules as GitHub Copilot apply. Use it for business processes and synthetic or sanitized examples. Do not put in customer files, customer personal data, credentials or tenant access.</p>
-          </div>
-          <div class="step">
-            <h3>What it contacts</h3>
-            <p>GitHub sign-in, GitHub Copilot, and this library on GitHub for updates. Nothing else, unless you add an agent file that calls another site, just as a tool you add to Copilot would. Two bundled agents reach out only when you ask: Hacker News reads public stories, and Learn New writes new agent files using your GitHub Copilot CLI and can prepare (not send) a submission to the public agent registry. The AIBAST one-liner also adds the AIBAST Registry agent: when you ask, it finds and installs agents from this library and checks every file against the library first. Two add-ons switch on and off by chat: offline mode answers with a model on your own computer and makes no outside calls, and Send to Copilot Studio prepares your agents for Copilot Studio and sends nothing until you press Send on a page on your computer.</p>
-          </div>
-          <div class="step">
-            <h3>Where it keeps things, and how to clear them</h3>
-            <p>Everything is under <code>~/.aibast-rapp</code>, its own folder, so AIBAST RAPP runs beside a personal Brainstem (<code>~/.brainstem</code>) without touching it, or on its own. Memories are in <code>.brainstem/src/rapp_brainstem/.brainstem_data/</code>; your sign-in is in <code>.brainstem/src/rapp_brainstem/.env</code>, readable by you only. The installer also adds one line to your shell profile so the <code>aibast-rapp</code> command is on your PATH. Nothing is sent anywhere for storage. To clear your memories, delete the <code>.brainstem_data</code> folder. Add-ons you switch on live in <code>~/.aibast-rapp/.brainstem/organs</code> and are deleted when you switch them off. To remove everything, delete <code>~/.aibast-rapp</code> and <code>~/.local/bin/aibast-rapp</code>.</p>
           </div>
         </div>
       </details>
@@ -650,9 +623,9 @@ html[data-theme="dark"] {
 
 <div class="status-bar" id="status-bar">
   <span class="dot checking" id="dot"></span>
-  <span class="status-label" id="status-label">Checking AIBAST RAPP...</span>
+  <span class="status-label" id="status-label">Checking brainstem...</span>
   <br>
-  <button class="open-btn" id="open-btn" disabled onclick="window.open('http://localhost:7272','_blank')">Open Chat UI</button>
+  <button class="open-btn" id="open-btn" disabled onclick="window.open('http://localhost:7071','_blank')">Open Chat UI</button>
 </div>
 
 <div class="links">
@@ -690,10 +663,10 @@ html[data-theme="dark"] {
       staging,
       owner,
       ref,
-      bash: `curl -fsSL ${base}aibast-install.sh | bash`,
-      windows: `irm ${base}aibast-install.ps1 | iex`,
-      macManual: `git clone --branch ${ref} ${repoUrl} ~/.aibast-rapp/.brainstem/src && cd ~/.aibast-rapp/.brainstem/src/rapp_brainstem && pip3 install -r requirements.txt && PORT=7272 ./start.sh`,
-      windowsManual: `git clone --branch ${ref} ${repoUrl} %USERPROFILE%\\.aibast-rapp\\.brainstem\\src && cd %USERPROFILE%\\.aibast-rapp\\.brainstem\\src\\rapp_brainstem && pip install -r requirements.txt && set PORT=7272 && python brainstem.py`
+      bash: `curl -fsSL ${base}install.sh | bash`,
+      windows: `irm ${base}install.ps1 | iex`,
+      macManual: `git clone --branch ${ref} ${repoUrl} ~/.brainstem/src && cd ~/.brainstem/src/rapp_brainstem && pip3 install -r requirements.txt && ./start.sh`,
+      windowsManual: `git clone --branch ${ref} ${repoUrl} %USERPROFILE%\\.brainstem\\src && cd %USERPROFILE%\\.brainstem\\src\\rapp_brainstem && pip install -r requirements.txt && python brainstem.py`
     };
   }
   const installCommands = buildInstallCommands(location.hostname, publishedBase);
@@ -823,7 +796,7 @@ html[data-theme="dark"] {
   }
 
   function toggleTier(e, el) {
-    if (e.target.closest('.cmd') || e.target.closest('a') || e.target.closest('details')) return;
+    if (e.target.closest('.cmd') || e.target.closest('a')) return;
     el.classList.toggle('open');
     if (el.id && el.classList.contains('open')) {
       history.replaceState(null, '', '#' + el.id);
@@ -837,20 +810,20 @@ html[data-theme="dark"] {
     const label = document.getElementById('status-label');
     const btn = document.getElementById('open-btn');
     try {
-      const r = await fetch('http://localhost:7272/health/public', { signal: AbortSignal.timeout(3000) });
+      const r = await fetch('http://localhost:7071/health/public', { signal: AbortSignal.timeout(3000) });
       const d = await r.json();
       if (d.status === 'ok') {
         dot.className = 'dot online';
-        label.textContent = `AIBAST RAPP running · v${d.version}`;
+        label.textContent = `Brainstem running · v${d.version}`;
         btn.disabled = false;
       } else {
         dot.className = 'dot offline';
-        label.textContent = 'AIBAST RAPP running but not signed in — visit localhost:7272';
+        label.textContent = 'Brainstem running but not authenticated — visit localhost:7071';
         btn.disabled = false;
       }
     } catch {
       dot.className = 'dot offline';
-      label.textContent = 'AIBAST RAPP not detected — install it and run aibast-rapp to get started';
+      label.textContent = 'Brainstem not detected — install and run brainstem to get started';
       btn.disabled = true;
     }
   }

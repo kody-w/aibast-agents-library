@@ -277,7 +277,7 @@ else
     fail "docs/installer.html missing one-liner"
 fi
 
-if grep -q "localhost:7272/health/public" "$REPO_ROOT/docs/installer.html"; then  # AIBAST RAPP, the work twin, is on 7272
+if grep -q "localhost:7071" "$REPO_ROOT/docs/installer.html"; then
     pass "docs/installer.html has health check"
 else
     fail "docs/installer.html missing health check"

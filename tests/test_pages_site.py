@@ -284,10 +284,6 @@ class PagesBuilderFixtureTests(unittest.TestCase):
         with fixture_root() as root:
             commands = (
                 ["git", "init", "--quiet"],
-                # No background gc or maintenance: a detached one still writing .git made the
-                # fixture's cleanup fail ("Directory not empty: 'repo'", deploy of e51d7430).
-                ["git", "config", "gc.auto", "0"],
-                ["git", "config", "maintenance.auto", "false"],
                 ["git", "config", "user.name", "Pages Test"],
                 ["git", "config", "user.email", "pages-test@example.invalid"],
                 ["git", "add", "."],
@@ -584,34 +580,6 @@ class RingInstallerRenderTests(unittest.TestCase):
             self.assertEqual((output / "docs/install.sh").read_bytes(), (output / "install.sh").read_bytes())
             # Source files are never touched.
             self.assertEqual((root / "install.sh").read_text(encoding="utf-8"), INSTALLER_SH)
-
-    def test_aibast_wrappers_render_to_the_ring_and_stay_byte_identical_in_production(self):
-        names = ("aibast-install.sh", "aibast-install.ps1")
-        for owner, repo, branch in (("staging-owner", "staging-repo", "staging"),
-                                    (pages.CANONICAL_OWNER, pages.CANONICAL_REPO, pages.CANONICAL_BRANCH)):
-            with fixture_root() as root:
-                write_installers(root)
-                for name in names:
-                    write_text(root, name, (ROOT / name).read_text(encoding="utf-8"))
-                output = root / "_site"
-                pages.build_site(root, output, owner, repo, REF, ring_branch=branch)
-                for name in names:
-                    served = (output / name).read_text(encoding="utf-8")
-                    if owner == pages.CANONICAL_OWNER:
-                        self.assertEqual(served, (root / name).read_text(encoding="utf-8"))
-                        continue
-                    self.assertIn("https://staging-owner.github.io/staging-repo/", served)
-                    self.assertIn("https://raw.githubusercontent.com/staging-owner/staging-repo/staging/", served)
-                    self.assertNotIn("microsoft/aibast-agents-library", served)
-                    self.assertNotIn("microsoft.github.io", served)
-
-    def test_aibast_wrapper_that_drops_the_site_fails_the_build(self):
-        with fixture_root() as root:
-            write_installers(root)
-            text = (ROOT / "aibast-install.sh").read_text(encoding="utf-8")
-            write_text(root, "aibast-install.sh", text.replace("https://microsoft.github.io/aibast-agents-library/", "x"))
-            with self.assertRaisesRegex(pages.BuildError, "aibast-install.sh no longer contains"):
-                pages.build_site(root, root / "_site", "staging-owner", "staging-repo", REF, ring_branch="staging")
 
     def test_installer_refactor_that_drops_the_default_fails_the_build(self):
         with fixture_root() as root:

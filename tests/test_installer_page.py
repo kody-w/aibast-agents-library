@@ -57,10 +57,10 @@ def test_installer_page_installer_uses_current_pages_host():
     )
     assert production["bash"] == (
         "curl -fsSL https://microsoft.github.io/aibast-agents-library/"
-        "aibast-install.sh | bash"
+        "install.sh | bash"
     )
     assert production["windows"] == (
-        "irm https://microsoft.github.io/aibast-agents-library/aibast-install.ps1 | iex"
+        "irm https://microsoft.github.io/aibast-agents-library/install.ps1 | iex"
     )
 
 
@@ -106,10 +106,10 @@ def test_staging_ring_uses_the_same_short_one_liner_as_production():
         "https://example-fork.github.io/aibast-agents-library/",
     )
     assert staging["bash"] == (
-        "curl -fsSL https://example-fork.github.io/aibast-agents-library/aibast-install.sh | bash"
+        "curl -fsSL https://example-fork.github.io/aibast-agents-library/install.sh | bash"
     )
     assert staging["windows"] == (
-        "irm https://example-fork.github.io/aibast-agents-library/aibast-install.ps1 | iex"
+        "irm https://example-fork.github.io/aibast-agents-library/install.ps1 | iex"
     )
     for command in (staging["macManual"], staging["windowsManual"]):
         assert "--branch staging https://github.com/example-fork/aibast-agents-library.git" in command
@@ -165,7 +165,7 @@ console.log(JSON.stringify(buildInstallerDownloads(commands)));
     )
     assert result.returncode == 0, result.stderr
     downloads = json.loads(result.stdout)
-    assert "https://example-fork.github.io/aibast-agents-library/aibast-install.sh | bash" in downloads["macOS/Linux"]["href"]
-    assert "irm https://example-fork.github.io/aibast-agents-library/aibast-install.ps1 | iex" in downloads["Windows"]["href"]
+    assert "https://example-fork.github.io/aibast-agents-library/install.sh | bash" in downloads["macOS/Linux"]["href"]
+    assert "irm https://example-fork.github.io/aibast-agents-library/install.ps1 | iex" in downloads["Windows"]["href"]
     for platform in ("macOS/Linux", "Windows"):
         assert "BRAINSTEM_" not in downloads[platform]["href"]

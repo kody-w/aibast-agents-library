@@ -653,7 +653,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .filters {
   display: grid;
-  grid-template-columns: repeat(6, minmax(130px, 1fr));
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
   gap: 8px;
 }
 .field {
@@ -897,14 +897,12 @@ body.first-party-view .industry-selector,
 body.first-party-view .industry-blueprint,
 body.first-party-view .popular,
 body.first-party-view #readiness,
-body.first-party-view #work,
 body.first-party-view #sort,
 body.first-party-view .upvote-explainer,
 body.partners-view .industry-selector,
 body.partners-view .industry-blueprint,
 body.partners-view .popular,
 body.partners-view #readiness,
-body.partners-view #work,
 body.partners-view #sort,
 body.partners-view .upvote-explainer {
   display: none;
@@ -1604,7 +1602,6 @@ footer {
       </div>
       <div class="filters">
         <select class="field" id="industry" aria-label="Industry"><option value="">All industries</option></select>
-        <select class="field" id="work" aria-label="Who uses it"><option value="">All workers</option></select>
         <select class="field" id="persona" aria-label="Persona"><option value="">All personas</option></select>
         <select class="field" id="system" aria-label="Microsoft product"><option value="">All Microsoft products</option></select>
         <select class="field" id="readiness" aria-label="Available proof">
@@ -1689,7 +1686,6 @@ const state = {
   view: "solutions",
   query: "",
   industry: "",
-  work: "",
   persona: "",
   system: "",
   readiness: "",
@@ -1713,11 +1709,6 @@ const urlSlug = value => compact(value).toLowerCase()
 const uniq = values => [...new Set(values.filter(Boolean))];
 const first = (values, fallback = "") => values && values.length ? values[0] : fallback;
 
-// Who uses a solution and where they work. Values come from each solution's
-// work_style list in solutions.json; add a label here when a new one appears.
-const WORK_STYLE_NAMES = {
-  frontline: "Frontline workers"
-};
 const CATEGORY_NAMES = {
   b2b_sales: "B2B Sales",
   b2c_sales: "B2C Sales",
@@ -1952,7 +1943,6 @@ function restoreState() {
   state.view = ["solutions", "first-party", "partners"].includes(params.get("view"))
     ? params.get("view") : "solutions";
   state.industry = industryValueFromParam(params.get("industry"));
-  state.work = workValueFromParam(params.get("work"));
   $("search").value = state.query;
 }
 
@@ -2010,25 +2000,6 @@ function industryParamValue(value, options = industryFilterOptions()) {
   return match ? urlSlug(match.label) : "";
 }
 
-function workFilterOptions(solutions = solutionAgents()) {
-  if (state.view !== "solutions") return [];
-  return uniq(solutions.flatMap(agent => solutionOf(agent).work_style || []))
-    .map(value => ({ value, label: WORK_STYLE_NAMES[value] || pretty(value) }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-}
-
-// ?work=frontline (or ?work=frontline-workers) preselects the filter so the
-// list can be shared as a link. The match is made against the values the
-// catalog actually carries, so a solution with no work_style is never claimed.
-function workValueFromParam(value) {
-  const requested = urlSlug(value);
-  if (!requested) return "";
-  const match = Object.entries(WORK_STYLE_NAMES).find(([key, label]) => (
-    urlSlug(key) === requested || urlSlug(label) === requested
-  ));
-  return match ? match[0] : requested;
-}
-
 function industryDeepLink(value) {
   const industry = industryParamValue(value);
   return industry ? `?industry=${enc(industry)}#library` : "#library";
@@ -2059,7 +2030,6 @@ function buildFilters() {
     industries,
     firstPartyView || partnersView ? "All solution areas" : "All industries"
   );
-  applyFilterOptions("work", workFilterOptions(solutions), "All workers");
   applyFilterOptions("persona", personas, "All personas");
   applyFilterOptions("system", systems, partnersView ? "All partners" : "All Microsoft products");
 }
@@ -2126,7 +2096,7 @@ function bindInputs() {
     renderSuggestions();
     render();
   });
-  ["industry", "work", "persona", "system", "readiness", "sort"].forEach(id => {
+  ["industry", "persona", "system", "readiness", "sort"].forEach(id => {
     $(id).addEventListener("change", event => {
       state[id] = event.target.value;
       render();
@@ -2371,7 +2341,6 @@ function filteredAgents() {
   }
   rows = rows
     .filter(row => !state.industry || row.agent.category === state.industry)
-    .filter(row => !state.work || (solutionOf(row.agent).work_style || []).includes(state.work))
     .filter(row => !state.persona || (solutionOf(row.agent).personas || []).includes(state.persona))
     .filter(row => !state.system || microsoftTools(row.agent).includes(state.system))
     .filter(row => matchesReadiness(row.agent));
@@ -2833,7 +2802,6 @@ function learnNewBrainstemUrl(query) {
 function renderActiveFilters() {
   const filters = [
     ["industry", state.industry, CATEGORY_NAMES[state.industry] || state.industry],
-    ["work", state.work, WORK_STYLE_NAMES[state.work] || pretty(state.work)],
     ["persona", state.persona, state.persona],
     ["system", state.system, state.system],
     ["readiness", state.readiness, $("readiness").selectedOptions[0].text]
@@ -3424,20 +3392,18 @@ function syncURL() {
   if (state.view !== "solutions") params.set("view", state.view);
   const industry = industryParamValue(state.industry);
   if (industry) params.set("industry", industry);
-  if (state.work) params.set("work", urlSlug(state.work));
   history.replaceState(null, "", `${location.pathname}${params.toString() ? `?${params}` : ""}${location.hash}`);
 }
 
 function clearAll() {
   state.query = "";
   state.industry = "";
-  state.work = "";
   state.persona = "";
   state.system = "";
   state.readiness = "";
   state.sort = "relevance";
   $("search").value = "";
-  ["industry", "work", "persona", "system", "readiness", "sort"].forEach(id => {
+  ["industry", "persona", "system", "readiness", "sort"].forEach(id => {
     $(id).value = state[id];
   });
   $("suggestions").classList.remove("visible");
@@ -3471,7 +3437,6 @@ document.addEventListener("click", event => {
     state.view = target.dataset.view;
     if (state.view === "first-party" || state.view === "partners") {
       state.readiness = "";
-      state.work = "";
       state.sort = "relevance";
     }
     buildFilters();
