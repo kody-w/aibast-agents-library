@@ -1192,8 +1192,25 @@ function Launch-Brainstem {
     & $py brainstem.py
 }
 
+function Add-DesktopIcon {
+    # First install only, on a person's own computer: put a double-click icon on
+    # the desktop without asking, so nothing pauses. BRAINSTEM_NO_ICON=1 skips it.
+    try {
+        if ($env:BRAINSTEM_NO_ICON) { return }
+        if (-not [Environment]::UserInteractive -or [Console]::IsOutputRedirected) { return }
+        $desktop = [Environment]::GetFolderPath('Desktop')
+        if (-not $desktop -or -not (Test-Path $desktop)) { return }
+        $icon = Join-Path $desktop 'Brainstem.cmd'
+        if (Test-Path $icon) { return }
+        $body = "@echo off`r`npowershell -NoProfile -ExecutionPolicy Bypass -Command `"try { Invoke-WebRequest -UseBasicParsing http://localhost:7071/health -TimeoutSec 2 | Out-Null; Start-Process 'http://localhost:7071' } catch { irm https://microsoft.github.io/aibast-agents-library/install.ps1 | iex }`"`r`n"
+        [IO.File]::WriteAllText($icon, $body, [Text.Encoding]::ASCII)
+        Write-Host "  [OK] Brainstem icon on your desktop: double-click it next time" -ForegroundColor Green
+    } catch { }
+}
+
 function Main {
     Print-Banner
+    $firstInstall = -not (Test-Path "$BRAINSTEM_HOME\src\.git")
 
     if ($PIN_VERSION) {
         Write-Host "  Pinning to version: $PIN_VERSION" -ForegroundColor Cyan
@@ -1243,6 +1260,8 @@ function Main {
     Write-Host "  [OK] RAPP Brainstem v$installedVersion installed!" -ForegroundColor Green
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host ""
+
+    if ($firstInstall) { Add-DesktopIcon }
 
     if ($NO_LAUNCH) {
         Write-Host "  [OK] Brainstem runtime is ready (launch skipped)" -ForegroundColor Green

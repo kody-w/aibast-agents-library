@@ -1122,6 +1122,29 @@ with open(sys.argv[2], 'w') as f: json.dump(out, f)
     fi
 }
 
+add_desktop_icon() {
+    # First install only, on a person's own computer: put a double-click icon on
+    # the desktop without asking, so nothing pauses. BRAINSTEM_NO_ICON=1 skips it.
+    [[ -n "${BRAINSTEM_NO_ICON:-}" ]] && return 0
+    { [ -r /dev/tty ] && : < /dev/tty; } 2>/dev/null || return 0
+    local desktop="$HOME/Desktop" icon script
+    if [[ "$(uname)" == "Darwin" ]]; then
+        icon="$desktop/Brainstem.command"
+    else
+        desktop=$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")
+        icon="$desktop/brainstem.desktop"
+    fi
+    [ -d "$desktop" ] && [ ! -e "$icon" ] || return 0
+    script='if curl -fsS -m 2 http://localhost:7071/health >/dev/null 2>&1; then OPEN http://localhost:7071; else curl -fsSL https://microsoft.github.io/aibast-agents-library/install.sh | bash; fi'
+    if [[ "$(uname)" == "Darwin" ]]; then
+        printf '#!/bin/bash\n%s\n' "${script//OPEN/open}" > "$icon"
+    else
+        printf "[Desktop Entry]\nType=Application\nName=Brainstem\nTerminal=true\nExec=bash -c '%s'\n" "${script//OPEN/xdg-open}" > "$icon"
+    fi
+    chmod +x "$icon" 2>/dev/null || true
+    echo -e "  ${GREEN}✓${NC} Brainstem icon on your desktop: double-click it next time"
+}
+
 main() {
     # Parse arguments (e.g. --version v0.6.0)
     while [ $# -gt 0 ]; do
@@ -1141,6 +1164,9 @@ main() {
     done
 
     print_banner
+
+    local first_install=false
+    [ -d "$BRAINSTEM_HOME/src/.git" ] || first_install=true
 
     if [ -n "$PIN_VERSION" ]; then
         echo -e "  ${CYAN}Pinning to version: ${PIN_VERSION}${NC}"
@@ -1190,6 +1216,8 @@ main() {
     echo -e "  ${GREEN}✓ RAPP Brainstem v${installed_version} installed!${NC}"
     echo "═══════════════════════════════════════════════════"
     echo ""
+
+    [[ "$first_install" == true ]] && add_desktop_icon
 
     if [[ "$NO_LAUNCH" == true ]]; then
         echo -e "  ${GREEN}✓${NC} Brainstem runtime is ready (launch skipped)"
