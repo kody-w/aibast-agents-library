@@ -184,7 +184,7 @@ class OfflineModeAgent(BasicAgent):
     def _fetch_organ(self):
         """Download the organ's files and check each against the registry. Nothing is
         written here; any mismatch raises before a byte reaches the disk."""
-        registry_url = os.getenv("OFFLINE_REGISTRY_URL") or DEFAULT_REGISTRY_URL
+        registry_url = os.getenv("OFFLINE_REGISTRY_URL") or os.getenv("AIBAST_REGISTRY_URL") or DEFAULT_REGISTRY_URL
         site = urljoin(registry_url, ".")
         raw_base = os.getenv("OFFLINE_RAW_BASE") or RAW_BASES.get(site, site)
         registry = json.loads(_http_get(registry_url))

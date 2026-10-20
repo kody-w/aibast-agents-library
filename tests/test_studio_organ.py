@@ -491,7 +491,8 @@ def test_switch_on_plan_build_send_off_leaves_the_kernel_running(rig):
     _kernel_ok(rig)
 
     # 10/20 browser pass: asking for the plan is the yes; it must not bounce the user to "turn it on"
-    plan = _switch(rig, action="plan")
+    one_setting = {"STUDIO_REGISTRY_URL": "", "AIBAST_REGISTRY_URL": rig["env"]["STUDIO_REGISTRY_URL"]}
+    plan = _switch(rig, action="plan", env=one_setting)  # the one AIBAST setting points every organ
     assert "HackerNews (hacker_news_agent.py): skill hacker-news" in plan and rig["organ"].exists()
     assert _switch(rig, action="off").startswith("Send to Copilot Studio is off.")
     _kernel_ok(rig)
