@@ -1,0 +1,45 @@
+{
+  "schema": "rapp-studio-sandbox-profile/1.0",
+  "version": "2026.10.20",
+  "as_of": "2026-10-20",
+  "describes": "What the Copilot Studio skill sandbox can do today. The translation reads only this file: change a fact here and the plan changes, with no code change.",
+  "python": {
+    "version": "3.12",
+    "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/skills-overview"
+  },
+  "libraries": {
+    "standard_library": true,
+    "known": ["requests"],
+    "approximate_count": 99,
+    "complete": false,
+    "note": "About 99 libraries, requests among them. The blog lists a sample, not a spec, so a library missing from 'known' is unconfirmed, not absent.",
+    "source": "https://microsoft.github.io/mcscatblog/posts/copilot-studio-agent-sandbox/"
+  },
+  "network": {
+    "outbound": false,
+    "note": "No outbound network from the sandbox.",
+    "source": "https://microsoft.github.io/mcscatblog/posts/copilot-studio-agent-sandbox/"
+  },
+  "persistence": {
+    "across_conversations": false,
+    "note": "Nothing persists after the conversation.",
+    "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/skills-overview"
+  },
+  "created_files": {
+    "allowed": true,
+    "max_bytes": 10485760,
+    "kept_days": 28,
+    "note": "Files the skill creates are kept as created files (10 MB each, 28 days); the next conversation's code does not read them back.",
+    "source": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/created-files-overview"
+  },
+  "subprocess": {
+    "allowed": false,
+    "note": "Not documented; treated as unavailable until a source says otherwise.",
+    "source": null
+  },
+  "environment": {
+    "variables": false,
+    "note": "The sandbox carries none of the Brainstem's .env; keys and tokens belong in a connection, never in a skill.",
+    "source": null
+  }
+}
