@@ -83,7 +83,8 @@ def test_registry_lists_the_organ_and_switch_with_current_hashes():
 def _kernel_python():
     probe = "import flask, flask_cors, requests, dotenv"
     for py in (sys.executable, os.environ.get("RAPP_KERNEL_PYTHON")):
-        if py and subprocess.run([py, "-c", probe], capture_output=True).returncode == 0:
+        if py and subprocess.run([py, "-c", probe], capture_output=True,  # the tests' own sandboxed HOME
+                                 env={**os.environ, "PYTHONNOUSERSITE": "1"}).returncode == 0:
             return py
     return None
 

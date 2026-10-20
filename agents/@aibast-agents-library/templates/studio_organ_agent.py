@@ -134,6 +134,10 @@ class SendToStudioAgent(BasicAgent):
             if action == "off":
                 return self._off()
             if action in ("plan", "build", "send"):
+                if action in ("plan", "build") and not self._state():
+                    turned_on = self._on()  # local and checksum-checked; asking for a plan is the yes
+                    if not self._state():
+                        return turned_on
                 organ = self._load()
                 if isinstance(organ, str):
                     return organ

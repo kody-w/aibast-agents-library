@@ -82,6 +82,18 @@ def _one_line(text, limit=140):
     return text if len(text) <= limit else text[: limit - 3].rstrip() + "..."
 
 
+def _key(text):
+    """One spelling for every way a person or model names an agent: 'GridOutageResponseAgent',
+    'Grid Outage Response', '@x/grid-outage-response' and its file name all give 'gridoutageresponse'."""
+    k = re.sub(r"[^a-z0-9]", "", str(text or "").split("/")[-1].lower())
+    k = re.sub(r"(agent)?(py)?$", "", re.sub(r"[0-9a-f]{12}agentpy$", "", k))
+    return k
+
+
+def _row_keys(row):
+    return {_key(row.get("name")), _key(row.get("display_name")), _key(row.get("file"))} - {""}
+
+
 class AIBASTRegistryAgent(BasicAgent):
     def __init__(self):
         self.name = "AIBASTRegistry"
@@ -275,7 +287,8 @@ class AIBASTRegistryAgent(BasicAgent):
             if stale is not None and stale.name == old.get("file") and stale.exists():
                 stale.unlink()
         ledger = [r for r in ledger if r.get("file") != target.name and r.get("name") != entry.get("name")]
-        ledger.append({"name": entry.get("name"), "file": target.name, "sha256": digest,
+        ledger.append({"name": entry.get("name"), "display_name": entry.get("display_name"),
+                       "file": target.name, "sha256": digest,
                        "version": entry.get("version"), "registry": url,
                        "installed_at": time.strftime("%Y-%m-%dT%H:%M:%S")})
         self._save_ledger(ledger)
@@ -287,7 +300,7 @@ class AIBASTRegistryAgent(BasicAgent):
     # ── list / remove ────────────────────────────────────────────────────────
 
     def _list(self):
-        rows = self._ledger()
+        rows = [r for r in self._ledger() if not r.get("removed_at")]
         if not rows:
             return "I have not installed any AIBAST agents here yet."
         lines = ["AIBAST agents I installed:"]
@@ -301,17 +314,23 @@ class AIBASTRegistryAgent(BasicAgent):
         if not ref:
             return "Which agent should I remove? Say 'list' to see what I installed."
         rows = self._ledger()
-        low = ref.strip().lower()
-        row = next((r for r in rows if low in {str(r.get("name", "")).lower(), str(r.get("file", "")).lower(),
-                                                str(r.get("name", "")).split("/")[-1].lower()}), None)
+        want = _key(ref)
+        hits = [r for r in rows if want and want in _row_keys(r)]
+        row = next((r for r in hits if not r.get("removed_at")), None)
         if not row:
+            gone = next((r for r in reversed(hits) if r.get("removed_at")), None)
+            if gone:  # said plainly so a repeat request never reads as "it was never removed"
+                return (f"{gone.get('display_name') or gone.get('name')} is already removed "
+                        f"(removed {gone.get('removed_at')}). Nothing else to do.")
             return (f"I did not install '{ref}', so I will not remove it. "
                     "I only remove agents I installed; say 'list' to see them.")
         target = self._safe_target(row.get("file"))
         if target is not None and target.name == row.get("file") and target.exists():
             target.unlink()
-        self._save_ledger([r for r in rows if r is not row])
-        return f"Removed {row.get('name')} ({row.get('file')}). It is gone from your next message."
+        row["removed_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        self._save_ledger(rows)
+        label = row.get("display_name") or row.get("name")
+        return f"Removed {label} ({row.get('file')}). It is gone from your next message."
 
     # ── submit ───────────────────────────────────────────────────────────────
 

@@ -228,7 +228,8 @@ def test_driver_dry_run_reads_contracts_first_and_stops_before_publish(workspace
 def _kernel_python():
     probe = "import flask, flask_cors, requests, dotenv"
     for py in (sys.executable, os.environ.get("RAPP_KERNEL_PYTHON")):
-        if py and subprocess.run([py, "-c", probe], capture_output=True).returncode == 0:
+        if py and subprocess.run([py, "-c", probe], capture_output=True,  # the tests' own sandboxed HOME
+                                 env={**os.environ, "PYTHONNOUSERSITE": "1"}).returncode == 0:
             return py
     return None
 
@@ -455,9 +456,12 @@ def _kernel_ok(rig):
 @needs_kernel
 def test_switch_on_plan_build_send_off_leaves_the_kernel_running(rig):
     assert _switch(rig, action="status") == "Send to Copilot Studio is off."
-    assert _switch(rig, action="plan") == "Send to Copilot Studio is off. Ask to turn it on first."
+    assert _switch(rig, action="send") == "Send to Copilot Studio is off. Ask to turn it on first."
 
     tampered = rig["env"]["STUDIO_REGISTRY_URL"].replace("registry.json", "tampered.json")
+    reply = _switch(rig, action="plan", env={"STUDIO_REGISTRY_URL": tampered})  # plan turns it on: same checks
+    assert reply.startswith("Refused:") and "Nothing was installed" in reply
+    assert not rig["organ"].exists()
     reply = _switch(rig, action="on", env={"STUDIO_REGISTRY_URL": tampered})
     assert reply.startswith("Refused:") and "Nothing was installed" in reply
     assert not rig["organ"].exists() and not rig["organ"].with_name("studio.staging").exists()
@@ -484,4 +488,10 @@ def test_switch_on_plan_build_send_off_leaves_the_kernel_running(rig):
     assert _switch(rig, action="off").startswith("Send to Copilot Studio is off.")
     assert not rig["organ"].exists()
     assert _switch(rig, action="status") == "Send to Copilot Studio is off."
+    _kernel_ok(rig)
+
+    # 10/20 browser pass: asking for the plan is the yes; it must not bounce the user to "turn it on"
+    plan = _switch(rig, action="plan")
+    assert "HackerNews (hacker_news_agent.py): skill hacker-news" in plan and rig["organ"].exists()
+    assert _switch(rig, action="off").startswith("Send to Copilot Studio is off.")
     _kernel_ok(rig)

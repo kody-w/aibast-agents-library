@@ -284,10 +284,27 @@ def test_remove_deletes_only_what_it_installed(folder):
     assert agent.perform(action="list").startswith("I have not installed")
 
 
+def test_remove_answers_every_spelling_and_a_repeat_says_already_removed(folder):
+    # 10/20 browser pass: the model removed by class name ("RegistryProbeAgent"), was refused, retried,
+    # then a repeat ("Registry Probe") said "I did not install" and the model told the user the
+    # removal had been false. Every spelling must hit, and a repeat must say "already removed".
+    agent = _load(folder, AGENT.read_text(encoding="utf-8"))
+    for ref in ("RegistryProbeAgent", "Registry Probe", "registry-probe", "RegistryProbe"):
+        agent.perform(action="install", name="@test/registry-probe")
+        file = json.loads((folder / "aibast_registry_installed.json").read_text())[-1]["file"]
+        out = agent.perform(action="remove", name=ref)
+        assert out.startswith("Removed Registry Probe"), (ref, out)
+        assert not (folder / file).exists()
+        again = agent.perform(action="remove", name=ref)
+        assert again.startswith("Registry Probe is already removed"), (ref, again)
+    assert agent.perform(action="list").startswith("I have not installed")
+    assert agent.perform(action="remove", name="HackerNews").startswith("I did not install")
+
+
 def test_negative_control_ledger_check_removed_deletes_a_bundled_agent(folder):
-    agent = _load(folder, _without(("        if not row:\n            return (f\"I did not install",
-                                    "        if not row:\n            row = {\"name\": ref, \"file\": ref}\n"
-                                    "        if False:\n            return (f\"I did not install")))
+    agent = _load(folder, _without(("        row = next((r for r in hits if not r.get(\"removed_at\")), None)\n",
+                                    "        row = next((r for r in hits if not r.get(\"removed_at\")), None)"
+                                    " or {\"name\": ref, \"file\": ref}\n")))
     agent.perform(action="remove", name="hacker_news_agent.py")
     assert not (folder / "hacker_news_agent.py").exists()
 
@@ -305,7 +322,8 @@ def test_submit_prepares_the_library_path_and_sends_nothing(folder):
 def _kernel_python():
     probe = "import flask, flask_cors, requests, dotenv"
     for py in (sys.executable, os.environ.get("RAPP_KERNEL_PYTHON")):
-        if py and subprocess.run([py, "-c", probe], capture_output=True).returncode == 0:
+        if py and subprocess.run([py, "-c", probe], capture_output=True,  # the tests' own sandboxed HOME
+                                 env={**os.environ, "PYTHONNOUSERSITE": "1"}).returncode == 0:
             return py
     return None
 
