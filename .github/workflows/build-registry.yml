@@ -5,6 +5,7 @@ on:
     branches: [main, easy-mode-copilot-chat-pilot]
     paths:
       - 'agents/**/*.py'
+      - 'organs/**'
       - 'build_registry.py'
       - 'academy/catalog.json'
       - 'scripts/build_academy.py'
@@ -19,6 +20,7 @@ on:
   pull_request:
     paths:
       - 'agents/**/*.py'
+      - 'organs/**'
       - 'build_registry.py'
       - 'academy/catalog.json'
       - 'scripts/build_academy.py'
