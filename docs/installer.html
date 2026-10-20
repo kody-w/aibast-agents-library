@@ -530,6 +530,27 @@ html[data-theme="dark"] {
           </div>
         </div>
       </details>
+      <details id="brainstem-data" style="margin-top:12px;overflow-wrap:anywhere">
+        <summary style="color:var(--cp-text-muted);font-size:13px;cursor:pointer;user-select:none">Your data — same shape as GitHub Copilot</summary>
+        <div class="steps">
+          <div class="step">
+            <h3>It works like GitHub Copilot CLI</h3>
+            <p>You sign in with your own GitHub account, and your GitHub Copilot license is the only AI it calls. Like Copilot CLI and Copilot in VS Code, it runs on your machine and keeps its history in your user folder. The one difference is the chat page: a local server that listens on <code>127.0.0.1</code> only, so nothing else on your network can reach it.</p>
+          </div>
+          <div class="step">
+            <h3>What to put in</h3>
+            <p>The same rules as GitHub Copilot apply. Use it for business processes and synthetic or sanitized examples. Do not put in customer files, customer personal data, credentials or tenant access.</p>
+          </div>
+          <div class="step">
+            <h3>What it contacts</h3>
+            <p>GitHub sign-in, GitHub Copilot, and this library on GitHub for updates. Nothing else, unless you add an agent file that calls another site, just as a tool you add to Copilot would. Two bundled agents reach out only when you ask: Hacker News reads public stories, and Learn New writes new agent files using your GitHub Copilot CLI and can prepare (not send) a submission to the public agent registry.</p>
+          </div>
+          <div class="step">
+            <h3>Where it keeps things, and how to clear them</h3>
+            <p>Everything is under <code>~/.brainstem</code>. Memories are in <code>src/rapp_brainstem/.brainstem_data/</code>; your sign-in is in <code>src/rapp_brainstem/.env</code>, readable by you only. The installer also adds one line to your shell profile so the <code>brainstem</code> command is on your PATH. Nothing is sent anywhere for storage. To clear your memories, delete the <code>.brainstem_data</code> folder. To remove everything, delete <code>~/.brainstem</code> and <code>~/.local/bin/brainstem</code>.</p>
+          </div>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -796,7 +817,7 @@ html[data-theme="dark"] {
   }
 
   function toggleTier(e, el) {
-    if (e.target.closest('.cmd') || e.target.closest('a')) return;
+    if (e.target.closest('.cmd') || e.target.closest('a') || e.target.closest('details')) return;
     el.classList.toggle('open');
     if (el.id && el.classList.contains('open')) {
       history.replaceState(null, '', '#' + el.id);
