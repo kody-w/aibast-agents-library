@@ -22,6 +22,7 @@ import os
 import sys
 import uuid
 import ipaddress
+from pathlib import Path
 from urllib.parse import urlsplit
 
 __manifest__ = {
@@ -137,7 +138,7 @@ def call_local(model, messages, tools=None):
 
 
 def create_app(kernel, model):
-    from flask import Flask, request, jsonify, send_from_directory
+    from flask import Flask, Response, request, jsonify
 
     app = Flask(__name__, static_folder=None)
     # The kernel's own Host and cross-origin guards, unchanged.
@@ -152,7 +153,16 @@ def create_app(kernel, model):
 
     @app.route("/", methods=["GET"])
     def index():
-        return send_from_directory(kernel._BASE_DIR, "index.html")
+        # The kernel's page, unchanged on disk; only its welcome line says where the answers come from here.
+        page = (Path(kernel._BASE_DIR) / "index.html").read_text(encoding="utf-8")
+        page = page.replace("your local assistant powered by Copilot",
+                            "your local assistant running on this device (offline mode)")
+        return Response(page, mimetype="text/html")
+
+    @app.route("/voice", methods=["GET"])
+    @kernel._require_secret
+    def voice_status():
+        return jsonify({"voice_mode": False})  # voice uses cloud speech; offline mode never turns it on
 
     @app.route("/health", methods=["GET"])
     @kernel._require_secret

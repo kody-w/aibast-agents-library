@@ -284,6 +284,12 @@ def test_on_chat_off_leaves_the_kernel_running(rig):
 
     _, health = _get(f"http://127.0.0.1:{port}/health")
     assert health["mode"] == "offline" and health["model"] == "fake-local"
+    # 10/20 browser pass: the offline page must not say "powered by Copilot"; the kernel file stays unchanged
+    page = urlopen(f"http://127.0.0.1:{port}/").read().decode("utf-8")
+    assert "powered by Copilot" not in page and "running on this device (offline mode)" in page
+    assert "powered by Copilot" in (rig["src"] / "index.html").read_text(encoding="utf-8")
+    _, voice = _get(f"http://127.0.0.1:{port}/voice")
+    assert voice == {"voice_mode": False}
     assert "OfflineMode" not in health["agents"] and "ProbeAgent" in health["agents"]
 
     status, body = _post(f"http://127.0.0.1:{port}/chat", {"user_input": "probe please"})
