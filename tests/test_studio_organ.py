@@ -122,9 +122,9 @@ def test_plan_routes_each_need_by_the_profile(agents_dir):
     assert all(op in ops for op in ("ListRecords", "CreateRecord", "UpdateRecord"))
     assert "Nothing persists" in mm["parts"][-1]["why"]
 
-    for pure in ("basic_agent.py", "circle_agent.py"):
-        assert p[pure]["workflow_tools"] == [] and p[pure]["ready"]
-        assert {x["goes_to"] for x in p[pure]["parts"]} == {"skill"}
+    assert p["circle_agent.py"]["workflow_tools"] == [] and p["circle_agent.py"]["ready"]
+    assert {x["goes_to"] for x in p["circle_agent.py"]["parts"]} == {"skill"}
+    assert "basic_agent.py" not in p  # 10/20 gate: the base class is no agent in the kernel, so no skill
 
 
 def test_changing_the_profile_changes_the_plan_with_no_code_change(agents_dir):
@@ -171,7 +171,7 @@ def _code_lines(agent_source, text):
 
 def test_every_agent_travels_byte_for_byte_in_a_skinny_skill(workspace, agents_dir):
     m, skills = workspace["manifest"], workspace["skills"]
-    assert sorted(a["file"] for a in m["agents"]) == sorted(FOUR + ["circle_agent.py"])
+    assert sorted(a["file"] for a in m["agents"]) == sorted([f for f in FOUR if f != "basic_agent.py"] + ["circle_agent.py"])
     assert (workspace["out"] / "instructions.md").read_bytes() == (KERNEL / "soul.md").read_bytes()
     run_py = (ORGAN_DIR / "skill_run.py").read_bytes()
     for a in m["agents"]:

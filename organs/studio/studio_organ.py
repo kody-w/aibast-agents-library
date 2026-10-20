@@ -574,8 +574,19 @@ def _is_organ_switch(path):
     return False
 
 
+def _defines_an_agent(path):
+    """The kernel's rule: a file is an agent only if it defines a class other than BasicAgent itself
+    (basic_agent.py loads as no agent, so it never becomes a Copilot Studio skill)."""
+    try:
+        tree = ast.parse(Path(path).read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, UnicodeDecodeError):
+        return True  # let plan_agent report it in plain words
+    return any(isinstance(n, ast.ClassDef) and n.name != "BasicAgent" for n in tree.body)
+
+
 def agent_files(agents_dir, skip=()):
-    return [p for p in sorted(Path(agents_dir).glob("*_agent.py")) if p.name not in skip and not _is_organ_switch(p)]
+    return [p for p in sorted(Path(agents_dir).glob("*_agent.py"))
+            if p.name not in skip and not _is_organ_switch(p) and _defines_an_agent(p)]
 
 
 def plan(agents_dir, profile=None, skip=()):

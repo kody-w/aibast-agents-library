@@ -19438,8 +19438,8 @@
         },
         {
           "path": "organs/studio/studio_organ.py",
-          "sha256": "5629673217dd868c13db37d5a4a637e82e5de8b19994b3da7afe2d141edd9d3a",
-          "bytes": 39301
+          "sha256": "a5be1532c1ed598d9846f0e02adb374bc76d9c37ba5edc05fbcbd054a88d8360",
+          "bytes": 39839
         }
       ],
       "_catalog_kind": "organ"
