@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "generated_at": "2026-10-08T14:45:39.255365+00:00",
   "stats": {
-    "total_agents": 87,
+    "total_agents": 88,
     "publishers": 1,
     "categories": 12,
     "total_stacks": 66,
@@ -16,8 +16,8 @@
     "curated_copy_solutions": 65,
     "solution_onepagers": 65,
     "solution_demo_videos": 61,
-    "total_lines": 47935,
-    "total_kb": 2408.6,
+    "total_lines": 48200,
+    "total_kb": 2420.5,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -34,7 +34,7 @@
       "Microsoft 365 Copilot",
       "Microsoft Agent 365"
     ],
-    "total_organs": 1,
+    "total_organs": 2,
     "total_partner_agents": 12,
     "partner_list": [
       "CongruentX"
@@ -65,7 +65,7 @@
     "tier_counts": {
       "verified": 85,
       "pilot": 1,
-      "community": 1
+      "community": 2
     }
   },
   "stacks": [
@@ -18317,6 +18317,37 @@
     },
     {
       "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/send-to-studio",
+      "version": "1.0.0",
+      "display_name": "Send to Copilot Studio",
+      "description": "Turns this Brainstem's agents into a Copilot Studio agent: plans which parts run as skills and which become workflow tools, builds the workspace, and sends it as a draft on request.",
+      "author": "AIBAST",
+      "tags": [
+        "copilot-studio",
+        "skills",
+        "organ-switch"
+      ],
+      "category": "general",
+      "quality_tier": "community",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "organ": "@aibast-agents-library/studio-organ",
+      "_file": "agents/@aibast-agents-library/templates/studio_organ_agent.py",
+      "_size_kb": 11.9,
+      "_lines": 265,
+      "_sha256": "8d96307c4d704ce4ab461eb2cbf4737516e40770057d071ea0caa0ac6ac687d6",
+      "_install_prefix": "send_to_studio__",
+      "_install_filename": "send_to_studio__8d96307c4d70_agent.py",
+      "_stack": null,
+      "_stack_vertical": null,
+      "_synthetic_data": false,
+      "_catalog_kind": "template",
+      "_readiness": []
+    },
+    {
+      "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/workshop",
       "version": "1.0.0",
       "display_name": "AIBAST Workshop Engine",
@@ -19333,6 +19364,51 @@
           "path": "organs/offline/offline_brainstem.py",
           "sha256": "1051b581526b4f5dad7944f3d8a267ea4b08ac831a05a8cad8e425e73972fe8c",
           "bytes": 10831
+        }
+      ],
+      "_catalog_kind": "organ"
+    },
+    {
+      "schema": "rapp-organ/1.0",
+      "name": "@aibast-agents-library/studio-organ",
+      "version": "1.0.0",
+      "display_name": "Send to Copilot Studio",
+      "description": "Turns a Brainstem's agents into a Copilot Studio workspace: skinny skills that carry each agent.py unchanged, plus workflow tools for what the skill sandbox cannot do.",
+      "author": "AIBAST",
+      "tags": [
+        "copilot-studio",
+        "skills",
+        "workflow-tools",
+        "organ"
+      ],
+      "category": "general",
+      "entry": "studio_organ.py",
+      "switch_agent": "@aibast-agents-library/send-to-studio",
+      "_files": [
+        {
+          "path": "organs/studio/README.md",
+          "sha256": "6356a4d8936f29b77398d344c248b24bd13fb8fdf8170694341ef605dddc5674",
+          "bytes": 3668
+        },
+        {
+          "path": "organs/studio/sandbox-profile.json",
+          "sha256": "0cb2bb14bb64c08f2725b23da5fe903da0fbe4e73d4b3968e7a7370d46122505",
+          "bytes": 1903
+        },
+        {
+          "path": "organs/studio/send_to_studio.py",
+          "sha256": "03c1852ed92558854b629627dba2e4308324192739d99573c3fc517724b8b5fa",
+          "bytes": 4531
+        },
+        {
+          "path": "organs/studio/skill_run.py",
+          "sha256": "7f99516f6562af69364e23f9a1bbda871ccf6b42c12112aa7b9786a961b0884e",
+          "bytes": 11558
+        },
+        {
+          "path": "organs/studio/studio_organ.py",
+          "sha256": "5629673217dd868c13db37d5a4a637e82e5de8b19994b3da7afe2d141edd9d3a",
+          "bytes": 39301
         }
       ],
       "_catalog_kind": "organ"
