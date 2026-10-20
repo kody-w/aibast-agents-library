@@ -295,8 +295,10 @@ def test_static_landing_page_uses_minimal_public_readiness_probe():
         "checkBrainstem();"
     )]
 
-    assert "http://localhost:7071/health/public" in check
-    assert "http://localhost:7071/health'" not in check
+    # AIBAST RAPP, the work twin, answers on 7272 (a personal Brainstem keeps 7071).
+    assert "http://localhost:7272/health/public" in check
+    assert "http://localhost:7272/health'" not in check
+    assert "localhost:7071" not in check
     assert "d.agents" not in check
     assert "d.model" not in check
 
