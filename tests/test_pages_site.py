@@ -284,6 +284,10 @@ class PagesBuilderFixtureTests(unittest.TestCase):
         with fixture_root() as root:
             commands = (
                 ["git", "init", "--quiet"],
+                # No background gc or maintenance: a detached one still writing .git made the
+                # fixture's cleanup fail ("Directory not empty: 'repo'", deploy of e51d7430).
+                ["git", "config", "gc.auto", "0"],
+                ["git", "config", "maintenance.auto", "false"],
                 ["git", "config", "user.name", "Pages Test"],
                 ["git", "config", "user.email", "pages-test@example.invalid"],
                 ["git", "add", "."],
