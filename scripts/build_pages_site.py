@@ -89,6 +89,10 @@ INSTALLER_PATHS = frozenset(
     }
 )
 
+# The AIBAST one-liner wrappers run the installer above unchanged, then add the AIBAST
+# Registry agent. They name the site and raw branch they read, rendered the same way.
+AIBAST_WRAPPER_PATHS = frozenset({"aibast-install.sh", "aibast-install.ps1"})
+
 # The workshop lane skills name the repository and branch they pull workshops
 # from. Like the installers, they are rendered to the ring that serves them.
 RING_SKILL_PATHS = frozenset(
@@ -1002,6 +1006,15 @@ def render_installer(
     """Point an installer's (or lane skill's) defaults at the ring being published."""
     if path.as_posix() in RING_SKILL_PATHS:
         substitutions = _skill_substitutions(owner, repo, branch)
+    elif path.as_posix() in AIBAST_WRAPPER_PATHS:
+        substitutions = [
+            (f"https://{CANONICAL_OWNER}.github.io/{CANONICAL_REPO}/", f"https://{owner}.github.io/{repo}/", True),
+            (
+                f"https://raw.githubusercontent.com/{CANONICAL_OWNER}/{CANONICAL_REPO}/{CANONICAL_BRANCH}/",
+                f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/",
+                True,
+            ),
+        ]
     elif path.as_posix() in FRONTIER_BOOTSTRAP_PATHS:
         substitutions = _frontier_bootstrap_substitutions(
             path.suffix.lower(), owner, repo
@@ -1033,7 +1046,7 @@ def prepare_installers(
     prepared: dict[PurePosixPath, bytes] = {}
     for path in sorted(included, key=lambda item: item.as_posix()):
         if path.as_posix() not in (
-            INSTALLER_PATHS | RING_SKILL_PATHS | FRONTIER_BOOTSTRAP_PATHS
+            INSTALLER_PATHS | RING_SKILL_PATHS | FRONTIER_BOOTSTRAP_PATHS | AIBAST_WRAPPER_PATHS
         ):
             continue
         source = _assert_regular_source(root, entries[path])

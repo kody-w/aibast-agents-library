@@ -8,6 +8,7 @@ RAPP_KERNEL_PYTHON, else those tests skip).
 
 import hashlib
 import json
+import re
 import os
 import shutil
 import socket
@@ -19,7 +20,8 @@ import zipfile
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 import pytest
 
@@ -478,8 +480,37 @@ def test_switch_on_plan_build_send_off_leaves_the_kernel_running(rig):
     built = _switch(rig, action="build")
     assert built.startswith(f"The Copilot Studio workspace is ready at {rig['organ'] / 'workspace'}")
     assert studio_organ.verify_workspace(rig["organ"] / "workspace") == []
-    reply = _switch(rig, action="send")
-    assert "Say 'send it, confirmed'" in reply  # never sends without an explicit confirm
+    # 10/20 gate: on "send it" the model set confirm itself. The chat now only opens a page the person presses.
+    reply = _switch(rig, action="send", confirm=True, env={"PATH": "/usr/bin:/bin"})
+    assert reply.startswith("Nothing was sent. Open http://127.0.0.1:"), reply
+    url = re.search(r"http://127\.0\.0\.1:\d+/", reply).group(0)
+    here = url[len("http://"):-1]
+    page = urlopen(url, timeout=5).read().decode("utf-8")
+    assert "Send as a draft" in page and "Nothing is published" in page
+    token = re.search(r"name=t value=([\w-]+)", page).group(1)
+
+    def post(headers, t=token):
+        req = Request(url + "send", data=f"t={t}".encode(), headers=headers, method="POST")
+        try:
+            with urlopen(req, timeout=60) as r:
+                return r.status, r.read().decode("utf-8")
+        except HTTPError as e:
+            return e.code, e.read().decode("utf-8")
+
+    origin = {"Origin": f"http://{here}", "Content-Type": "application/x-www-form-urlencoded"}
+    assert post({})[0] == 403                                    # a script with no Origin
+    assert post(origin, t="guess")[0] == 403                     # the right origin, a guessed token
+    assert post({**origin, "Origin": "http://evil.example"})[0] == 403
+    assert _switch(rig, action="send").endswith("(it closes on its own in 15 minutes).")  # same page, not a second
+    status, body = post(origin)                                  # the person's own press goes through
+    assert status == 200 and "Send stopped" in body and "nothing was sent" in body  # no copilot on this PATH
+    for _ in range(300):  # one press only: the page closes itself after it
+        with socket.socket() as so:
+            if so.connect_ex(("127.0.0.1", int(here.split(":")[1]))) != 0:
+                break
+        time.sleep(0.1)
+    else:
+        raise AssertionError("send page still open after the press")
     _kernel_ok(rig)
 
     (rig["organ"] / "studio_organ.py").write_text("# edited\n", encoding="utf-8")

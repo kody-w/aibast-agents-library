@@ -18366,11 +18366,11 @@
       ],
       "organ": "@aibast-agents-library/studio-organ",
       "_file": "agents/@aibast-agents-library/templates/studio_organ_agent.py",
-      "_size_kb": 12.2,
-      "_lines": 269,
-      "_sha256": "255099cd629dc91a3a1f84697646a9210c64551bcfa9427c76e2b05b8614d317",
+      "_size_kb": 13.1,
+      "_lines": 295,
+      "_sha256": "b752593b70b11ea213198d0bc1a006113a768ef84cc4a61737581d81c381af76",
       "_install_prefix": "send_to_studio__",
-      "_install_filename": "send_to_studio__255099cd629d_agent.py",
+      "_install_filename": "send_to_studio__b752593b70b1_agent.py",
       "_stack": null,
       "_stack_vertical": null,
       "_synthetic_data": false,
@@ -19418,8 +19418,8 @@
       "_files": [
         {
           "path": "organs/studio/README.md",
-          "sha256": "6356a4d8936f29b77398d344c248b24bd13fb8fdf8170694341ef605dddc5674",
-          "bytes": 3668
+          "sha256": "68d0616858a29c18ff173a89258f81b7e181835ff3e52509edc3c22301a42bf8",
+          "bytes": 3776
         },
         {
           "path": "organs/studio/sandbox-profile.json",
@@ -19428,8 +19428,8 @@
         },
         {
           "path": "organs/studio/send_to_studio.py",
-          "sha256": "03c1852ed92558854b629627dba2e4308324192739d99573c3fc517724b8b5fa",
-          "bytes": 4531
+          "sha256": "a1070f0cd3cc7502a0b655a51805bdfa069b9f1c775b8957f26d2c951823c0b9",
+          "bytes": 9368
         },
         {
           "path": "organs/studio/skill_run.py",

@@ -10,8 +10,8 @@ someone asks for it:
     plan    say, in plain words, how each of this Brainstem's agents would move to
             Copilot Studio: what runs as a skill, what becomes a workflow tool, why
     build   write that Copilot Studio workspace to ~/.brainstem/organs/studio/workspace/
-    send    push the workspace through the Copilot Studio MCP server as drafts
-            (refuses without confirm=true; publishes only with publish=true too)
+    send    open a page on 127.0.0.1 that shows what would be created; the person presses
+            Send there (drafts; publish only with publish=true). The chat never sends.
     off     delete ~/.brainstem/organs/studio/ (the workspace with it)
     status  on or off, and whether a workspace is built
 
@@ -27,8 +27,10 @@ import importlib.util
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -62,6 +64,7 @@ RAW_BASES = {
     "https://kody-w.github.io/aibast-agents-library/": "https://raw.githubusercontent.com/kody-w/aibast-agents-library/staging/",
 }
 STATE_FILE = "organ.json"
+SEND_PAGE_FILE = "send-page.json"  # the open send page: port and pid
 
 
 def _organ_dir():
@@ -93,6 +96,21 @@ def _http_get(url, timeout=20):
     return r.content
 
 
+def _read_json(path):
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def _alive(pid):
+    try:
+        os.kill(int(pid), 0)
+        return True
+    except (OSError, TypeError, ValueError):
+        return False
+
+
 class SendToStudioAgent(BasicAgent):
     def __init__(self):
         self.name = "SendToStudio"
@@ -101,8 +119,9 @@ class SendToStudioAgent(BasicAgent):
             "description": (
                 "Moves this Brainstem's agents to Copilot Studio. Use 'plan' when the user asks how "
                 "their agents would work in Copilot Studio, 'build' to prepare the Copilot Studio "
-                "workspace, 'send' to push it as a draft (only with confirm true, after the user says "
-                "so), 'on' or 'off' to add or remove this feature, 'status' to check."
+                "workspace, 'send' to open a page on this computer where the user reviews it and presses Send "
+                "themselves (nothing is sent from the chat), 'on' or 'off' to add or remove this feature, "
+                "'status' to check."
             ),
             "parameters": {
                 "type": "object",
@@ -111,10 +130,6 @@ class SendToStudioAgent(BasicAgent):
                         "type": "string",
                         "enum": ["status", "on", "off", "plan", "build", "send"],
                         "description": "status (default), on, off, plan, build or send.",
-                    },
-                    "confirm": {
-                        "type": "boolean",
-                        "description": "True only when the user has said to send it now.",
                     },
                     "publish": {
                         "type": "boolean",
@@ -126,7 +141,7 @@ class SendToStudioAgent(BasicAgent):
         }
         super().__init__(name=self.name, metadata=self.metadata)
 
-    def perform(self, action="status", confirm=False, publish=False, **kwargs):
+    def perform(self, action="status", publish=False, **kwargs):
         action = (action or "status").strip().lower()
         try:
             if action == "on":
@@ -145,7 +160,7 @@ class SendToStudioAgent(BasicAgent):
                     return organ.plain_words(organ.plan(_agents_dir()))
                 if action == "build":
                     return self._build(organ)
-                return self._send(confirm is True, publish is True)
+                return self._send(publish is True)
             return self._status()
         except Exception as e:  # plain words, never a traceback in chat
             return f"Send to Copilot Studio: something went wrong ({e})."
@@ -233,6 +248,9 @@ class SendToStudioAgent(BasicAgent):
         target = _organ_dir()
         if not target.exists():
             return "Send to Copilot Studio is already off."
+        page = _read_json(target / SEND_PAGE_FILE)
+        if page and _alive(page.get("pid")):
+            os.kill(page["pid"], signal.SIGTERM)  # the send page this switch opened
         shutil.rmtree(target, ignore_errors=True)
         return ("Send to Copilot Studio is off. Its files and any built workspace were removed; "
                 "your Brainstem is back to its normal setup.")
@@ -249,19 +267,27 @@ class SendToStudioAgent(BasicAgent):
                 f"{len(m['agents'])} skill(s) and {tools} workflow tool(s).{held} "
                 "Say 'send it' when you want it in Copilot Studio as a draft.")
 
-    def _send(self, confirm, publish):
+    def _send(self, publish):
+        """Never sends. Opens a page on 127.0.0.1 where the person presses Send; the model cannot press it."""
         ws = _organ_dir() / "workspace"
         if not (ws / "manifest.json").is_file():
             return "Nothing is built yet. Ask to build the workspace first."
-        if not confirm:
-            return ("Sending creates draft workflows and a draft agent in your Copilot Studio environment, "
-                    "signed in as you. Say 'send it, confirmed' to go ahead.")
-        cmd = [sys.executable, str(_organ_dir() / "send_to_studio.py"), str(ws), "--execute"]
-        if publish:
-            cmd.append("--publish")
-        done = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
-        tail = "\n".join((done.stdout + done.stderr).strip().splitlines()[-15:])
-        return f"Send finished (exit {done.returncode}).\n{tail}"
+        port_file = _organ_dir() / SEND_PAGE_FILE
+        page = _read_json(port_file)
+        if not (page and _alive(page.get("pid"))):
+            port_file.unlink(missing_ok=True)
+            cmd = [sys.executable, str(_organ_dir() / "send_to_studio.py"), str(ws), "--confirm-page",
+                   "--port-file", str(port_file)] + (["--publish"] if publish else [])
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            for _ in range(300):  # a busy laptop can take a while to start Python
+                page = _read_json(port_file)
+                if page:
+                    break
+                time.sleep(0.1)
+        if not page:
+            return "Send to Copilot Studio could not open its send page, so nothing was sent."
+        return (f"Nothing was sent. Open http://127.0.0.1:{page['port']}/ to see what it creates and press Send "
+                "yourself; close that page to cancel (it closes on its own in 15 minutes).")
 
 
 if __name__ == "__main__":

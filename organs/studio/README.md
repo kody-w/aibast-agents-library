@@ -10,7 +10,7 @@ again; the kernel keeps running and is never changed.
 | `sandbox-profile.json` | What the Copilot Studio skill sandbox can do, dated and sourced. The only input that decides the translation. |
 | `studio_organ.py` | Static analyzer (AST; never runs an agent), the plan, and the workspace builder. |
 | `skill_run.py` | Shipped in each skill as `scripts/run.py`: stands in for BasicAgent and the storage helper, and routes web calls and saved memory to workflow tools. |
-| `send_to_studio.py` | The MCP driver: prints the steps, or runs them through GitHub Copilot CLI with `@microsoft/copilot-studio-mcp`. Stops before publish unless `--publish`. |
+| `send_to_studio.py` | The MCP driver: prints the steps, or runs them through GitHub Copilot CLI with `@microsoft/copilot-studio-mcp`. Stops before publish unless `--publish`. `--confirm-page` serves a page on 127.0.0.1 where the person presses Send; the chat's `send` only opens it. |
 
 ## The rule
 
