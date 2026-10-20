@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "generated_at": "2026-10-08T14:45:39.255365+00:00",
   "stats": {
-    "total_agents": 89,
+    "total_agents": 90,
     "publishers": 1,
     "categories": 12,
     "total_stacks": 66,
@@ -16,8 +16,8 @@
     "curated_copy_solutions": 65,
     "solution_onepagers": 65,
     "solution_demo_videos": 61,
-    "total_lines": 48566,
-    "total_kb": 2438.5,
+    "total_lines": 48658,
+    "total_kb": 2442.8,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -65,7 +65,7 @@
     "tier_counts": {
       "verified": 85,
       "pilot": 1,
-      "community": 3
+      "community": 4
     }
   },
   "stacks": [
@@ -18273,6 +18273,37 @@
       "_sha256": "f47cc3cc0c221cec23ca19371dd22dafe0340b20a56aa419ef49cb60ef4adc87",
       "_install_prefix": "aibast_registry__",
       "_install_filename": "aibast_registry__f47cc3cc0c22_agent.py",
+      "_stack": null,
+      "_stack_vertical": null,
+      "_synthetic_data": false,
+      "_catalog_kind": "template",
+      "_readiness": []
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/first-hour",
+      "version": "1.0.0",
+      "display_name": "FirstHour",
+      "description": "Walks you through your first hour with your AIBAST Brainstem, one step at a time.",
+      "author": "AIBAST",
+      "tags": [
+        "first-hour",
+        "learn",
+        "getting-started",
+        "onboarding"
+      ],
+      "category": "general",
+      "quality_tier": "community",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/templates/first_hour_agent.py",
+      "_size_kb": 4.3,
+      "_lines": 92,
+      "_sha256": "e7f037fc0295b340eeb5a3853803be609a291d2bcdfba5b7b84612690b78b0b5",
+      "_install_prefix": "first_hour__",
+      "_install_filename": "first_hour__e7f037fc0295_agent.py",
       "_stack": null,
       "_stack_vertical": null,
       "_synthetic_data": false,

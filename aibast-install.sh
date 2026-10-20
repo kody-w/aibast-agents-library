@@ -8,8 +8,9 @@
 #
 # 1. Runs this site's Brainstem installer (install.sh) unchanged, without launching, with HOME
 #    pointed at ~/.aibast-rapp, so everything it writes lands there.
-# 2. Adds the AIBAST Registry agent, checked byte for byte against this site's registry,
-#    so AIBAST agents, offline mode and Send to Copilot Studio are one chat message away.
+# 2. Adds the AIBAST Registry agent and FirstHour, each checked byte for byte against this site's
+#    registry, so AIBAST agents, offline mode and Send to Copilot Studio are one chat message away
+#    and "teach me my first hour" walks a new user through it.
 # 3. Installs the aibast-rapp command and launches the work twin on its own port.
 # Arguments (such as --version or --no-launch) pass through to the installer.
 # AIBAST_HOME and AIBAST_PORT change the folder and the port.
@@ -36,20 +37,24 @@ chmod 700 "$AIBAST_HOME"
 # The installer launches on 7071 itself, so it never launches here; the work twin starts below.
 HOME="$AIBAST_HOME" bash "$installer" --no-launch "$@" </dev/null
 
-echo "  Adding the AIBAST Registry agent..."
+echo "  Adding the AIBAST Registry and FirstHour agents..."
 "$VENV_PYTHON" -I - "$SITE" "$RAW" "$KERNEL" "$AIBAST_PORT" <<'PY'
 import hashlib, json, os, pathlib, sys, urllib.request
 site, raw, kernel, port = sys.argv[1:5]
 with urllib.request.urlopen(site + "registry.json", timeout=60) as r:
-    entry = next(a for a in json.load(r)["agents"] if a["name"] == "@aibast-agents-library/aibast-registry")
-with urllib.request.urlopen(raw + entry["_file"], timeout=60) as r:
-    body = r.read()
-if hashlib.sha256(body).hexdigest() != entry["_sha256"]:
-    sys.exit("  The AIBAST Registry agent did not match the registry, so it was not added.")
+    registry = {a["name"]: a for a in json.load(r)["agents"]}
 agents = pathlib.Path(kernel) / "agents"
-part = agents / ".aibast_registry_agent.py.part"
-part.write_bytes(body)
-os.replace(part, agents / "aibast_registry_agent.py")
+# The AIBAST Registry agent, and FirstHour, the guide to the first hour ("teach me my first hour").
+for name, fname, label in (("@aibast-agents-library/aibast-registry", "aibast_registry_agent.py", "AIBAST Registry"),
+                           ("@aibast-agents-library/first-hour", "first_hour_agent.py", "FirstHour")):
+    entry = registry[name]
+    with urllib.request.urlopen(raw + entry["_file"], timeout=60) as r:
+        body = r.read()
+    if hashlib.sha256(body).hexdigest() != entry["_sha256"]:
+        sys.exit(f"  The {label} agent did not match the registry, so it was not added.")
+    part = agents / f".{fname}.part"
+    part.write_bytes(body)
+    os.replace(part, agents / fname)
 env = pathlib.Path(kernel) / ".env"
 text = env.read_text(encoding="utf-8") if env.exists() else ""
 lines = text.splitlines()
@@ -68,7 +73,7 @@ if new != text:
     part.write_text(new, encoding="utf-8")
     os.chmod(part, 0o600)
     os.replace(part, env)
-print("  ✓ AIBAST Registry agent added (checked against " + site + "registry.json)")
+print("  ✓ AIBAST Registry and FirstHour agents added (checked against " + site + "registry.json)")
 PY
 
 # The aibast-rapp command runs the installer's own launcher with HOME set to the work twin's folder.
