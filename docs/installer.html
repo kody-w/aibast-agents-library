@@ -528,6 +528,12 @@ html[data-theme="dark"] {
             <h3>4. Make it yours</h3>
             <p>Write a <code>soul.md</code> to define its personality. Drop <code>*_agent.py</code> files into the agents folder to give it skills. Point <code>SOUL_PATH</code> and <code>AGENTS_PATH</code> in <code>.env</code> to your private files.</p>
           </div>
+          <div class="step">
+            <h3>5. Offline mode (optional)</h3>
+            <p>Run your Brainstem on a model on your own computer, with no internet. Install <a href="https://ollama.com/download">Ollama</a>, then download a small model:</p>
+            <div class="cmd" onclick="copyCmd(event, this)">ollama pull qwen3:4b</div>
+            <p style="margin-top:8px">Add the <strong>Offline Mode</strong> agent from the library to your agents folder, then tell your Brainstem <em>"turn on offline mode"</em>. It opens a second chat at <code>localhost:7072</code> that uses the same agents, soul, and memory. Say <em>"turn off offline mode"</em> to stop it and remove its files. Your normal Brainstem keeps running the whole time, and offline mode never sends your chat to the cloud.</p>
+          </div>
         </div>
       </details>
       <details id="brainstem-data" style="margin-top:12px;overflow-wrap:anywhere">

@@ -27,6 +27,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 AGENTS_DIR = Path("agents")
+ORGANS_DIR = Path("organs")
+ORGAN_SCHEMA = "rapp-organ/1.0"
 REGISTRY_FILE = Path("registry.json")
 SOLUTIONS_FILE = Path("solutions.json")
 FIRST_PARTY_FILE = Path("first_party.json")
@@ -269,6 +271,48 @@ def load_partners(errors: list) -> tuple:
 
     rows.sort(key=lambda r: (r["partner_id"], r["category"], r["name"]))
     return partners, rows
+
+
+def load_organs(errors: list, root: Path = Path(".")) -> list:
+    """Organs: add-on processes an agent installs beside a running Brainstem.
+
+    Each organs/<name>/ folder has one .py file carrying a __manifest__ with
+    schema rapp-organ/1.0. Every file in the folder is published with its
+    SHA-256 over the exact bytes, so the installing agent can refuse a file
+    that does not match before writing it.
+    """
+    organs = []
+    for folder in sorted((root / ORGANS_DIR).glob("*/")):
+        if not folder.is_dir():
+            continue
+        files = sorted(
+            p for p in folder.rglob("*")
+            if p.is_file() and "__pycache__" not in p.parts
+        )
+        manifest = None
+        for py_path in (p for p in files if p.suffix == ".py"):
+            found = extract_manifest(py_path)
+            if found and found.get("schema") == ORGAN_SCHEMA:
+                manifest = found
+                break
+        if manifest is None:
+            errors.append(f"{folder.as_posix()}: no {ORGAN_SCHEMA} __manifest__")
+            continue
+        validation_errors = validate_manifest(folder, manifest)
+        if validation_errors:
+            errors.extend(f"{folder.as_posix()}: {e}" for e in validation_errors)
+            continue
+        manifest["_files"] = [
+            {
+                "path": p.relative_to(root).as_posix(),
+                "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
+                "bytes": p.stat().st_size,
+            }
+            for p in files
+        ]
+        manifest["_catalog_kind"] = "organ"
+        organs.append(manifest)
+    return organs
 
 
 def load_community_tools(errors: list) -> list:
@@ -546,6 +590,7 @@ def build_registry():
     first_party = load_first_party(errors)
     partners, partner_agents = load_partners(errors)
     community_tools = load_community_tools(errors)
+    organs = load_organs(errors)
     onepager_content = load_onepager_content()
     solution_copy = load_solution_copy()
     demo_cases = load_demo_cases()
@@ -775,6 +820,7 @@ def build_registry():
                 a["_documented"] for a in first_party
             ),
             "first_party_products": sorted({a["product"] for a in first_party}),
+            "total_organs": len(organs),
             "total_partner_agents": len(partner_agents),
             "partner_list": sorted({p["name"] for p in partners}),
             "partner_agent_categories": sorted({a["category"] for a in partner_agents}),
@@ -787,7 +833,8 @@ def build_registry():
         "first_party": first_party,
         "partners": partners,
         "partner_agents": partner_agents,
-        "community_tools": community_tools
+        "community_tools": community_tools,
+        "organs": organs,
     }
 
     with open(REGISTRY_FILE, "w", encoding="utf-8") as f:

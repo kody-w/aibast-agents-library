@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "generated_at": "2026-10-08T14:45:39.255365+00:00",
   "stats": {
-    "total_agents": 86,
+    "total_agents": 87,
     "publishers": 1,
     "categories": 12,
     "total_stacks": 66,
@@ -16,8 +16,8 @@
     "curated_copy_solutions": 65,
     "solution_onepagers": 65,
     "solution_demo_videos": 61,
-    "total_lines": 47656,
-    "total_kb": 2397.6,
+    "total_lines": 47935,
+    "total_kb": 2408.6,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -34,6 +34,7 @@
       "Microsoft 365 Copilot",
       "Microsoft Agent 365"
     ],
+    "total_organs": 1,
     "total_partner_agents": 12,
     "partner_list": [
       "CongruentX"
@@ -63,7 +64,8 @@
     ],
     "tier_counts": {
       "verified": 85,
-      "pilot": 1
+      "pilot": 1,
+      "community": 1
     }
   },
   "stacks": [
@@ -18283,6 +18285,38 @@
     },
     {
       "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/offline-mode",
+      "version": "1.0.0",
+      "display_name": "Offline Mode",
+      "description": "Turns offline mode on or off: runs this Brainstem's agents on a model on your own computer (Ollama) at 127.0.0.1:7072, beside the normal Brainstem.",
+      "author": "AIBAST",
+      "tags": [
+        "offline",
+        "local-model",
+        "ollama",
+        "organ-switch"
+      ],
+      "category": "general",
+      "quality_tier": "community",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "organ": "@aibast-agents-library/offline-runner",
+      "_file": "agents/@aibast-agents-library/templates/offline_mode_agent.py",
+      "_size_kb": 11.0,
+      "_lines": 279,
+      "_sha256": "c74b3072c976ae6bafbc199518c40548ea000c88c015e5b9b65695047ac5e571",
+      "_install_prefix": "offline_mode__",
+      "_install_filename": "offline_mode__c74b3072c976_agent.py",
+      "_stack": null,
+      "_stack_vertical": null,
+      "_synthetic_data": false,
+      "_catalog_kind": "template",
+      "_readiness": []
+    },
+    {
+      "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/workshop",
       "version": "1.0.0",
       "display_name": "AIBAST Workshop Engine",
@@ -19275,6 +19309,33 @@
       "url": "https://coworkcookbook.com/map/prospect-to-quote",
       "author": "Cowork Cookbook",
       "description": "Community recipe map walking through a prospect-to-quote workflow, useful as a reference pattern for structuring a similar sales agent flow."
+    }
+  ],
+  "organs": [
+    {
+      "schema": "rapp-organ/1.0",
+      "name": "@aibast-agents-library/offline-runner",
+      "version": "1.0.0",
+      "display_name": "Offline Runner",
+      "description": "Runs the Brainstem's agents and soul on a model on this computer (Ollama or Foundry Local) on 127.0.0.1:7072, beside the unchanged kernel.",
+      "author": "AIBAST",
+      "tags": [
+        "offline",
+        "local-model",
+        "ollama",
+        "organ"
+      ],
+      "category": "general",
+      "entry": "offline_brainstem.py",
+      "switch_agent": "@aibast-agents-library/offline-mode",
+      "_files": [
+        {
+          "path": "organs/offline/offline_brainstem.py",
+          "sha256": "1051b581526b4f5dad7944f3d8a267ea4b08ac831a05a8cad8e425e73972fe8c",
+          "bytes": 10831
+        }
+      ],
+      "_catalog_kind": "organ"
     }
   ]
 }
