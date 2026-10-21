@@ -156,10 +156,10 @@ def test_get_help_opens_privacy_scrubbed_public_draft_without_prompt_or_submissi
     assert "form.target = '_blank'" in helper
     assert "form.action = `${API}/diagnostics/report`" in helper
     assert "form.submit()" in helper
-    assert "fullTranscript.slice(-16)" in helper
-    assert "content: String(turn.content || '').slice(0, 2000)" in helper
+    # AIBAST: the draft is a public issue, so no chat transcript is sent.
+    assert "fullTranscript" not in helper
     assert "prompt(" not in helper
-    assert "GitHub issue draft opened with privacy-scrubbed diagnostics" in helper
+    assert "GitHub issue draft opened with diagnostics only (no chat messages)" in helper
 
 
 def test_unauthenticated_health_clears_stale_connected_hint():

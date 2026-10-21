@@ -1433,21 +1433,13 @@
     events.name = 'client_events';
     events.value = JSON.stringify(_clientLog);
     form.appendChild(events);
-    const transcript = document.createElement('input');
-    transcript.type = 'hidden';
-    transcript.name = 'transcript';
-    transcript.value = JSON.stringify(
-      fullTranscript.slice(-16).map(turn => ({
-        role: turn.role,
-        content: String(turn.content || '').slice(0, 2000)
-      }))
-    );
-    form.appendChild(transcript);
+    // No chat transcript: the draft becomes an issue in a public repository, and
+    // chats can hold customer details. Diagnostics alone describe the problem.
     document.body.appendChild(form);
     form.submit();
     form.remove();
     appendMsg('system',
-      'GitHub issue draft opened with privacy-scrubbed diagnostics. Review it before submitting.'
+      'GitHub issue draft opened with diagnostics only (no chat messages). The issue is public: review it before submitting.'
     );
   }
 

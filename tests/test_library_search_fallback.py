@@ -140,3 +140,12 @@ def test_chat_page_has_no_third_party_tutorial_or_retired_voice_model():
     assert "blazingbeard" not in brainstem
     assert "Training Quest" not in brainstem
     assert '<option value="eleven_monolingual_v1">' not in brainstem
+
+
+def test_get_help_does_not_send_the_chat_transcript():
+    brainstem = BRAINSTEM_UI.read_text(encoding="utf-8")
+    share = brainstem[brainstem.index("async function shareWithAdmin()"):]
+    share = share[:share.index("\n  }\n")]
+    assert "client_events" in share
+    assert "transcript" not in share.replace("No chat transcript", "")
+    assert "fullTranscript" not in share
