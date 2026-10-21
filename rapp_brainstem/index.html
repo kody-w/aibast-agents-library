@@ -1090,16 +1090,16 @@
     </button>
 
     <div class="registry-wrapper">
-      <button class="icon-btn" id="registry-btn" onclick="toggleRegistryPanel()" title="Browse the AIBAST Agent Library">
+      <button class="icon-btn" id="registry-btn" onclick="toggleRegistryPanel()" title="Browse the RAR agent registry">
         <span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></span>
       </button>
       <div id="registry-panel">
         <h3>
           <span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></span>
-          AIBAST Agent Library
+          RAR Agent Registry
         </h3>
         <div class="rar-search">
-          <input id="rar-search-input" type="text" placeholder="Search the AIBAST Agent Library…"
+          <input id="rar-search-input" type="text" placeholder="Search the RAR agent registry…"
                  oninput="rarSearch()" autocomplete="off" spellcheck="false">
         </div>
         <div id="rar-results" class="rar-results"></div>
@@ -1179,6 +1179,7 @@
           <select id="el-model-select">
             <option value="eleven_multilingual_v2">Multilingual v2</option>
             <option value="eleven_turbo_v2_5">Turbo v2.5 (low latency)</option>
+            <option value="eleven_monolingual_v1">English v1</option>
           </select>
         </div>
         <div class="panel-row">
@@ -1217,7 +1218,7 @@
         <li><strong>Add Agents</strong>: Drag and drop any <code>agent.py</code> file directly onto this window to instantly teach me new things.</li>
       </ul>
       <p><em>Click one of the prompts below to get started!</em></p>
-      <p class="tour-invite-wrap"><button class="starter-btn tour-invite" onclick="startTour()">New here? Take the 5-minute guided tour</button><button class="tour-invite-hide" onclick="hideTourInvite()" title="Hide this — the Tutorial link in the toolbar stays available"><svg viewBox="0 0 16 16" style="width:10px;height:10px;fill:currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg></button></p>
+      <p class="tour-invite-wrap"><button class="starter-btn tour-invite" onclick="startTour()">New here? Take the 5-minute guided tour</button><button class="tour-invite-hide" onclick="hideTourInvite()" title="Hide this — you can still find the Training Quest in the toolbar"><svg viewBox="0 0 16 16" style="width:10px;height:10px;fill:currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg></button></p>
     </div>
   </div>
 </div>
@@ -1240,7 +1241,7 @@
       <button class="toolbar-link" onclick="document.getElementById('chat-import').click()" title="Import transcript">Import</button>
       <input type="file" id="chat-import" accept=".json" style="display:none" onchange="importChat(event)">
       <button class="toolbar-link" onclick="clearChat()">Clear</button>
-      <a class="toolbar-link" href="https://microsoft.github.io/aibast-agents-library/docs/tutorial.html" target="_blank" rel="noopener" title="Step-by-step Brainstem tutorial" onclick="showTourInvite()">Tutorial</a>
+      <a class="toolbar-link" href="https://blazingbeard.github.io/quests/rapp-brainstem.html" target="_blank" title="Guided training quest with checkpoints" onclick="showTourInvite()">Tutorial</a>
       <button class="toolbar-link" onclick="shareWithAdmin()" title="Share diagnostics with admin for help" style="color:#f0883e">Get Help</button>
       <button class="toolbar-link dev-only" onclick="toggleDevMode()" id="dev-toggle">Dev</button>
     </div>
@@ -1312,7 +1313,7 @@
   const MAX_HISTORY_MSGS = 40;
   const MAX_HISTORY_CHARS = 60000;
   function cappedHistory(excludedTurns) {
-    let msgs = chatHistory
+    let msgs = history
       .filter(message => !excludedTurns?.has(message))
       .slice(-MAX_HISTORY_MSGS);
     let total = msgs.reduce((n, m) => n + ((m && m.content) ? m.content.length : 0), 0);
@@ -1333,7 +1334,7 @@
     requestState.historyReply = {
       role: 'assistant', content: content
     };
-    insertReplyAfter(chatHistory, requestState.historyTurn, requestState.historyReply);
+    insertReplyAfter(history, requestState.historyTurn, requestState.historyReply);
     requestState.transcriptReply = {
       role: 'assistant',
       content: content,
@@ -1352,7 +1353,7 @@
   // booted twin on 7081+, etc). For file:// or non-brainstem origins, fall back to 7071.
   const API = (location.protocol === 'http:' || location.protocol === 'https:') ? '' : 'http://127.0.0.1:7071';
   let sessionId = null;
-  let chatHistory = [];
+  let history = [];
   let fullTranscript = [];
   const activeRequests = new Map();
   let requestSequence = 0;
@@ -1394,11 +1395,7 @@
     _clientLog.push({ ts: new Date().toISOString(), type, level: 'info', ...(data && { data }) });
     if (_clientLog.length > 500) _clientLog.splice(0, _clientLog.length - 500);
   }
-  // Log the page address without a ?prompt= value: the log is shared through Get Help,
-  // and a prompt carried in a link is the user's text, not diagnostics.
-  const _loggedUrl = new URL(location.href);
-  if (_loggedUrl.searchParams.has('prompt')) _loggedUrl.searchParams.set('prompt', '[omitted]');
-  clog('client.page_load', { url: _loggedUrl.href, userAgent: navigator.userAgent });
+  clog('client.page_load', { url: location.href, userAgent: navigator.userAgent });
 
   async function exportBook() {
     clog('client.export_book');
@@ -1408,7 +1405,7 @@
       // Merge client events into the book
       book.client_events = _clientLog;
       book.conversation_snapshot = {
-        history_length: (typeof chatHistory !== 'undefined') ? chatHistory.length : 0,
+        history_length: (typeof history !== 'undefined') ? history.length : 0,
         transcript_length: (typeof fullTranscript !== 'undefined') ? fullTranscript.length : 0,
       };
       const blob = new Blob([JSON.stringify(book, null, 2)], { type: 'application/json' });
@@ -1433,13 +1430,21 @@
     events.name = 'client_events';
     events.value = JSON.stringify(_clientLog);
     form.appendChild(events);
-    // No chat transcript: the draft becomes an issue in a public repository, and
-    // chats can hold customer details. Diagnostics alone describe the problem.
+    const transcript = document.createElement('input');
+    transcript.type = 'hidden';
+    transcript.name = 'transcript';
+    transcript.value = JSON.stringify(
+      fullTranscript.slice(-16).map(turn => ({
+        role: turn.role,
+        content: String(turn.content || '').slice(0, 2000)
+      }))
+    );
+    form.appendChild(transcript);
     document.body.appendChild(form);
     form.submit();
     form.remove();
     appendMsg('system',
-      'GitHub issue draft opened with diagnostics only (no chat messages). The issue is public: review it before submitting.'
+      'GitHub issue draft opened with privacy-scrubbed diagnostics. Review it before submitting.'
     );
   }
 
@@ -1521,12 +1526,8 @@
   }
 
   function hideLoginOverlay() {
-    const overlay = document.getElementById('login-overlay');
-    // The health poll calls this every 30s; only move focus when the overlay was
-    // actually showing, or it pulls the cursor out of whatever the user is typing in.
-    const wasShowing = overlay.style.display !== 'none';
-    overlay.style.display = 'none';
-    if (wasShowing) document.getElementById('input')?.focus();
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('input')?.focus();
   }
 
   // ── Copilot-access banner ──
@@ -1659,9 +1660,7 @@
         if (d.copilot === 'no_access') { showCopilotBanner(d.copilot_username); }
         else { hideCopilotBanner(); }
         loadModels();
-        // Refresh the agents list only while its panel is open; rebuilding a hidden
-        // panel every poll is wasted work and can swap rows under a pending click.
-        if (document.getElementById('agents-panel')?.classList.contains('open')) loadAgentsList();
+        loadAgentsList();
         // Slow down polling once connected
         if (healthInterval) clearInterval(healthInterval);
         healthInterval = setInterval(checkHealth, 30000);
@@ -1880,13 +1879,11 @@
   // ── RAR Registry Browser ──
   // Search a public catalog of agents and hot-load any of them into this
   // brainstem by fetching the raw .py and POSTing it to /agents/import.
-  // AIBAST distribution: the built-in catalog is the AIBAST Agent Library on Microsoft main
-  // (pinned commit; every file is checked against the registry's SHA-256 before import).
-  const RAR_REVISION = '5012997dc8353e5720f7e54e054087d42f78c80f';
-  const RAR_BASE = `https://raw.githubusercontent.com/microsoft/aibast-agents-library/${RAR_REVISION}`;
+  const RAR_REVISION = '241c6191736a856b6837ef2398447a25710b8d72';
+  const RAR_BASE = `https://raw.githubusercontent.com/kody-w/RAR/${RAR_REVISION}`;
   // Same static files via the jsdelivr CDN mirror — used only when raw
   // rate-limits (HTTP 429) or hiccups. Plain file hosting, no API.
-  const RAR_MIRROR = `https://cdn.jsdelivr.net/gh/microsoft/aibast-agents-library@${RAR_REVISION}`;
+  const RAR_MIRROR = `https://cdn.jsdelivr.net/gh/kody-w/RAR@${RAR_REVISION}`;
   async function rarFetch(path) {
     try {
       const r = await fetch(encodeURI(`${RAR_BASE}/${path}`));
@@ -1944,7 +1941,7 @@
     // Featured agents are the empty-state browse view — hide them once a search starts.
     if (featured) featured.style.display = q ? 'none' : '';
     if (!q) { results.innerHTML = ''; return; }
-    results.innerHTML = '<div class="rar-status">Searching the AIBAST Agent Library…</div>';
+    results.innerHTML = '<div class="rar-status">Searching the RAR registry…</div>';
     loadRarRegistry().then(agents => {
       // Bail if the query changed while the registry was downloading.
       if (document.getElementById('rar-search-input').value.trim().toLowerCase() !== q) return;
@@ -1957,25 +1954,21 @@
         const hay = fold([a.display_name, a.name, a.description, a.category, a._file, ...(a.tags || [])]
           .filter(Boolean).join(' '));
         return words.every(w => hay.includes(w));
-      });
+      }).slice(0, 40);
       renderRarResults(matches);
     }).catch(() => {
-      results.innerHTML = '<div class="rar-status" style="color:#f85149">Could not reach the AIBAST Agent Library — check your connection.</div>';
+      results.innerHTML = '<div class="rar-status" style="color:#f85149">Could not reach the RAR registry — check your connection.</div>';
     });
   }
 
-  // Rows rendered per search; the label always reports the full match count.
-  const RAR_RESULTS_SHOWN = 40;
   function renderRarResults(matches) {
     const results = document.getElementById('rar-results');
     results.innerHTML = '';
     const label = document.createElement('div');
     label.className = 'rar-section-label';
     label.textContent = matches.length
-      ? (matches.length > RAR_RESULTS_SHOWN
-        ? `AIBAST Agent Library — showing ${RAR_RESULTS_SHOWN} of ${matches.length} matches; add a word to narrow`
-        : `AIBAST Agent Library — ${matches.length} match${matches.length === 1 ? '' : 'es'}`)
-      : 'AIBAST Agent Library';
+      ? `RAR registry — ${matches.length} match${matches.length === 1 ? '' : 'es'}`
+      : 'RAR registry';
     results.appendChild(label);
     if (!matches.length) {
       const none = document.createElement('div');
@@ -1984,7 +1977,7 @@
       results.appendChild(none);
       return;
     }
-    for (const a of matches.slice(0, RAR_RESULTS_SHOWN)) results.appendChild(buildRarItem(a));
+    for (const a of matches) results.appendChild(buildRarItem(a));
   }
 
   // Shared row used by both search results and the featured list.
@@ -2138,7 +2131,7 @@
       alert('This registry entry has no valid SHA-256 digest and cannot be installed.');
       return;
     }
-    if (!confirm(`Install ${filename}?\n\nThis executes Python code on your machine. The source is pinned to AIBAST Agent Library commit ${RAR_REVISION.slice(0, 12)} and its SHA-256 will be verified before installation.`)) {
+    if (!confirm(`Install ${filename}?\n\nThis executes Python code on your machine. The source is pinned to RAR commit ${RAR_REVISION.slice(0, 12)} and its SHA-256 will be verified before installation.`)) {
       return;
     }
     const orig = btn.textContent;
@@ -2151,7 +2144,7 @@
       const bytes = await r.arrayBuffer();
       const actualDigest = await sha256Hex(bytes);
       if (actualDigest !== expectedDigest) {
-        throw new Error('integrity check failed — downloaded bytes do not match the pinned AIBAST Agent Library catalog');
+        throw new Error('integrity check failed — downloaded bytes do not match the pinned RAR catalog');
       }
       const fd = new FormData();
       fd.append('file', new Blob([bytes], { type: 'text/x-python' }), filename);
@@ -2358,12 +2351,9 @@
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 120) + 'px';
     input.focus();
-    // Any website can link here with a prompt, and the box shows only a few lines of
-    // it. Say where it came from and how long it is, so nothing is sent unread.
-    appendMsg('system', `The message box was filled in from a link (${input.value.length} characters). Read all of it before you send it.`);
     const cleanUrl = new URL(window.location.href);
     cleanUrl.searchParams.delete('prompt');
-    window.history.replaceState(null, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+    history.replaceState(null, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
   }
   input.addEventListener('input', () => {
     input.style.height = 'auto';
@@ -2636,7 +2626,7 @@
     const payload = (starterPayloadOverride != null) ? starterPayloadOverride : text;
     starterPayloadOverride = null;
 
-    clog('chat.send', { input_len: payload.length, history_len: chatHistory.length });
+    clog('chat.send', { input_len: payload.length, history_len: history.length });
 
     // Immediately hide prompts on any send
     document.getElementById('starter-prompts')?.classList.add('hidden-prompts');
@@ -2650,7 +2640,7 @@
     requestState.transcriptTurn = {
       role: 'user', content: text, timestamp: new Date().toISOString()
     };
-    chatHistory.push(requestState.historyTurn);
+    history.push(requestState.historyTurn);
     fullTranscript.push(requestState.transcriptTurn);
 
     appendTyping(requestState);
@@ -2724,13 +2714,7 @@
         signal: requestState.controller.signal,
       });
 
-      // The server answered, so this is never "not connected": a non-JSON body (an
-      // HTML 500 page, a proxy error) becomes an ordinary error reply below.
-      let d;
-      try { d = await r.json(); }
-      catch { d = { error: `The Brainstem returned an error (HTTP ${r.status}). Try again, or share the details with your admin.` }; }
-      if (!d || typeof d !== 'object') d = { error: `The Brainstem returned an unexpected reply (HTTP ${r.status}).` };
-      if (!r.ok && !d.error) d.error = `The Brainstem returned an error (HTTP ${r.status}).`;
+      const d = await r.json();
       if (requestState.epoch !== conversationEpoch) return;
       removeTyping(requestState);
       if (d.agent_logs) console.log('[brainstem] agent_logs:', d.agent_logs.slice(0, 200));
@@ -2749,9 +2733,7 @@
             d.error, el('br'),
             actionLink('Switch to a different account', 'color:#58a6ff;font-size:12px', switchAccount)
           ]);
-        } else if (d.error.includes('Not authenticated') || d.error.includes('Not signed in') || d.error.includes('Sign in')) {
-          // Match the server's sign-in messages only. "Copilot" alone also appears in
-          // outage and subscription errors, which must not be shown as "Not signed in".
+        } else if (d.error.includes('Not authenticated') || d.error.includes('Copilot') || d.error.includes('Sign in')) {
           const wrap = appendMsg('system', '', null, requestState.responseSlot);
           setChildren(wrap.querySelector('.bubble'), [
             'Not signed in. ',
@@ -3116,13 +3098,7 @@
   let elApiKey = safeGet('el_api_key') || '';
   safeRemove('el_api_key');
   let elVoiceId = safeGet('el_voice_id') || '';
-  // A saved or imported model that is no longer offered (ElevenLabs retired
-  // eleven_monolingual_v1) falls back to the default instead of an empty selection.
-  function knownElModel(model) {
-    const offered = [...document.getElementById('el-model-select').options].map(o => o.value);
-    return offered.includes(model) ? model : 'eleven_multilingual_v2';
-  }
-  let elModel = knownElModel(safeGet('el_model') || 'eleven_multilingual_v2');
+  let elModel = safeGet('el_model') || 'eleven_multilingual_v2';
 
   let currentAudio = null;
   let voiceZipPassword = '';
@@ -3179,9 +3155,9 @@
         safeSet('el_voice_id', cfg.voice_id);
       }
       if (cfg.model && cfg.model !== 'eleven_multilingual_v2') {
-        elModel = knownElModel(cfg.model);
-        document.getElementById('el-model-select').value = elModel;
-        safeSet('el_model', elModel);
+        elModel = cfg.model;
+        document.getElementById('el-model-select').value = cfg.model;
+        safeSet('el_model', cfg.model);
       }
       switchVoiceProvider();
     } catch {}
@@ -3533,9 +3509,9 @@
       safeSet('el_voice_id', cfg.voice_id);
     }
     if (cfg.model) {
-      elModel = knownElModel(cfg.model);
-      document.getElementById('el-model-select').value = elModel;
-      safeSet('el_model', elModel);
+      elModel = cfg.model;
+      document.getElementById('el-model-select').value = cfg.model;
+      safeSet('el_model', cfg.model);
     }
     switchVoiceProvider();
     if (azSpeechKey) loadAzureVoices();
@@ -3614,7 +3590,7 @@
     conversationEpoch += 1;
     cancelActiveRequests(true);
     starterPayloadOverride = null;
-    chatHistory = [];
+    history = [];
     fullTranscript = [];
     sessionId = null;
     const sidEl = document.getElementById('session-id');
@@ -3636,7 +3612,7 @@
             <li><strong>Add Agents</strong>: Drag and drop any <code>agent.py</code> file directly onto this window to instantly teach me new things.</li>
           </ul>
           <p><em>Click one of the prompts below to get started!</em></p>
-          <p class="tour-invite-wrap"><button class="starter-btn tour-invite" onclick="startTour()">New here? Take the 5-minute guided tour</button><button class="tour-invite-hide" onclick="hideTourInvite()" title="Hide this — the Tutorial link in the toolbar stays available"><svg viewBox="0 0 16 16" style="width:10px;height:10px;fill:currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg></button></p>
+          <p class="tour-invite-wrap"><button class="starter-btn tour-invite" onclick="startTour()">New here? Take the 5-minute guided tour</button><button class="tour-invite-hide" onclick="hideTourInvite()" title="Hide this — you can still find the Training Quest in the toolbar"><svg viewBox="0 0 16 16" style="width:10px;height:10px;fill:currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg></button></p>
         </div>
       </div>
     `;
@@ -3726,7 +3702,7 @@
         }
 
         // Clear current chat and restore session
-        chatHistory = [];
+        history = [];
         fullTranscript = [];
         const chat = document.getElementById('chat');
         chat.innerHTML = '';
@@ -3740,10 +3716,10 @@
           const role = turn.role || 'user';
           const content = turn.content || '';
           if (role === 'user') {
-            chatHistory.push({ role: 'user', content });
+            history.push({ role: 'user', content });
             appendMsg('user', content);
           } else if (role === 'assistant') {
-            chatHistory.push({ role: 'assistant', content });
+            history.push({ role: 'assistant', content });
             const logs = turn.agent_logs && turn.agent_logs.trim() ? turn.agent_logs : null;
             appendMsg('assistant', content, logs);
           }
@@ -4169,7 +4145,7 @@
             <p class="tc-punch">Interview it. Teach it. Correct it. Trade agents.</p>
             <p>That method never changes, no matter how good the models get.</p>
             <p>Ready for the deep end? The <strong>VS Code button</strong> up top opens the workshop — GitHub Copilot builds new agents on this brainstem while you watch. It can't even tell Copilot and you apart.</p>
-            <p><em>Want to go further? The <a href="https://microsoft.github.io/aibast-agents-library/docs/tutorial.html" target="_blank" rel="noopener" style="color:#58a6ff">Brainstem tutorial</a> picks up where this tour ends.</em></p>`,
+            <p><em>Want to go further? The <a href="https://blazingbeard.github.io/quests/rapp-brainstem.html" target="_blank" style="color:#58a6ff">full Training Quest</a> picks up where this tour ends.</em></p>`,
           last: true
         }
       ];

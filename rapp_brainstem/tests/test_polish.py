@@ -89,7 +89,7 @@ def test_client_request_lifecycle_supports_concurrent_owned_replies():
     assert "cappedHistory(inFlightTurns)" in send
     assert ".filter(message => !excludedTurns?.has(message))" in index
     assert "appendTyping(requestState)" in send
-    assert "insertReplyAfter(chatHistory, requestState.historyTurn" in index
+    assert "insertReplyAfter(history, requestState.historyTurn" in index
     assert "fullTranscript, requestState.transcriptTurn, requestState.transcriptReply" in index.replace("\n", " ")
     assert "activeRequests.delete(requestState.id)" in send
     assert "activeRequest" not in index.replace("activeRequests", "")
@@ -156,10 +156,10 @@ def test_get_help_opens_privacy_scrubbed_public_draft_without_prompt_or_submissi
     assert "form.target = '_blank'" in helper
     assert "form.action = `${API}/diagnostics/report`" in helper
     assert "form.submit()" in helper
-    # AIBAST: the draft is a public issue, so no chat transcript is sent.
-    assert "fullTranscript" not in helper
+    assert "fullTranscript.slice(-16)" in helper
+    assert "content: String(turn.content || '').slice(0, 2000)" in helper
     assert "prompt(" not in helper
-    assert "GitHub issue draft opened with diagnostics only (no chat messages)" in helper
+    assert "GitHub issue draft opened with privacy-scrubbed diagnostics" in helper
 
 
 def test_unauthenticated_health_clears_stale_connected_hint():
