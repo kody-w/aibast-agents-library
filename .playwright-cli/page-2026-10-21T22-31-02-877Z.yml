@@ -1,0 +1,53 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - heading [level=1] [ref=e7]
+    - generic [ref=e10]:
+      - status [ref=e12]: offline
+      - combobox "Model" [ref=e13] [cursor=pointer]
+      - button "Toggle Light/Dark Mode" [ref=e14] [cursor=pointer]
+      - button "Browse the RAR agent registry" [ref=e19] [cursor=pointer]
+      - button "Manage installed agents" [ref=e24] [cursor=pointer]
+      - generic [ref=e28]:
+        - button "Voice mode off" [ref=e29] [cursor=pointer]
+        - button "Voice settings" [ref=e33] [cursor=pointer]
+      - link "Open in VS Code" [ref=e37] [cursor=pointer]:
+        - /url: vscode://file/$HOME/.brainstem/src/rapp_brainstem
+  - log [ref=e41]:
+    - generic: Drag & Drop .py Agents Here
+    - generic [ref=e43]:
+      - heading "Welcome to your local RAPP Brainstem!" [level=2] [ref=e44]
+      - paragraph [ref=e45]: "I am your local assistant powered by Copilot. Here is a quick tour to get you started:"
+      - list [ref=e46]:
+        - listitem [ref=e47]:
+          - strong [ref=e48]: Chat
+          - text: ": Just ask me questions below to start building and researching!"
+        - listitem [ref=e49]:
+          - strong [ref=e50]: Agents Panel
+          - text: ": Click the icon (top right) to view or remove installed tools."
+        - listitem [ref=e53]:
+          - strong [ref=e54]: Add Agents
+          - text: ": Drag and drop any"
+          - code [ref=e55]: agent.py
+          - text: file directly onto this window to instantly teach me new things.
+      - paragraph [ref=e56]:
+        - emphasis [ref=e57]: Click one of the prompts below to get started!
+      - paragraph [ref=e58]:
+        - button "New here? Take the 5-minute guided tour" [ref=e59] [cursor=pointer]
+        - button "Hide this — you can still find the Training Quest in the toolbar" [ref=e60] [cursor=pointer]
+  - contentinfo [ref=e63]:
+    - generic [ref=e64]:
+      - button "What can you do?" [ref=e65] [cursor=pointer]
+      - button "What do you remember?" [ref=e66] [cursor=pointer]
+      - button "What should I do next?" [ref=e67] [cursor=pointer]
+    - generic [ref=e69]:
+      - button [ref=e70] [cursor=pointer]
+      - button "Import" [ref=e74] [cursor=pointer]
+      - button "Clear" [ref=e75] [cursor=pointer]
+      - link "Tutorial" [ref=e76] [cursor=pointer]:
+        - /url: https://blazingbeard.github.io/quests/rapp-brainstem.html
+      - button "Get Help" [ref=e77] [cursor=pointer]
+    - generic [ref=e78]:
+      - textbox "Message" [active] [ref=e79]:
+        - /placeholder: Message brainstem...
+        - text: hello world
+      - button "Send message" [ref=e80] [cursor=pointer]: Send

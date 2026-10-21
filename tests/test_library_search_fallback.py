@@ -31,32 +31,35 @@ console.log(JSON.stringify({
     assert result["synonym"] > 0
 
 
-def test_failed_search_offers_learn_new_and_prefills_without_sending():
+def test_failed_search_offers_learn_new_as_a_request_to_paste():
     result = run_library_node(
         """
 state.query = "build a customs tariff classifier";
-const html = emptyState();
-const url = learnNewBrainstemUrl(state.query);
-console.log(JSON.stringify({html, url, prompt: learnNewPrompt(state.query)}));
+console.log(JSON.stringify({html: emptyState(), prompt: learnNewPrompt(state.query)}));
+state.query = "";
 """
     )
     assert "No library match" in result["html"]
     assert "Download Learn New agent.py" in result["html"]
-    assert "Open Brainstem with this request" in result["html"]
     assert "VS Code" in result["html"]
     assert "Brain Surgeon" in result["html"]
-    assert result["url"].startswith("http://localhost:7071/?prompt=")
-    assert "customs+tariff+classifier" in result["url"]
     assert "preview, create, self-test, and hot-load" in result["prompt"]
+    assert "customs tariff classifier" in result["html"]
+    # Installed Brainstems before the replaceState fix break on ?prompt=, so the library links no prefill.
+    assert "localhost:7071/?prompt=" not in result["html"]
+    assert "learnNewBrainstemUrl" not in LIBRARY.read_text(encoding="utf-8")
 
+
+def test_brainstem_prompt_prefill_uses_window_history():
     brainstem = BRAINSTEM_UI.read_text(encoding="utf-8")
     assert "new URLSearchParams(window.location.search).get('prompt')" in brainstem
     assert "input.value = prefilledPrompt.slice(0, 4000)" in brainstem
-    assert "history.replaceState" in brainstem
-    assert "handleSendButton()" not in brainstem[
-        brainstem.index("const prefilledPrompt"):
-        brainstem.index("input.addEventListener('input'")
-    ]
+    # The chat keeps its own `let history = []`, which shadows window.history.
+    assert "let history = [];" in brainstem
+    assert "window.history.replaceState(null, '', cleanUrl" in brainstem
+    prefill = brainstem[brainstem.index("const prefilledPrompt"):brainstem.index("input.addEventListener('input'")]
+    assert " history.replaceState" not in prefill.replace("window.history.replaceState", "")
+    assert "handleSendButton()" not in prefill
 
 
 def test_library_displays_and_sorts_observed_agent_downloads():

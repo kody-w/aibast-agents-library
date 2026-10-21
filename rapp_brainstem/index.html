@@ -2353,7 +2353,7 @@
     input.focus();
     const cleanUrl = new URL(window.location.href);
     cleanUrl.searchParams.delete('prompt');
-    history.replaceState(null, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+    window.history.replaceState(null, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
   }
   input.addEventListener('input', () => {
     input.style.height = 'auto';
