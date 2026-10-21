@@ -88,17 +88,16 @@ state.query = "";
 REQUEST_FORM_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR7RNABRLLw9Eq-9okV_7Z-hUOEY3QjQ3V1RJUk43OEs4WEkzTDZQUVdNMC4u"
 
 
-def test_install_link_carries_the_search_and_installer_reuses_the_same_prompt():
+
+def test_install_link_does_not_carry_the_search():
+    # Carrying the search into the installer waits on security review; the link stays plain.
     result = run_library_node(
         """
 state.query = "field technician photo inspection";
-console.log(JSON.stringify({html: emptyState(), prompt: learnNewPrompt("QUERY")}));
+console.log(JSON.stringify({html: emptyState()}));
 state.query = "";
 """
     )
-    assert 'href="docs/installer.html?request=field%20technician%20photo%20inspection"' in result["html"]
-    installer = (ROOT / "docs" / "installer.html").read_text(encoding="utf-8")
-    assert "get('request')" in installer
-    # The installer builds the same prompt the library sends, so both routes ask the Brainstem the same thing.
-    assert result["prompt"].replace('"QUERY"', '"${request}"') in installer
-    assert "url.searchParams.set('prompt', prompt)" in installer
+    assert 'href="docs/installer.html">Install it first</a>' in result["html"]
+    assert "?request=" not in result["html"]
+    assert "pending-request" not in (ROOT / "docs" / "installer.html").read_text(encoding="utf-8")
