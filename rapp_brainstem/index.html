@@ -1090,16 +1090,16 @@
     </button>
 
     <div class="registry-wrapper">
-      <button class="icon-btn" id="registry-btn" onclick="toggleRegistryPanel()" title="Browse the RAR agent registry">
+      <button class="icon-btn" id="registry-btn" onclick="toggleRegistryPanel()" title="Browse the AIBAST Agent Library">
         <span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></span>
       </button>
       <div id="registry-panel">
         <h3>
           <span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></span>
-          RAR Agent Registry
+          AIBAST Agent Library
         </h3>
         <div class="rar-search">
-          <input id="rar-search-input" type="text" placeholder="Search the RAR agent registry…"
+          <input id="rar-search-input" type="text" placeholder="Search the AIBAST Agent Library…"
                  oninput="rarSearch()" autocomplete="off" spellcheck="false">
         </div>
         <div id="rar-results" class="rar-results"></div>
@@ -1879,11 +1879,13 @@
   // ── RAR Registry Browser ──
   // Search a public catalog of agents and hot-load any of them into this
   // brainstem by fetching the raw .py and POSTing it to /agents/import.
-  const RAR_REVISION = '241c6191736a856b6837ef2398447a25710b8d72';
-  const RAR_BASE = `https://raw.githubusercontent.com/kody-w/RAR/${RAR_REVISION}`;
+  // AIBAST distribution: the built-in catalog is the AIBAST Agent Library on Microsoft main
+  // (pinned commit; every file is checked against the registry's SHA-256 before import).
+  const RAR_REVISION = '5012997dc8353e5720f7e54e054087d42f78c80f';
+  const RAR_BASE = `https://raw.githubusercontent.com/microsoft/aibast-agents-library/${RAR_REVISION}`;
   // Same static files via the jsdelivr CDN mirror — used only when raw
   // rate-limits (HTTP 429) or hiccups. Plain file hosting, no API.
-  const RAR_MIRROR = `https://cdn.jsdelivr.net/gh/kody-w/RAR@${RAR_REVISION}`;
+  const RAR_MIRROR = `https://cdn.jsdelivr.net/gh/microsoft/aibast-agents-library@${RAR_REVISION}`;
   async function rarFetch(path) {
     try {
       const r = await fetch(encodeURI(`${RAR_BASE}/${path}`));
@@ -1941,7 +1943,7 @@
     // Featured agents are the empty-state browse view — hide them once a search starts.
     if (featured) featured.style.display = q ? 'none' : '';
     if (!q) { results.innerHTML = ''; return; }
-    results.innerHTML = '<div class="rar-status">Searching the RAR registry…</div>';
+    results.innerHTML = '<div class="rar-status">Searching the AIBAST Agent Library…</div>';
     loadRarRegistry().then(agents => {
       // Bail if the query changed while the registry was downloading.
       if (document.getElementById('rar-search-input').value.trim().toLowerCase() !== q) return;
@@ -1957,7 +1959,7 @@
       }).slice(0, 40);
       renderRarResults(matches);
     }).catch(() => {
-      results.innerHTML = '<div class="rar-status" style="color:#f85149">Could not reach the RAR registry — check your connection.</div>';
+      results.innerHTML = '<div class="rar-status" style="color:#f85149">Could not reach the AIBAST Agent Library — check your connection.</div>';
     });
   }
 
@@ -1967,8 +1969,8 @@
     const label = document.createElement('div');
     label.className = 'rar-section-label';
     label.textContent = matches.length
-      ? `RAR registry — ${matches.length} match${matches.length === 1 ? '' : 'es'}`
-      : 'RAR registry';
+      ? `AIBAST Agent Library — ${matches.length} match${matches.length === 1 ? '' : 'es'}`
+      : 'AIBAST Agent Library';
     results.appendChild(label);
     if (!matches.length) {
       const none = document.createElement('div');
@@ -2131,7 +2133,7 @@
       alert('This registry entry has no valid SHA-256 digest and cannot be installed.');
       return;
     }
-    if (!confirm(`Install ${filename}?\n\nThis executes Python code on your machine. The source is pinned to RAR commit ${RAR_REVISION.slice(0, 12)} and its SHA-256 will be verified before installation.`)) {
+    if (!confirm(`Install ${filename}?\n\nThis executes Python code on your machine. The source is pinned to AIBAST Agent Library commit ${RAR_REVISION.slice(0, 12)} and its SHA-256 will be verified before installation.`)) {
       return;
     }
     const orig = btn.textContent;
@@ -2144,7 +2146,7 @@
       const bytes = await r.arrayBuffer();
       const actualDigest = await sha256Hex(bytes);
       if (actualDigest !== expectedDigest) {
-        throw new Error('integrity check failed — downloaded bytes do not match the pinned RAR catalog');
+        throw new Error('integrity check failed — downloaded bytes do not match the pinned AIBAST Agent Library catalog');
       }
       const fd = new FormData();
       fd.append('file', new Blob([bytes], { type: 'text/x-python' }), filename);
