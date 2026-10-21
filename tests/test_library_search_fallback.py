@@ -82,3 +82,13 @@ state.query = "";
     for word in ("Learn New", "VS Code", "Brain Surgeon", "transcript", "localhost:7071", "agent.py"):
         assert word not in result["html"]
     assert "learnNewPrompt" not in LIBRARY.read_text(encoding="utf-8")
+
+
+def test_request_use_case_page_opens_the_form_on_not_listed():
+    page = (ROOT / "request-use-case.html").read_text(encoding="utf-8")
+    assert f'href="{REQUEST_FORM_URL}&amp;r2c6c3672a0d9465d8f24e5caf6f21619=%22My%20use%20case%20is%20not%20listed%22"' in page
+    assert "<!-- aibast-design:start -->" in page and "<!-- clarity:start -->" in page
+    assert "no customer names and no customer data" in page
+    for word in ("Factory", "Request access", "Azure"):
+        assert word not in page
+    assert 'href="request-use-case.html"' in LIBRARY.read_text(encoding="utf-8")
