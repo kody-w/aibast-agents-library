@@ -66,7 +66,8 @@ console.log(JSON.stringify({withQuery: emptyState(), url: requestMissingUrl()}))
 state.query = "";
 """
     )
-    assert "Request access" in result["withQuery"]
+    assert "Tell us what you need" in result["withQuery"]
+    assert "Request access" not in result["withQuery"]
     assert 'class="button primary" href="https://forms.cloud.microsoft/' in result["withQuery"]
     assert result["url"] == REQUEST_FORM_URL + "&r2c6c3672a0d9465d8f24e5caf6f21619=%22My%20use%20case%20is%20not%20listed%22"
     # The search text never goes into the form, and Factory access is an internal follow-up.
@@ -91,3 +92,11 @@ state.query = "";
     assert 'href="docs/installer.html">Install it first</a>' in result["html"]
     assert "?request=" not in result["html"]
     assert "pending-request" not in (ROOT / "docs" / "installer.html").read_text(encoding="utf-8")
+
+
+def test_tell_us_is_offered_after_every_search_not_only_empty_ones():
+    library = LIBRARY.read_text(encoding="utf-8")
+    suggestions = library[library.index("function renderSuggestions()"):library.index("function learnNewPrompt")]
+    assert 'join("") + tellUs;' in suggestions
+    assert "if (!rows.length)" not in suggestions
+    assert "Request access" not in library
