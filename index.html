@@ -956,6 +956,7 @@ body.partners-view .agent-card h2 {
   text-align: left;
 }
 .empty-path h4 { margin: 0 0 8px; }
+.empty-path summary { cursor: pointer; }
 .empty-path ol { margin: 12px 0; padding-left: 22px; }
 .empty-path li { margin: 7px 0; }
 .empty-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
@@ -2773,15 +2774,10 @@ function renderSuggestions() {
     .filter(row => row.score >= Math.max(8, topScore * 0.5))
     .slice(0, 5);
   if (!rows.length) {
-    const promptUrl = learnNewBrainstemUrl(query);
     $("suggestions").innerHTML = `
       <a class="suggestion" href="${esc(requestMissingUrl())}" target="_blank" rel="noopener">
         <div><strong>Not in the library? Request access</strong><span>One short form. We follow up by email to learn about your use case.</span></div>
         <em>Request access</em>
-      </a>
-      <a class="suggestion" href="${esc(promptUrl)}" target="_blank" rel="noopener">
-        <div><strong>Create "${esc(query)}" with Learn New</strong><span>Open Brainstem with the request prefilled; review it, then press Send.</span></div>
-        <em>Build it</em>
       </a>`;
     $("suggestions").classList.add("visible");
     return;
@@ -2829,19 +2825,21 @@ function emptyState() {
         <div class="empty-actions" style="justify-content:center">
           <a class="button primary" href="${esc(requestMissingUrl())}" target="_blank" rel="noopener">Request access ↗</a>
           <button class="button" type="button" data-action="clear-all">Clear search and filters</button>
-          <a class="button" href="rapp_brainstem/agents/rar_rapp_learn_new_agent.py" download="rar_rapp_learn_new_agent.py">Download Learn New agent.py</a>
-          <a class="button" href="${esc(promptUrl)}" target="_blank" rel="noopener">Open Brainstem with this request ↗</a>
         </div>
-        <div class="empty-path">
-          <h4>Teach the Brainstem to build what is missing</h4>
+        <details class="empty-path">
+          <summary><strong>Build it yourself with the Brainstem</strong></summary>
           <ol>
+            <li>No Brainstem yet? <a href="docs/installer.html?request=${enc(query)}">Install it first</a> (one command). The installer page keeps your search and gives you a one-click way to continue once the Brainstem is running. The buttons below only work while it is running on this computer.</li>
             <li>Open Brainstem. The search request is prefilled but is <strong>not sent automatically</strong>; review it and press Send.</li>
-            <li>Current AIBAST Brainstem includes Learn New. If it is missing, download the file above and drag it into the Brainstem window to hot-load it.</li>
+            <li>Current AIBAST Brainstem includes Learn New. If it is missing, download the file below and drag it into the Brainstem window to hot-load it.</li>
             <li>Learn New creates and self-tests the new <code>agent.py</code> locally.</li>
             <li>If the result is not what you expected, export the Brainstem transcript, click the <strong>VS Code</strong> button, drag the transcript into Copilot Chat (Brain Surgeon), and ask it to test and fix the generated agent against <code>localhost:7071</code>.</li>
           </ol>
-          <p>This keeps the failed search useful: first discover, then create, test, correct, and reuse.</p>
-        </div>
+          <div class="empty-actions">
+            <a class="button" href="${esc(promptUrl)}" target="_blank" rel="noopener">Open Brainstem with this request ↗</a>
+            <a class="button" href="rapp_brainstem/agents/rar_rapp_learn_new_agent.py" download="rar_rapp_learn_new_agent.py">Download Learn New agent.py</a>
+          </div>
+        </details>
       </div>`;
   }
   return `

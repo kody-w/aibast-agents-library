@@ -204,6 +204,13 @@ html[data-theme="dark"] {
     border-color: var(--cp-accent); background: var(--cp-accent-soft); color: var(--cp-text);
     text-decoration: none;
   }
+  .pending-request {
+    max-width: 760px; margin: 0 auto 24px; padding: 16px 20px;
+    border: 1px solid var(--cp-border); border-radius: 12px; background: var(--cp-surface);
+  }
+  .pending-request p { margin: 0 0 10px; }
+  .pending-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  button.hero-action { cursor: pointer; font-family: inherit; }
   .hero-action.primary {
     background: var(--cp-accent); border-color: var(--cp-accent); color: var(--cp-accent-fg);
   }
@@ -455,6 +462,15 @@ html[data-theme="dark"] {
   </div>
 </div>
 
+<div class="pending-request" id="pending-request" hidden>
+  <p><strong>Your library search is saved:</strong> <span id="pending-request-text"></span></p>
+  <p>Install the Brainstem below. When it is running, continue and it opens with your request filled in. Nothing is sent until you press Send.</p>
+  <div class="pending-actions">
+    <a class="hero-action primary" id="pending-request-open" href="#" target="_blank" rel="noopener">Continue with my request ↗</a>
+    <button class="hero-action" type="button" id="pending-request-dismiss">Dismiss</button>
+  </div>
+</div>
+
 <div class="install-widget" id="install-widget">
   <div class="install-tabs">
     <div class="install-tabs-left">
@@ -644,6 +660,31 @@ html[data-theme="dark"] {
 </div>
 
 <script>
+  // ── Pending library request ──
+  // A failed library search links here as ?request=...; keep it until the Brainstem is
+  // installed, then open it with the same Learn New prompt the library uses.
+  (function () {
+    const KEY = 'aibast.pendingRequest';
+    const store = {
+      get() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } },
+      set(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} }
+    };
+    const fromUrl = (new URLSearchParams(location.search).get('request') || '').trim().slice(0, 200);
+    if (fromUrl) store.set(fromUrl);
+    const request = fromUrl || store.get();
+    if (!request) return;
+    const prompt = `Use Learn New to preview, create, self-test, and hot-load an agent for this unmet AIBAST library search: "${request}". Return the agent.py filename, what it does, a test prompt, and the VS Code Brain Surgeon repair steps if its behavior needs work.`;
+    const url = new URL('http://localhost:7071/');
+    url.searchParams.set('prompt', prompt);
+    document.getElementById('pending-request-text').textContent = `"${request}"`;
+    document.getElementById('pending-request-open').href = url.toString();
+    document.getElementById('pending-request-dismiss').addEventListener('click', () => {
+      store.set('');
+      document.getElementById('pending-request').hidden = true;
+    });
+    document.getElementById('pending-request').hidden = false;
+  })();
+
   // ── Install widget ──
   const publishedBase = (
     location.protocol === 'https:' && location.hostname.endsWith('.github.io')
