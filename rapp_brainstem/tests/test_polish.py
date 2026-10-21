@@ -89,7 +89,7 @@ def test_client_request_lifecycle_supports_concurrent_owned_replies():
     assert "cappedHistory(inFlightTurns)" in send
     assert ".filter(message => !excludedTurns?.has(message))" in index
     assert "appendTyping(requestState)" in send
-    assert "insertReplyAfter(history, requestState.historyTurn" in index
+    assert "insertReplyAfter(chatHistory, requestState.historyTurn" in index
     assert "fullTranscript, requestState.transcriptTurn, requestState.transcriptReply" in index.replace("\n", " ")
     assert "activeRequests.delete(requestState.id)" in send
     assert "activeRequest" not in index.replace("activeRequests", "")
