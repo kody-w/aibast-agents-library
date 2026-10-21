@@ -1,7 +1,0 @@
-[      75ms] TypeError: history.replaceState is not a function
-    at http://127.0.0.1:8799/index.html?prompt=hello%20world:2356:13
-[      75ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8799/health:0
-[      75ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8799/health:0
-[      75ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:8799/index.html?prompt=hello%20world:0
-[      76ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:8799/index.html?prompt=hello%20world:0
-[    5065ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8799/health:0
