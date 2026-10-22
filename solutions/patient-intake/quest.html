@@ -2005,12 +2005,14 @@ These skill names above are the ONLY valid skill identifiers. Never invent, gues
       const makeItYoursInputs = Array.from(document.querySelectorAll("[data-make-it-yours]"));
       const applyMakeItYours = (value) => {
         const industry = value.replace(/\s+/g, " ").trim();
+        // "the telecom industry" reads as "telecom" inside the sentence below.
+        const named = industry.replace(/^the\s+/i, "").replace(/\s+(industry|industries|sector)$/i, "") || industry;
         makeItYoursInputs.forEach((input) => {
           if (input.value !== value) input.value = value;
           const target = document.getElementById(input.dataset.makeItYours);
           if (!target) return;
           const base = input.dataset.basePrompt || "";
-          target.textContent = industry ? `${base} Then adapt it for the ${industry} industry.` : base;
+          target.textContent = industry ? `${base} Then adapt it for the ${named} industry.` : base;
         });
         try {
           if (industry) window.localStorage.setItem(industryKey, industry);
