@@ -1500,7 +1500,7 @@ footer {
   .your-industry-row input { min-height: 40px; padding: 8px 12px; }
   .your-industry-row input { flex: 1; min-width: 0; }
   .clear-industry { border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text); border-radius: 8px; padding: 0 14px; font: inherit; cursor: pointer; }
-  .adapt-note { display: inline-block; align-self: flex-start; width: fit-content; margin: 2px 0 6px; padding: 2px 9px; border-radius: 999px; background: var(--cp-surface-soft); color: var(--cp-text-muted); font-size: 12px; font-weight: 600; }
+  .adapt-note { display: inline-block; align-self: flex-start; width: fit-content; max-width: 100%; overflow-wrap: anywhere; margin: 2px 0 6px; padding: 2px 9px; border-radius: 999px; background: var(--cp-surface-soft); color: var(--cp-text-muted); font-size: 12px; font-weight: 600; }
   .adapt-note.built { background: var(--cp-accent-soft); color: var(--cp-accent); }
   .more-adapt { grid-column: 1 / -1; margin: 22px 0 0; }
   .more-adapt > summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
@@ -2117,16 +2117,18 @@ function bindInputs() {
     yourIndustryTimer = setTimeout(render, 250);
   });
   // Follow changes made in a workshop (Back button) or in another tab.
-  const syncYourIndustry = () => {
+  const syncYourIndustry = fromOtherTab => {
     const saved = readYourIndustry();
+    // Coming back (Back button), the box is always reset, even if the browser restored focus to it.
+    // From another tab, leave the box alone only while this tab's user is typing in it.
+    if (!fromOtherTab || document.activeElement !== $("your-industry")) $("your-industry").value = saved;
     if (saved === state.yourIndustry) return;
     state.yourIndustry = saved;
-    if (document.activeElement !== $("your-industry")) $("your-industry").value = saved;
     render();
   };
-  window.addEventListener("pageshow", syncYourIndustry);
+  window.addEventListener("pageshow", () => syncYourIndustry(false));
   window.addEventListener("storage", event => {
-    if (event.key === null || event.key === YOUR_INDUSTRY_KEY) syncYourIndustry();
+    if (event.key === null || event.key === YOUR_INDUSTRY_KEY) syncYourIndustry(true);
   });
   $("clear-your-industry").addEventListener("click", () => {
     $("your-industry").value = "";
@@ -3065,12 +3067,12 @@ function architectureHTML(architecture, solution, agentName) {
         `).join("")}
       </div>
       <h3>Learn and build</h3>
-      <p>The workshop is the single entry point. Step one lets GitHub Copilot in VS Code install the stable RAPP Brainstem from its canonical onboarding skill; the remaining steps teach the use case, run the globally configured Easy harness, and keep the complete Manual mode inline on the same page.</p>
+      <p>The workshop is the single entry point. Step one opens GitHub Copilot Chat in VS Code; the remaining steps teach the use case, run Easy mode with your workshop setting, and keep the complete Manual mode inline on the same page.</p>
       <div class="capability-grid">
         <article class="capability-card">
           <code>Step 1</code>
-          <strong>Install RAPP Brainstem with Copilot</strong>
-          <p>Paste one setup prompt into GitHub Copilot Agent mode. Copilot runs the stable installer, pauses only for authentication or approval, verifies the health endpoint, and opens the chat.</p>
+          <strong>Open GitHub Copilot Chat</strong>
+          <p>Start in GitHub Copilot Chat in VS Code. The workshop's skill handles any additional setup, and adds the Brainstem only if you chose it in Workshop settings.</p>
         </article>
         <article class="capability-card">
           <code>Guided Easy mode</code>
@@ -3601,7 +3603,8 @@ document.addEventListener("keydown", event => {
     event.preventDefault();
     $("search").focus();
   }
-  if (event.altKey && event.key.toLowerCase() === "q") {
+  if (event.altKey && event.key.toLowerCase() === "q"
+      && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) {
     window.location.href = "solutions/building-permit-processing/quest.html";
   }
   if ((event.key === "Enter" || event.key === " ")
