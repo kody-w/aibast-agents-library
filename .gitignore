@@ -18,6 +18,3 @@ work/
 
 # Tenant values for the request-access flow. Never commit these.
 automation/**/settings.local.json
-
-# Local browser-automation session output
-.playwright-cli/
