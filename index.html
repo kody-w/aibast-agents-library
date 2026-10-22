@@ -2117,19 +2117,22 @@ function bindInputs() {
     yourIndustryTimer = setTimeout(render, 250);
   });
   // Follow changes made in a workshop (Back button) or in another tab.
-  const syncYourIndustry = fromOtherTab => {
+  // The box and the cards always show the same saved industry.
+  const syncYourIndustry = () => {
     const saved = readYourIndustry();
-    // Coming back (Back button), the box is always reset, even if the browser restored focus to it.
-    // From another tab, leave the box alone only while this tab's user is typing in it.
-    if (!fromOtherTab || document.activeElement !== $("your-industry")) $("your-industry").value = saved;
+    $("your-industry").value = saved;
     if (saved === state.yourIndustry) return;
     state.yourIndustry = saved;
     render();
   };
-  window.addEventListener("pageshow", () => syncYourIndustry(false));
+  // Coming back (Back button): always, even if the browser restored focus to the box.
+  window.addEventListener("pageshow", syncYourIndustry);
+  // A change from another tab waits while someone is in the box here, then applies when they leave it.
   window.addEventListener("storage", event => {
-    if (event.key === null || event.key === YOUR_INDUSTRY_KEY) syncYourIndustry(true);
+    if ((event.key === null || event.key === YOUR_INDUSTRY_KEY)
+        && document.activeElement !== $("your-industry")) syncYourIndustry();
   });
+  $("your-industry").addEventListener("blur", syncYourIndustry);
   $("clear-your-industry").addEventListener("click", () => {
     $("your-industry").value = "";
     writeYourIndustry("");
