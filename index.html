@@ -904,7 +904,9 @@ body.partners-view .industry-blueprint,
 body.partners-view .popular,
 body.partners-view #readiness,
 body.partners-view #sort,
-body.partners-view .upvote-explainer {
+body.partners-view .upvote-explainer,
+body.first-party-view .your-industry,
+body.partners-view .your-industry {
   display: none;
 }
 body.first-party-view .persona,
@@ -1512,10 +1514,10 @@ footer {
   .clear-industry { border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text); border-radius: 8px; padding: 0 14px; font: inherit; cursor: pointer; }
   .adapt-note { display: inline-block; align-self: flex-start; width: fit-content; margin: 2px 0 6px; padding: 2px 9px; border-radius: 999px; background: var(--cp-surface-soft); color: var(--cp-text-muted); font-size: 12px; font-weight: 600; }
   .adapt-note.built { background: var(--cp-accent-soft); color: var(--cp-accent); }
-  .more-adapt { margin: 22px 0 0; }
+  .more-adapt { grid-column: 1 / -1; margin: 22px 0 0; }
   .more-adapt > summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
   .more-adapt .more-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 8px; }
-  .first-party-strip { margin: 0 0 18px; padding: 14px 16px; border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-link); border-radius: 10px; background: var(--cp-surface); }
+  .first-party-strip { grid-column: 1 / -1; margin: 0 0 18px; padding: 14px 16px; border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-link); border-radius: 10px; background: var(--cp-surface); }
   .first-party-strip h3 { margin: 0 0 8px; font-size: 15px; }
   .first-party-strip ul { margin: 0; padding-left: 18px; }
   .first-party-strip li { margin: 4px 0; }
@@ -2561,11 +2563,19 @@ function writeYourIndustry(value) {
   state.yourIndustry = cleaned;
 }
 
+const GENERIC_INDUSTRY_WORDS = new Set(["and", "services", "products", "industry", "cross"]);
+
+function industryWords(value) {
+  return normalize(value).split(" ")
+    .filter(word => word.length > 2 && !GENERIC_INDUSTRY_WORDS.has(word));
+}
+
 function yourIndustryMatches(agent) {
-  const typed = normalize(state.yourIndustry || "");
-  if (!typed) return false;
-  const label = normalize(CATEGORY_NAMES[agent.category] || pretty(agent.category));
-  return label.includes(typed) || typed.includes(label);
+  // Whole words only, so "rail" never matches "retail".
+  const typed = industryWords(state.yourIndustry || "");
+  if (!typed.length) return false;
+  const label = industryWords(CATEGORY_NAMES[agent.category] || pretty(agent.category));
+  return typed.some(word => label.includes(word));
 }
 
 function adaptNote(agent) {

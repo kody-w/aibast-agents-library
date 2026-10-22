@@ -143,9 +143,12 @@ test("stable Frontier aliases fail closed and point to the Brainstem one-liners"
     "RAPP Brainstem Frontier has been retired. To build from scratch on your own device, install the Brainstem:";
   for (const bootstrap of [frontierUnix, frontierWindows]) {
     assert.match(bootstrap, new RegExp(message.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-    assert.match(bootstrap, /exit 1/);
     assert.doesNotMatch(bootstrap, /api\.github\.com|beta\/install\.(?:sh|cmd)|BRAINSTEM_BETA_/);
   }
+  assert.match(frontierUnix, /^exit 1$/m);
+  // Under "irm ... | iex", exit closes the user's window before the message can be read.
+  assert.match(frontierWindows, /^throw "RAPP Brainstem Frontier has been retired\."$/m);
+  assert.doesNotMatch(frontierWindows, /^\s*exit\b/m);
   assert.match(
     frontierUnix,
     /curl -fsSL https:\/\/microsoft\.github\.io\/aibast-agents-library\/install\.sh \| bash/,

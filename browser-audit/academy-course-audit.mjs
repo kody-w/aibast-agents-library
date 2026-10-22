@@ -370,7 +370,7 @@ async function completeEasyCourse(page, baseUrl, slug) {
 async function checkGroup(page, group) {
   const locator = page.locator(
     `[data-checkpoint][data-achievements-group="${group}"]`
-    + '[data-achievements-path="brainstem"], '
+    + '[data-achievements-path="copilot"], '
     + `[data-checkpoint][data-achievements-group="${group}"]`
     + '[data-achievements-path="shared"]',
   );
@@ -382,6 +382,7 @@ async function checkGroup(page, group) {
   return count;
 }
 
+// Runs with no stored engine, so the default GitHub Copilot lane is what a new learner sees.
 async function auditAchievementRuntime(browser, baseUrl, slug) {
   const context = await browser.newContext({ viewport: { width: 1024, height: 900 } });
   const page = await context.newPage();
@@ -406,7 +407,7 @@ async function auditAchievementRuntime(browser, baseUrl, slug) {
         && !Object.hasOwn(checkpoint.dataset, "achievementGroup")
       )),
       required: checkpoints.filter((checkpoint) => (
-        ["brainstem", "shared"].includes(
+        ["copilot", "shared"].includes(
           checkpoint.getAttribute("data-achievements-path"),
         )
       )).length,
@@ -435,7 +436,7 @@ async function auditAchievementRuntime(browser, baseUrl, slug) {
   }
 
   const required = page.locator(
-    '[data-checkpoint][data-achievements-path="brainstem"], '
+    '[data-checkpoint][data-achievements-path="copilot"], '
     + '[data-checkpoint][data-achievements-path="shared"]',
   );
   for (let index = 0; index < await required.count(); index += 1) {
@@ -513,8 +514,8 @@ async function auditStorageDenial(browser, baseUrl, slug) {
     };
   });
   record(
-    "storage denial defaults visual engine to brainstem",
-    before.engine === "brainstem",
+    "storage denial defaults visual engine to copilot",
+    before.engine === "copilot",
     String(before.engine),
   );
   record(
@@ -1123,9 +1124,9 @@ async function auditRepresentativeRuntime(browser, baseUrl, slugs) {
     ? "account-intelligence"
     : slugs[0];
   for (const [storedValue, expected] of [
-    [null, "brainstem"],
+    [null, "copilot"],
     ["brainstem", "brainstem"],
-    ["invalid", "brainstem"],
+    ["invalid", "copilot"],
     ["copilot", "copilot"],
   ]) {
     const state = await engineScenario(browser, baseUrl, slug, storedValue);
