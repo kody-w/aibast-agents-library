@@ -1503,6 +1503,23 @@ footer {
   }
   .arch-l2-domain:last-child { border-bottom: 0; }
 }
+  .your-industry { display: grid; gap: 6px; margin: 12px 0 4px; }
+  .your-industry label { font-size: 14px; color: var(--cp-text); }
+  .your-industry label span { color: var(--cp-text-muted); }
+  .your-industry-row { display: flex; align-items: stretch; gap: 8px; max-width: 560px; }
+  .your-industry-row input { min-height: 40px; padding: 8px 12px; }
+  .your-industry-row input { flex: 1; min-width: 0; }
+  .clear-industry { border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text); border-radius: 8px; padding: 0 14px; font: inherit; cursor: pointer; }
+  .adapt-note { display: inline-block; align-self: flex-start; width: fit-content; margin: 2px 0 6px; padding: 2px 9px; border-radius: 999px; background: var(--cp-surface-soft); color: var(--cp-text-muted); font-size: 12px; font-weight: 600; }
+  .adapt-note.built { background: var(--cp-accent-soft); color: var(--cp-accent); }
+  .more-adapt { margin: 22px 0 0; }
+  .more-adapt > summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+  .more-adapt .more-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 8px; }
+  .first-party-strip { margin: 0 0 18px; padding: 14px 16px; border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-link); border-radius: 10px; background: var(--cp-surface); }
+  .first-party-strip h3 { margin: 0 0 8px; font-size: 15px; }
+  .first-party-strip ul { margin: 0; padding-left: 18px; }
+  .first-party-strip li { margin: 4px 0; }
+  .first-party-strip a { color: var(--cp-link); }
 </style>
 <!-- clarity:start -->
 <script data-clarity-project="yeqkj55zbc">
@@ -1583,6 +1600,13 @@ footer {
       <input class="search" id="search" type="search" autocomplete="off" placeholder="Search: claims fraud, permit backlog, plant manager, Dynamics 365...">
       <button class="clear-search" id="clear-search" type="button" data-action="clear-search" aria-label="Clear search">×</button>
       <div class="suggestions" id="suggestions"></div>
+      <div class="your-industry">
+        <label for="your-industry"><strong>Your industry (optional)</strong> <span>Every template adapts to it. Workshops use it too, and this browser remembers it until you clear it.</span></label>
+        <div class="your-industry-row">
+          <input class="field" id="your-industry" type="text" maxlength="120" autocomplete="off" placeholder="For example: homebuilders, telecom, media">
+          <button class="clear-industry" id="clear-your-industry" type="button">Clear</button>
+        </div>
+      </div>
       <div class="popular">
         <span class="popular-label">Browse by goal</span>
         <button class="query-chip" type="button" data-action="query" data-query="grow revenue sales pipeline renewal">Grow revenue</button>
@@ -2090,6 +2114,22 @@ function fillSelect(id, values, placeholder) {
 }
 
 function bindInputs() {
+  state.yourIndustry = readYourIndustry();
+  $("your-industry").value = state.yourIndustry;
+  let yourIndustryTimer = 0;
+  $("your-industry").addEventListener("input", event => {
+    clearTimeout(yourIndustryTimer);
+    yourIndustryTimer = setTimeout(() => {
+      writeYourIndustry(event.target.value);
+      render();
+    }, 250);
+  });
+  $("clear-your-industry").addEventListener("click", () => {
+    $("your-industry").value = "";
+    writeYourIndustry("");
+    render();
+    $("your-industry").focus();
+  });
   $("search").addEventListener("input", event => {
     state.query = event.target.value;
     $("clear-search").classList.toggle("visible", Boolean(state.query));
@@ -2500,6 +2540,70 @@ function partnerAgentCard(agent) {
     </article>`;
 }
 
+const YOUR_INDUSTRY_KEY = "aibast.workshop.industry";
+
+function readYourIndustry() {
+  try {
+    return (localStorage.getItem(YOUR_INDUSTRY_KEY) || "").trim();
+  } catch (_error) {
+    return "";
+  }
+}
+
+function writeYourIndustry(value) {
+  const cleaned = String(value || "").replace(/\s+/g, " ").trim();
+  try {
+    if (cleaned) localStorage.setItem(YOUR_INDUSTRY_KEY, cleaned);
+    else localStorage.removeItem(YOUR_INDUSTRY_KEY);
+  } catch (_error) {
+    // The page still works for this visit.
+  }
+  state.yourIndustry = cleaned;
+}
+
+function yourIndustryMatches(agent) {
+  const typed = normalize(state.yourIndustry || "");
+  if (!typed) return false;
+  const label = normalize(CATEGORY_NAMES[agent.category] || pretty(agent.category));
+  return label.includes(typed) || typed.includes(label);
+}
+
+function adaptNote(agent) {
+  if (!state.yourIndustry || state.view !== "solutions") return "";
+  return yourIndustryMatches(agent)
+    ? `<span class="adapt-note built">Built for ${esc(state.yourIndustry)}</span>`
+    : `<span class="adapt-note">Adapts to ${esc(state.yourIndustry)}</span>`;
+}
+
+function firstPartyStrip() {
+  if (state.view !== "solutions" || !state.query) return "";
+  const matches = filteredFirstParty().filter(row => row.score >= 10).slice(0, 3);
+  if (!matches.length) return "";
+  return `
+    <section class="first-party-strip" aria-label="Microsoft agents">
+      <h3>Microsoft agents that already do this</h3>
+      <ul>${matches.map(row => `<li><strong>${esc(row.agent.name)}</strong> (${esc(row.agent.product)}): ${esc(row.agent.description || "")}</li>`).join("")}</ul>
+      <p><a href="?view=first-party&amp;q=${encodeURIComponent(state.query)}">See them in the Microsoft first-party catalog</a>. The templates below are for prototyping the same job, or the parts those agents don't cover.</p>
+    </section>`;
+}
+
+function moreThatAdapt(shownRows) {
+  if (state.view !== "solutions" || !state.industry) return "";
+  const shownNames = new Set(shownRows.map(row => row.agent.name));
+  const saved = state.industry;
+  state.industry = "";
+  const others = filteredAgents().filter(row => !shownNames.has(row.agent.name));
+  state.industry = saved;
+  if (!others.length) return "";
+  const industryName = CATEGORY_NAMES[saved] || pretty(saved);
+  return `
+    <details class="more-adapt">
+      <summary>${others.length} more template${others.length === 1 ? "" : "s"} adapt to ${esc(industryName)}</summary>
+      <p>Built for other industries. In a workshop, set your industry and GitHub Copilot adapts it.</p>
+      <div class="more-grid">${others.map(row => agentCard(row.agent)).join("")}</div>
+    </details>`;
+}
+
 function render() {
   const firstPartyView = state.view === "first-party";
   const partnersView = state.view === "partners";
@@ -2571,15 +2675,20 @@ function render() {
     return;
   }
 
-  const rows = filteredAgents();
+  const filteredRows = filteredAgents();
+  // With no search text, templates built for the remembered industry come first.
+  const rows = state.view === "solutions" && state.yourIndustry && !state.query
+    ? [...filteredRows.filter(row => yourIndustryMatches(row.agent)),
+       ...filteredRows.filter(row => !yourIndustryMatches(row.agent))]
+    : filteredRows;
   const label = state.view === "solutions" ? "industry solution" : "building block";
   $("result-count").innerHTML = `<strong>${rows.length}</strong> ${label}${rows.length === 1 ? "" : "s"}`;
   $("result-context").textContent = state.query ? `matching "${state.query}"` : "";
   const journeyMode = state.view === "solutions" && Boolean(state.industry) && rows.length;
   $("grid").classList.toggle("journey-mode", Boolean(journeyMode));
-  $("grid").innerHTML = rows.length
+  $("grid").innerHTML = firstPartyStrip() + (rows.length
     ? (journeyMode ? journeyGroups(rows) : rows.map(row => agentCard(row.agent)).join(""))
-    : emptyState();
+    : emptyState()) + moreThatAdapt(rows);
 }
 
 function journeyGroups(rows) {
@@ -2701,6 +2810,7 @@ function agentCard(agent) {
       </div>
       <div class="card-body">
         <div class="category">${esc(CATEGORY_NAMES[agent.category] || pretty(agent.category))}</div>
+        ${adaptNote(agent)}
         <h2>${esc(shown(agent))}</h2>
         ${solution.sales_headline ? `<div class="sales-headline">${esc(solution.sales_headline)}</div>` : ""}
         <p class="what">${esc(summary(agent))}</p>

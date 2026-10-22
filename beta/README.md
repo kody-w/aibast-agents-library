@@ -1,3 +1,5 @@
+**Status: retired (2026-10-22).** The Frontier desktop app is no longer offered. The Brainstem one-liner is the frontier path; GitHub Copilot alone is the default workshop path. The source stays here until its removal is scheduled.
+
 # RAPP Brainstem Frontier
 
 See [`GOLDEN_PATH.md`](GOLDEN_PATH.md) for the guiding product path:

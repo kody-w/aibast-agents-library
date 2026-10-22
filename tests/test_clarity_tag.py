@@ -51,6 +51,8 @@ def test_landing_catalog_metrics_and_solution_pages_are_covered():
         "index.html",
         "library.html",
         "metrics.html",
+        "beta/index.html",
+        "beta/show-mode.html",
         "docs/rapp-guide.html",
         "reports/impact-report.html",
         "solutions/ask-hr/quest.html",
@@ -62,7 +64,6 @@ def test_installed_software_and_local_tools_are_never_tagged():
     for relative in (
         "rapp_brainstem/index.html",
         "rapp_ai/index.html",
-        "beta/index.html",
         "beta/ui/index.html",
     ):
         path = ROOT / relative

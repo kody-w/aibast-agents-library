@@ -54,6 +54,7 @@ def create_fixture(root: Path) -> None:
         '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBA==">',
     )
     write_text(root, "docs/index.html", '<a href="../tools/demo.html">Tool</a>')
+    write_text(root, "docs/installer.html", '<a href="../index.html">Home</a>')
     write_text(root, "tools/demo.html", "<h1>Repository tool</h1>")
     write_text(root, "agents/template.py", "print('template')\n")
     write_text(root, "reports/report.html", '<a href="../index.html">Home</a>')
@@ -170,21 +171,17 @@ class PagesBuilderFixtureTests(unittest.TestCase):
         with fixture_root() as root:
             pages.build_site(root, root / "_site", OWNER, REPO, REF, overlay_value=root / "no-such-dir")
 
-    def test_download_center_module_is_served_with_its_page(self):
+    def test_retired_download_center_module_is_preserved_without_wiring(self):
         with fixture_root() as root:
             module = "export const DEFAULT_REPOSITORY = 'microsoft/aibast-agents-library';\n"
             write_text(root, "beta/download-center.js", module)
-            write_text(
-                root, "beta/index.html",
-                '<script type="module" src="download-center.js"></script>',
-            )
             output, _manifest = build_fixture(root)
             self.assertEqual(
                 (output / "beta/download-center.js").read_text(encoding="utf-8"),
                 module,
             )
-            self.assertIn(
-                'src="download-center.js"',
+            self.assertNotIn(
+                "download-center.js",
                 (output / "beta/index.html").read_text(encoding="utf-8"),
             )
 
@@ -598,6 +595,7 @@ class RingInstallerRenderTests(unittest.TestCase):
 class FrontierPagesRingTests(unittest.TestCase):
     def write_frontier(self, root):
         paths = ("beta/frontier.sh", "beta/frontier.ps1", "beta/index.html",
+                 "beta/show-mode.html",
                  "beta/download-center.js", "beta/build/icon.svg")
         for name in paths:
             write_bytes(root, name, (ROOT / name).read_bytes())
@@ -615,7 +613,7 @@ class FrontierPagesRingTests(unittest.TestCase):
                 self.assertEqual((output / name).read_bytes(), contents, name)
                 self.assertEqual((root / name).read_bytes(), contents, name)
 
-    def test_fork_no_js_links_and_resolvers_use_the_serving_ring(self):
+    def test_fork_keeps_retirement_pages_and_aliases_byte_identical(self):
         with fixture_root() as root:
             originals = self.write_frontier(root)
             output = root / "_site"
@@ -623,22 +621,23 @@ class FrontierPagesRingTests(unittest.TestCase):
                 root, output, "example-owner", "frontier-fork", REF,
                 ring_branch="staging",
             )
-            rendered_page = (output / "beta/index.html").read_text(encoding="utf-8")
-            self.assertIn(
-                'href="https://github.com/example-owner/frontier-fork/tree/staging/beta"',
-                rendered_page,
-            )
-            self.assertIn(
-                'href="https://github.com/example-owner/frontier-fork/releases"',
-                rendered_page,
-            )
-            self.assertNotIn("github.com/microsoft/aibast-agents-library", rendered_page)
+            for name in ("beta/index.html", "beta/show-mode.html"):
+                rendered_page = (output / name).read_text(encoding="utf-8")
+                self.assertIn(
+                    'href="../index.html?view=solutions#workshops"',
+                    rendered_page,
+                )
+                self.assertIn(
+                    'href="../docs/installer.html"',
+                    rendered_page,
+                )
+                self.assertEqual((output / name).read_bytes(), originals[name])
             for name in ("beta/frontier.sh", "beta/frontier.ps1"):
                 rendered = (output / name).read_text(encoding="utf-8")
-                self.assertIn("example-owner/frontier-fork", rendered)
-                self.assertNotIn("microsoft/aibast-agents-library", rendered)
-                self.assertIn("RAPP_FRONTIER_REPO", rendered)
-                self.assertIn(name, manifest["ring"]["rendered_installers"])
+                self.assertIn("microsoft.github.io/aibast-agents-library/install.", rendered)
+                self.assertNotIn("example-owner/frontier-fork", rendered)
+                self.assertNotIn(name, manifest["ring"]["rendered_installers"])
+                self.assertEqual((output / name).read_bytes(), originals[name])
             for name, contents in originals.items():
                 self.assertEqual((root / name).read_bytes(), contents, name)
             self.assertEqual(
@@ -646,15 +645,24 @@ class FrontierPagesRingTests(unittest.TestCase):
                 originals["beta/download-center.js"],
             )
 
-    def test_fork_resolver_default_refactor_fails_closed(self):
+    def test_retirement_aliases_are_not_treated_as_ring_installers(self):
         with fixture_root() as root:
             self.write_frontier(root)
-            write_text(root, "beta/frontier.sh", "#!/bin/bash\nrepo=unrelated/project\n")
-            with self.assertRaisesRegex(pages.BuildError, "beta/frontier.sh no longer contains"):
-                pages.build_site(
-                    root, root / "_site", "example-owner", "frontier-fork", REF,
-                    ring_branch="staging",
-                )
+            source = "#!/bin/bash\necho microsoft.github.io/aibast-agents-library\nexit 1\n"
+            write_text(root, "beta/frontier.sh", source)
+            output = root / "_site"
+            manifest = pages.build_site(
+                root, output, "example-owner", "frontier-fork", REF,
+                ring_branch="staging",
+            )
+            self.assertEqual(
+                (output / "beta/frontier.sh").read_text(encoding="utf-8"),
+                source,
+            )
+            self.assertNotIn(
+                "beta/frontier.sh",
+                manifest["ring"]["rendered_installers"],
+            )
 
 
 class FullRepositoryArtifactTests(unittest.TestCase):

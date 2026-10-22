@@ -3,127 +3,283 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Show Mode click-through preview for RAPP Brainstem Frontier: record or import a task, approve the steps, hotload the agent, test it in your Brainstem, confirm, promote.">
-  <title>Show Mode · RAPP Brainstem Frontier click-through</title>
-  <style>
-    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; background: #0d1117; color: #e6edf3; }
-    * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
-    :root { --explorer-width: min(360px, 100vw); --surgeon-width: min(440px, 100vw); }
-    button { border: 1px solid #30363d; border-radius: 6px; padding: 7px 11px; background: #21262d; color: #e6edf3; cursor: pointer; font: inherit; font-size: 12px; }
-    button:hover { border-color: #58a6ff; background: #30363d; }
-    #ribbon { position: fixed; z-index: 30; top: 0; left: 0; right: 0; height: 34px; display: flex; align-items: center; gap: 12px; padding: 0 14px;
-      background: #161b22; border-bottom: 1px solid #30363d; font-size: 12px; color: #9ea7b3; }
-    #ribbon b { color: #f0f6fc; }
-    #ribbon .dot { width: 8px; height: 8px; border-radius: 50%; background: #ff5f52; box-shadow: 0 0 0 3px rgba(255,95,82,.25); }
-    #ribbon .sp { flex: 1; }
-    #ribbon a { color: #58a6ff; text-decoration: none; }
-    #ribbon button { padding: 4px 10px; font-size: 11.5px; }
-    main { position: absolute; top: 34px; bottom: 0; left: var(--explorer-width); right: var(--surgeon-width); background: #0d1117; display: flex; flex-direction: column; }
-    /* center: a still of the kernel chat */
-    .k-head { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid #21262d; color: #c9d1d9; font-size: 13px; }
-    .k-head .brand { font-weight: 700; color: #f0f6fc; }
-    .k-head .pill { margin-left: auto; font: 11px/1 ui-monospace, Menlo, monospace; color: #8b949e; border: 1px solid #30363d; border-radius: 999px; padding: 4px 8px; }
-    .k-chat { flex: 1; padding: 20px clamp(14px, 6%, 80px); display: flex; flex-direction: column; gap: 10px; justify-content: flex-end; }
-    .k-msg { max-width: 70%; padding: 10px 13px; border-radius: 12px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 13.5px; line-height: 1.5; }
-    .k-input { display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid #21262d; }
-    .k-input div { flex: 1; border: 1px solid #30363d; border-radius: 10px; padding: 10px 12px; color: #6e7681; font-size: 13px; background: #0d1117; }
-    .k-input button { border-radius: 10px; padding: 8px 16px; background: #1f6feb; border-color: #1f6feb; color: #fff; font-weight: 700; }
-    aside { position: fixed; top: 34px; bottom: 0; background: #0f1218; border-color: #23262c; }
-    #explorer { left: 0; width: var(--explorer-width); border-right: 1px solid #23262c; display: flex; flex-direction: column; }
-    #surgeon { right: 0; width: var(--surgeon-width); border-left: 1px solid #23262c; display: flex; flex-direction: column; }
-    aside header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #23262c; }
-    aside header strong { display: block; font-size: 14px; }
-    aside header span.sub { color: #8b8f98; font-size: 10.5px; }
-    .title { display: flex; flex-direction: column; line-height: 1.15; }
-    #agent-tree { padding: 10px 6px; font-size: 12.5px; color: #c9d1d9; }
-    #agent-tree .h { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8b949e; margin: 10px 10px 4px; }
-    #agent-tree .row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; color: #8b949e; }
-    #agent-tree .row .scope { margin-left: auto; font: 10px/1 ui-monospace, Menlo, monospace; padding: 3px 6px; border-radius: 4px; background: #21262d; }
-    #agent-viewer { margin: auto 10px 10px; border: 1px dashed #30363d; border-radius: 8px; padding: 14px; color: #6e7681; font-size: 12px; }
-    #surgeon-log { flex: 1; padding: 14px; overflow: hidden; }
-    .surgeon-empty { text-align: center; color: #9ea7b3; font-size: 13px; }
-    .surgeon-empty h2 { margin: 8px 0 5px; color: #e7e8ea; font-size: 16px; }
-    .surgeon-caps { display: flex; justify-content: center; gap: 6px; margin: 10px 0 14px; }
-    .surgeon-caps span { font-size: 10.5px; color: #8b949e; border: 1px solid #2a2d33; border-radius: 999px; padding: 3px 8px; }
-    .surgeon-starters { display: flex; flex-direction: column; gap: 7px; text-align: left; }
-    .surgeon-starters button { padding: 9px 12px; border-color: #2a2d33; border-radius: 10px; background: #1a1c21; color: #d7dae0; text-align: left; }
-    .surgeon-starters button.deploy-copilot-studio { margin-top: 5px; border-color: #8957e5; background: linear-gradient(135deg,#25163f,#10263f); color: #f0e7ff; font-weight: 800; box-shadow: inset 3px 0 #a371f7; }
-    .surgeon-starters button.show-mode-preview { border-color: #d0463a; background: linear-gradient(135deg,#3a1614,#26191f); color: #ffe9e6; font-weight: 800; box-shadow: inset 3px 0 #ff6a5c; }
-    .surgeon-starters button.show-mode-preview::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ff5f52; margin-right: 9px; vertical-align: 1px; box-shadow: 0 0 0 3px rgba(255,95,82,.25); }
-    .surgeon-composer { padding: 10px 12px 12px; border-top: 1px solid #23262c; }
-    .surgeon-box { border: 1px solid #2a2d33; border-radius: 12px; background: #16181d; padding: 9px 11px 6px; color: #6e7681; font-size: 13px; }
-    .surgeon-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 10px; color: #8b8f98; }
-    .surgeon-bar button { margin-left: auto; border-radius: 9px; padding: 7px 16px; background: linear-gradient(180deg,#3d7cf0,#2f66d8); border: 0; color: #fff; font-weight: 700; }
-    @media (max-width: 900px) {
-      :root { --explorer-width: 0px; --surgeon-width: min(360px, 100vw); }
-      #explorer { display: none; }
+  <meta name="color-scheme" content="light dark">
+  <title>RAPP Brainstem Frontier has been retired</title>
+  <!-- aibast-design:start -->
+<style>
+/* AIBAST design tokens - generated by tools/design_tokens.py, do not hand-edit.
+   Stamped before each page's own <style>, so page rules still win. */
+:root {
+  color-scheme: light;
+  --cp-bg: #f4f4f5;
+  --cp-bg-elevated: #fafafa;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #eeeeef;
+  --cp-border: #dcdcde;
+  --cp-border-strong: #8e8e93;
+  --cp-text: #18181b;
+  --cp-text-muted: #52525b;
+  --cp-text-soft: #6b6b74;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #15803d;
+  --cp-danger: #c81e1e;
+  --cp-warning: #b45309;
+  --cp-link: #0f6cbd;
+  --cp-shadow: 0 16px 40px rgba(24, 24, 27, 0.10);
+  --cp-overlay: rgba(24, 24, 27, 0.55);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(24, 24, 27, 0.04);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+  --cp-focus: #0b5fa5;
+  --cp-focus-halo: rgba(11, 95, 165, 0.28);
+  --cp-font: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --cp-font-mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+  --cp-text-xs: 0.75rem;
+  --cp-text-sm: 0.875rem;
+  --cp-text-base: 1rem;
+  --cp-text-lg: 1.125rem;
+  --cp-text-xl: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  --cp-text-2xl: clamp(1.5rem, 1.3rem + 0.9vw, 2rem);
+  --cp-text-3xl: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem);
+  --cp-text-4xl: clamp(2.25rem, 1.6rem + 2.8vw, 3.75rem);
+  --cp-leading-tight: 1.15;
+  --cp-leading-snug: 1.35;
+  --cp-leading: 1.6;
+  --cp-tracking-tight: -0.02em;
+  --cp-tracking-label: 0.08em;
+  --cp-measure: 65ch;
+  --cp-space-1: 0.25rem;
+  --cp-space-2: 0.5rem;
+  --cp-space-3: 0.75rem;
+  --cp-space-4: 1rem;
+  --cp-space-5: 1.5rem;
+  --cp-space-6: 2rem;
+  --cp-space-7: 3rem;
+  --cp-space-8: 4rem;
+  --cp-space-9: 6rem;
+  --cp-radius-sm: 6px;
+  --cp-radius: 10px;
+  --cp-radius-lg: 16px;
+  --cp-radius-pill: 999px;
+  --cp-ease: cubic-bezier(0.2, 0, 0, 1);
+  --cp-duration-fast: 120ms;
+  --cp-duration: 220ms;
+  --cp-container: 1200px;
+  --cp-header-height: 68px;
+  --cp-z-base: 1;
+  --cp-z-sticky: 100;
+  --cp-z-overlay: 200;
+  --cp-z-modal: 300;
+  --cp-z-toast: 400;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #18181b;
+  --cp-bg-elevated: #232327;
+  --cp-surface: #1f1f23;
+  --cp-surface-soft: #27272b;
+  --cp-border: #34343a;
+  --cp-border-strong: #54545c;
+  --cp-text: #f4f4f5;
+  --cp-text-muted: #a9a9b2;
+  --cp-text-soft: #c4c4cc;
+  --cp-accent: #ff7a9c;
+  --cp-accent-hover: #ff96b0;
+  --cp-accent-soft: rgba(255, 122, 156, 0.14);
+  --cp-accent-fg: #18181b;
+  --cp-success: #4ade80;
+  --cp-danger: #fb8a8a;
+  --cp-warning: #fbbf24;
+  --cp-link: #66b3ff;
+  --cp-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --cp-overlay: rgba(9, 9, 11, 0.7);
+  --cp-panel: rgba(31, 31, 35, 0.78);
+  --cp-panel-strong: rgba(31, 31, 35, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.05);
+  --cp-highlight: rgba(255, 122, 156, 0.12);
+  --cp-focus: #7cc4ff;
+  --cp-focus-halo: rgba(124, 196, 255, 0.34);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    color-scheme: dark;
+    --cp-bg: #18181b;
+    --cp-bg-elevated: #232327;
+    --cp-surface: #1f1f23;
+    --cp-surface-soft: #27272b;
+    --cp-border: #34343a;
+    --cp-border-strong: #54545c;
+    --cp-text: #f4f4f5;
+    --cp-text-muted: #a9a9b2;
+    --cp-text-soft: #c4c4cc;
+    --cp-accent: #ff7a9c;
+    --cp-accent-hover: #ff96b0;
+    --cp-accent-soft: rgba(255, 122, 156, 0.14);
+    --cp-accent-fg: #18181b;
+    --cp-success: #4ade80;
+    --cp-danger: #fb8a8a;
+    --cp-warning: #fbbf24;
+    --cp-link: #66b3ff;
+    --cp-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    --cp-overlay: rgba(9, 9, 11, 0.7);
+    --cp-panel: rgba(31, 31, 35, 0.78);
+    --cp-panel-strong: rgba(31, 31, 35, 0.96);
+    --cp-sheen: rgba(255, 255, 255, 0.05);
+    --cp-highlight: rgba(255, 122, 156, 0.12);
+    --cp-focus: #7cc4ff;
+    --cp-focus-halo: rgba(124, 196, 255, 0.34);
+  }
+}
+/* Keyboard focus has to be visible on every page, not only the ones that
+   remembered to style it. Pages that define their own :focus-visible override
+   this, because their <style> comes after. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--cp-focus);
+  outline-offset: 2px;
+  border-radius: var(--cp-radius-sm);
+  box-shadow: 0 0 0 4px var(--cp-focus-halo);
+}
+/* An anchored heading must not land under a sticky header. */
+:where([id]) { scroll-margin-top: calc(var(--cp-header-height) + var(--cp-space-4)); }
+:where(img, svg, video, canvas) { max-width: 100%; }
+:where(p) { text-wrap: pretty; }
+::selection { background: var(--cp-accent-soft); color: var(--cp-text); }
+/* Opt-in: aligns digits in tables and metric readouts. */
+.cp-nums { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+<!-- aibast-design:end -->
+<style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--cp-bg);
+      color: var(--cp-text);
+    }
+
+    body {
+      min-width: 0;
+      min-height: 100vh;
+      margin: 0;
+      padding: clamp(var(--cp-space-4), 5vw, var(--cp-space-7));
+      display: grid;
+      place-items: center;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      font-family: var(--cp-font);
+      font-size: var(--cp-text-base);
+      line-height: var(--cp-leading);
+    }
+
+    main {
+      width: min(100%, 46rem);
+      padding: clamp(var(--cp-space-5), 6vw, var(--cp-space-8));
+      overflow-wrap: anywhere;
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: var(--cp-radius-lg);
+      box-shadow: var(--cp-shadow);
+    }
+
+    h1 {
+      max-width: 18ch;
+      margin: 0 0 var(--cp-space-6);
+      font-size: var(--cp-text-3xl);
+      line-height: var(--cp-leading-tight);
+      letter-spacing: var(--cp-tracking-tight);
+    }
+
+    p {
+      max-width: var(--cp-measure);
+      margin: 0;
+    }
+
+    p + p {
+      margin-top: var(--cp-space-5);
+    }
+
+    a {
+      color: var(--cp-link);
+      font-weight: 600;
+      text-underline-offset: 0.18em;
+    }
+
+    a:hover {
+      color: var(--cp-accent);
+    }
+
+    @media (max-width: 390px) {
+      body {
+        padding: var(--cp-space-3);
+      }
+
+      main {
+        padding: var(--cp-space-5);
+        border-radius: var(--cp-radius);
+      }
     }
   </style>
+<!-- clarity:start -->
+<script data-clarity-project="yeqkj55zbc">
+(function (w, d, id) {
+  if (!id || !/\.github\.io$/i.test(d.location.hostname)) return;
+  var n = w.navigator || {};
+  if (n.globalPrivacyControl || n.doNotTrack === "1" || w.doNotTrack === "1") return;
+  var KEY = "aibast-clarity-consent";
+  function read() { try { return w.localStorage.getItem(KEY); } catch (e) { return null; } }
+  function write(v) { try { w.localStorage.setItem(KEY, v); } catch (e) {} }
+  function load() {
+    w.clarity = w.clarity || function () { (w.clarity.q = w.clarity.q || []).push(arguments); };
+    var t = d.createElement("script"); t.async = 1; t.src = "https://www.clarity.ms/tag/" + id;
+    var y = d.getElementsByTagName("script")[0]; y.parentNode.insertBefore(t, y);
+    w.clarity("consentv2", { ad_Storage: "denied", analytics_Storage: "granted" });
+  }
+  function el(tag, css, text) { var e = d.createElement(tag); e.style.cssText = css; if (text) e.textContent = text; return e; }
+  function banner() {
+    if (d.getElementById(KEY)) return;
+    var bar = el("div", "position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;padding:12px 16px;background:Canvas;color:CanvasText;border-top:1px solid GrayText;font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif");
+    bar.id = KEY; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Cookie consent");
+    var text = el("span", "max-width:62ch", "This site uses Microsoft Clarity to understand how visitors use it. Typed text is masked. ");
+    var link = el("a", "color:LinkText;text-decoration:underline", "Microsoft Privacy Statement");
+    link.href = "https://go.microsoft.com/fwlink/?LinkId=521839"; link.target = "_blank"; link.rel = "noopener";
+    text.appendChild(link);
+    var btn = "cursor:pointer;border-radius:6px;padding:7px 14px;font:inherit;font-weight:600;";
+    var accept = el("button", btn + "border:1px solid AccentColor;background:AccentColor;color:AccentColorText", "Accept");
+    var decline = el("button", btn + "border:1px solid GrayText;background:ButtonFace;color:ButtonText", "Decline");
+    accept.type = "button"; decline.type = "button";
+    accept.onclick = function () { write("granted"); bar.remove(); load(); };
+    decline.onclick = function () { write("denied"); bar.remove(); };
+    bar.appendChild(text); bar.appendChild(accept); bar.appendChild(decline);
+    d.body.appendChild(bar);
+  }
+  var choice = read();
+  if (choice === "granted") { load(); return; }
+  if (choice === "denied") return;
+  if (d.body) banner(); else d.addEventListener("DOMContentLoaded", banner);
+})(window, document, "yeqkj55zbc");
+</script>
+<!-- clarity:end -->
 </head>
-<body class="explorer-open surgeon-open">
-  <div id="ribbon">
-    <span class="dot" aria-hidden="true"></span>
-    <span><b>Show Mode</b> · click-through preview of RAPP Brainstem Frontier</span>
-    <span class="sp"></span>
-    <button type="button" data-show-mode-tour="true">Start the click-through</button>
-    <a href="./" title="RAPP Brainstem Frontier installer">Install Frontier →</a>
-  </div>
-
-  <aside id="explorer" class="open" aria-label="Live Brainstem agents Explorer">
-    <header>
-      
-      <span class="title"><strong>Explorer</strong><span class="sub">live Brainstem workspace</span></span>
-    </header>
-    <div id="agent-tree" role="tree">
-      <div class="h">global agents</div>
-      <div class="row">context_memory_agent.py <span class="scope">memory</span></div>
-      <div class="row">manage_memory_agent.py <span class="scope">memory</span></div>
-      <div class="row">hacker_news_agent.py <span class="scope">global</span></div>
-    </div>
-    <div id="agent-viewer">Select an <code>agent.py</code> file to inspect the exact source the live Brainstem discovers on every chat request.</div>
-  </aside>
-
+<body>
   <main>
-    <div class="k-head"><span class="brand">RAPP Brainstem</span><span>· local · loopback worker</span><span class="pill">RAPP/1 · /chat</span></div>
-    <div class="k-chat">
-      <div class="k-msg">Hi. I'm your Brainstem — I know a few things and I can learn a lot more. Ask me what I can do.</div>
-    </div>
-    <div class="k-input"><div>Message your Brainstem…</div><button type="button">Send</button></div>
+    <h1>RAPP Brainstem Frontier has been retired</h1>
+    <p>The Frontier desktop app is no longer offered or updated. Two paths replace it.</p>
+    <p><strong>Workshops:</strong> GitHub Copilot in VS Code is all you need. <a href="../index.html?view=solutions#workshops">Browse the workshops</a></p>
+    <p><strong>Build from scratch on your own device:</strong> install the Brainstem with one line, then build agents and learn how they work. <a href="../docs/installer.html">Install the Brainstem</a></p>
+    <p>Already installed the desktop app? It no longer receives updates. Your Brainstem, its agents and its memories live in a separate folder and are not affected.</p>
   </main>
-
-  <aside id="surgeon" class="open" aria-label="GitHub Copilot Brain Surgeon">
-    <header>
-      <span class="title"><strong>GitHub Copilot</strong><span class="sub">Brain Surgeon · agent mode</span></span>
-    </header>
-    <div id="surgeon-log" role="log">
-      <div class="surgeon-empty">
-        <h2>GitHub Copilot, in your Brainstem</h2>
-        The full Copilot agent loop: files, shell, tests, one-chat capability injection, visible UI control, screenshots, and recorded demos.
-        <div class="surgeon-caps"><span>run commands</span><span>read/write files</span><span>test Brainstem</span></div>
-        <div class="surgeon-starters">
-          <button type="button">Build and test an agent for this customer use case</button>
-          <button type="button">Inspect this Brainstem and tell me what it can do</button>
-          <button type="button">Check for beta updates while I watch</button>
-          <button type="button">Record a short autopilot demo of the current workflow</button>
-          <button type="button" class="show-mode-preview" data-show-mode-tour="true">Show Mode: click-through preview</button>
-          <button type="button" class="deploy-copilot-studio">Deploy loaded agents to Copilot Studio</button>
-        </div>
-      </div>
-    </div>
-    <div class="surgeon-composer">
-      <div class="surgeon-box">Describe what to build or do…
-        <div class="surgeon-bar"><span>Agent · files, shell, tests, Brainstem</span><button type="button">Build</button></div>
-      </div>
-    </div>
-  </aside>
-
-  <script src="ui/show-mode-tour.js"></script>
-  <script>
-    // Auto-start the click-through on load unless the URL says otherwise.
-    if (!/(?:^|[?&])autostart=0(?:&|$)/.test(location.search)) {
-      window.addEventListener("load", () => setTimeout(() => window.rappShowModeTour.start(0), 400), { once: true });
-    }
-  </script>
 </body>
 </html>
