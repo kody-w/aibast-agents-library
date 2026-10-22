@@ -18,7 +18,7 @@ def test_library_routes_architecture_into_the_beta_workshop():
         "Open interactive demo",
         "Workshop settings",
         "Open field guide",
-        "Install RAPP Brainstem with Copilot",
+        "Open GitHub Copilot Chat",
         "function workshopPackageFor(",
         "function interactiveDemoUrl(",
         'localStorage.getItem("aibast:workshop-engine")',
@@ -26,6 +26,10 @@ def test_library_routes_architecture_into_the_beta_workshop():
         "GitHub Copilot",
     ):
         assert required in text
+
+    # GitHub Copilot is the default lane, so installing the Brainstem is never step one.
+    assert "Install RAPP Brainstem with Copilot" not in text
+    assert "Step one lets GitHub Copilot in VS Code install" not in text
 
     assert re.search(
         r'localStorage\.getItem\("aibast:workshop-engine"\)\s*===\s*"brainstem"'
