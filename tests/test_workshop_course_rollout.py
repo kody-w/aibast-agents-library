@@ -78,8 +78,8 @@ def valid_pages() -> dict[str, str]:
     <script>
     (() => {{
     {storage}
-    const engine = readWorkshopStorage("aibast:workshop-engine") === "copilot"
-      ? "copilot" : "brainstem";
+    const engine = readWorkshopStorage("aibast:workshop-engine") === "brainstem"
+      ? "brainstem" : "copilot";
     document.documentElement.setAttribute("data-workshop-engine", engine);
     }})();
     </script>
@@ -155,8 +155,8 @@ function announcePersistenceFailure() {{
     "Storage unavailable; progress is not saved, but remains usable in memory for this session.";
 }}
 function currentEasyPath() {{
-  return readWorkshopStorage(globalEngineKey) === "copilot"
-    ? "copilot" : "brainstem";
+  return readWorkshopStorage(globalEngineKey) === "brainstem"
+    ? "brainstem" : "copilot";
 }}
 function requiredEasyBoxes() {{
   const path = currentEasyPath();
@@ -878,13 +878,13 @@ def test_mutation_catches_removed_overflow_containment(tmp_path):
     )
 
 
-def test_mutation_catches_copilot_default_engine(tmp_path):
+def test_mutation_catches_brainstem_default_engine(tmp_path):
     package = create_fixture(tmp_path)
     path = package / "quest.html"
     path.write_text(
         path.read_text(encoding="utf-8").replace(
-            '? "copilot" : "brainstem"',
             '? "brainstem" : "copilot"',
+            '? "copilot" : "brainstem"',
         ),
         encoding="utf-8",
     )
@@ -892,7 +892,7 @@ def test_mutation_catches_copilot_default_engine(tmp_path):
 
     assert_failure(
         audit_fixture(tmp_path),
-        "visual and achievement engines must both default to brainstem",
+        "visual and achievement engines must both default to copilot",
     )
 
 

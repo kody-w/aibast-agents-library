@@ -24,9 +24,11 @@ a successful test.
    credentials. Ask for field and column names and a description of the data
    instead, and write new fictional example data in that shape.
 3. When the user names a Microsoft application, such as Dynamics 365 Field
-   Service, Dynamics 365 Sales, Dataverse, SharePoint, Excel, or Teams, shape
-   the fictional data like that application's own records and field names, so
-   the later move to live data is a swap rather than a rebuild.
+   Service, Dynamics 365 Sales, Dynamics 365 Finance and Operations (including
+   Supply Chain Management and Asset Management), Dataverse, SharePoint, Excel,
+   or Teams, shape the fictional data like that application's own records and
+   field names, so the later move to live data is a mapping step rather than a
+   rebuild.
 4. Work on a copy named `<solution>-adapted` in the workspace. Never change
    the library original.
 5. Change as little as possible: keep the operations that still fit, rename or
@@ -58,7 +60,8 @@ its Preview cases:
    field it replaces. Real systems have custom fields and permissions; this
    is a mapping step, not a swap.
 3. Prefer the standard connector: Dataverse or the Dynamics 365 connector for
-   Dynamics applications, the matching Microsoft 365 connector for Excel,
+   Dynamics applications (for Finance and Operations apps, the Fin & Ops Apps
+   connector or their Dataverse virtual tables), the matching Microsoft 365 connector for Excel,
    SharePoint, Outlook, or Teams, and otherwise the system's own Power Platform
    connector or a custom connector the user's IT team approves.
 4. Add each connector to the Draft agent as a tool, read-only first, against a

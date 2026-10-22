@@ -117,9 +117,9 @@ WORKSHOP_STORAGE_SCRIPT = """(() => {
       try {
         backend = globalThis.localStorage;
         const storedEngine =
-          localStorage.getItem("aibast:workshop-engine") === "copilot"
-            ? "copilot"
-            : "brainstem";
+          localStorage.getItem("aibast:workshop-engine") === "brainstem"
+            ? "brainstem"
+            : "copilot";
         memory.set(engineKey, storedEngine);
         const probeKey = "aibast:workshop-storage-probe";
         backend.setItem(probeKey, "1");
@@ -176,7 +176,7 @@ WORKSHOP_ENGINE_SCRIPT = """(() => {
       const storedEngine =
         globalThis.aibastWorkshopStorage.getItem("aibast:workshop-engine");
       const engine =
-        storedEngine === "copilot" ? "copilot" : "brainstem";
+        storedEngine === "brainstem" ? "brainstem" : "copilot";
       document.documentElement.setAttribute("data-workshop-engine", engine);
     })();"""
 
@@ -3288,6 +3288,7 @@ def render_manual_tutorial(
 {COMMON_CSS}
     .layout {{ display: grid; grid-template-columns: 270px minmax(0, 840px); gap: 32px; width: 100%; max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }}
     .layout > *, .step, .step-body, .instruction-grid > * {{ min-width: 0; }}
+    .industry-note {{ margin: 12px 0 18px; padding: 12px 16px; border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-link); border-radius: 10px; background: var(--cp-surface); color: var(--cp-text); font-size: 15px; }}
     .sidebar {{ position: sticky; top: 82px; align-self: start; max-height: calc(100vh - 104px); overflow: auto; }}
     .toc {{ display: grid; gap: 4px; margin-top: 14px; }}
     .toc a {{ padding: 7px 9px; border-left: 3px solid var(--cp-border); color: var(--cp-text-muted); text-decoration: none; font-size: 13px; }}
@@ -3355,6 +3356,7 @@ def render_manual_tutorial(
         {pending_notice}
       </section>
       <h2>Build and verify</h2>
+      <div class="industry-note" data-industry-note hidden><strong>These screenshots are click guides.</strong> <span data-industry-note-text></span> They show the standard workshop, so your names and answers will differ; the buttons are the same.</div>
       {steps_markup}
       <h2 id="troubleshooting">Troubleshooting</h2>
       <section class="card troubleshooting">
@@ -3503,6 +3505,18 @@ Describe what was inaccurate or missing.
       }});
     }})();
   </script>
+<script>
+  (() => {{
+    let industry = "";
+    try {{ industry = (window.localStorage.getItem("aibast.workshop.industry") || "").trim(); }} catch (error) {{}}
+    if (!industry) return;
+    document.querySelectorAll("[data-industry-note]").forEach((note) => {{
+      const text = note.querySelector("[data-industry-note-text]");
+      if (text) text.textContent = `You set your industry to ${{industry}}.`;
+      note.hidden = false;
+    }});
+  }})();
+</script>
 </body>
 </html>
 """
@@ -4079,6 +4093,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
     .prompt-heading {{ display: flex; align-items: start; justify-content: space-between; gap: 16px; }}
     .prompt-heading h3 {{ margin: 0; }}
     .prompt-kicker {{ margin: 0 0 4px; color: var(--cp-accent); font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }}
+    .industry-note {{ margin: 12px 0 18px; padding: 12px 16px; border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-link); border-radius: 10px; background: var(--cp-surface); color: var(--cp-text); font-size: 15px; }}
     .make-it-yours {{ display: grid; gap: 8px; margin: 14px 0 18px; padding: 14px 16px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface); }}
     .make-it-yours label {{ display: grid; gap: 4px; }}
     .make-it-yours span {{ color: var(--cp-text-muted); font-size: 14px; }}
@@ -4252,6 +4267,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
       </section>
 
       <h2>Build and verify</h2>
+      <div class="industry-note" data-industry-note hidden><strong>These screenshots are click guides.</strong> <span data-industry-note-text></span> They show the standard workshop, so your names and answers will differ; the buttons are the same.</div>
       {manual_content.steps_markup}
 
       <h2 id="hard-troubleshooting">Manual-mode troubleshooting</h2>
@@ -4344,9 +4360,9 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
       }});
 
       function currentEasyPath() {{
-        return localStorage.getItem(globalEngineKey) === "copilot"
-          ? "copilot"
-          : "brainstem";
+        return localStorage.getItem(globalEngineKey) === "brainstem"
+          ? "brainstem"
+          : "copilot";
       }}
 
       function requiredEasyBoxes() {{
@@ -4720,6 +4736,18 @@ Opening this form does not sync anything. Submit the issue to sync these earned 
       }});
     }})();
   </script>
+<script>
+  (() => {{
+    let industry = "";
+    try {{ industry = (window.localStorage.getItem("aibast.workshop.industry") || "").trim(); }} catch (error) {{}}
+    if (!industry) return;
+    document.querySelectorAll("[data-industry-note]").forEach((note) => {{
+      const text = note.querySelector("[data-industry-note-text]");
+      if (text) text.textContent = `You set your industry to ${{industry}}.`;
+      note.hidden = false;
+    }});
+  }})();
+</script>
 </body>
 </html>
 """

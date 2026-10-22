@@ -85,6 +85,12 @@ def scripts(page):
     return re.findall(r"<script>(.*?)</script>", page, re.DOTALL)
 
 
+def script_containing(page, token):
+    matches = [script for script in scripts(page) if token in script]
+    assert len(matches) == 1, f"expected one script containing {token!r}"
+    return matches[0]
+
+
 def run_node(source, path):
     path.write_text(source, encoding="utf-8")
     result = subprocess.run(
@@ -181,7 +187,7 @@ def mode_button_records(page):
 
 
 def run_easy_runtime(page, path):
-    quest_script = scripts(page)[-1]
+    quest_script = script_containing(page, "const ACHIEVEMENT_PROFILE_KEY")
     start = quest_script.index("const ACHIEVEMENT_PROFILE_KEY")
     end = quest_script.index("const ACHIEVEMENT_CANONICAL_AGENT")
     runtime = quest_script[start:end]
@@ -200,7 +206,7 @@ def run_easy_runtime(page, path):
     button_records = mode_button_records(page)
     assert button_records
     expected_total = sum(
-        record["dataset"]["achievementsPath"] in {"brainstem", "shared"}
+        record["dataset"]["achievementsPath"] in {"copilot", "shared"}
         for record in records
     )
     probe = f"""
@@ -246,7 +252,7 @@ function markGroup(group) {{
   boxes
     .filter((box) =>
       box.dataset.achievementsGroup === group &&
-      ["brainstem", "shared"].includes(box.dataset.achievementsPath))
+      ["copilot", "shared"].includes(box.dataset.achievementsPath))
     .forEach((box) => {{ box.checked = true; }});
   evaluateAchievement(false, true);
   return snapshot();
@@ -257,7 +263,7 @@ const stages = {{
   preview: markGroup("preview-proven"),
 }};
 boxes
-  .filter((box) => ["brainstem", "shared"].includes(box.dataset.achievementsPath))
+  .filter((box) => ["copilot", "shared"].includes(box.dataset.achievementsPath))
   .forEach((box) => {{ box.checked = true; }});
 evaluateAchievement(false, true);
 stages.complete = snapshot();
@@ -298,7 +304,10 @@ def test_fixed_points_and_runtime_awards_are_idempotent_and_private(
     }
     assert ACHIEVEMENT_LABELS["hard-mode-complete"] == "Manual mode complete"
 
-    quest_script = scripts(achievement_pages["quest"])[-1]
+    quest_script = script_containing(
+        achievement_pages["quest"],
+        "const ACHIEVEMENT_PROFILE_KEY",
+    )
     start = quest_script.index("const ACHIEVEMENT_PROFILE_KEY")
     end = quest_script.index("const ACHIEVEMENT_CANONICAL_AGENT")
     runtime = quest_script[start:end]
@@ -376,11 +385,14 @@ def test_easy_runtime_executes_checkpoint_groups_and_completion(
     assert_easy_runtime_complete(result, expected_total)
 
 
-def test_visual_and_achievement_engines_fail_closed_to_brainstem(
+def test_visual_and_achievement_engines_default_to_copilot(
     achievement_pages,
     tmp_path,
 ):
-    quest_script = scripts(achievement_pages["quest"])[-1]
+    quest_script = script_containing(
+        achievement_pages["quest"],
+        "const ACHIEVEMENT_PROFILE_KEY",
+    )
     current_easy_path = extract_function(quest_script, "currentEasyPath")
     visual_source = WORKSHOP_ENGINE_SCRIPT
     safe_alias = "const localStorage = globalThis.aibastWorkshopStorage;"
@@ -444,16 +456,16 @@ console.log(JSON.stringify({{
     )
 
     assert result["visual"] == [
-        {"selected": "brainstem", "error": None},
-        {"selected": "brainstem", "error": None},
+        {"selected": "copilot", "error": None},
         {"selected": "brainstem", "error": None},
         {"selected": "copilot", "error": None},
+        {"selected": "copilot", "error": None},
     ]
-    assert result["visualDenied"] == {"selected": "brainstem", "error": None}
+    assert result["visualDenied"] == {"selected": "copilot", "error": None}
     assert result["achievement"] == [
+        "copilot",
         "brainstem",
-        "brainstem",
-        "brainstem",
+        "copilot",
         "copilot",
     ]
 
@@ -492,7 +504,7 @@ def test_named_checkpoint_conditions_and_existing_persistence(achievement_pages)
     assert 'parsed.filter((step) => typeof step === "string")' in manual
     assert "saved.includes(box.dataset.step)" in manual
     assert re.search(
-        r'===\s*"copilot"\s*\?\s*"copilot"\s*:\s*"brainstem"',
+        r'===\s*"brainstem"\s*\?\s*"brainstem"\s*:\s*"copilot"',
         quest,
     )
 
@@ -557,7 +569,10 @@ def test_quest_syncs_all_earned_ids_without_automatic_submission(achievement_pag
 def test_structured_signals_target_the_current_github_pages_owner(
     achievement_pages, tmp_path
 ):
-    quest_script = scripts(achievement_pages["quest"])[-1]
+    quest_script = script_containing(
+        achievement_pages["quest"],
+        "function aibastSignalIssueUrl",
+    )
     start = quest_script.index("function aibastSignalIssueUrl")
     end = quest_script.index("const ACHIEVEMENT_CANONICAL_AGENT")
     runtime = quest_script[start:end]
