@@ -48,3 +48,14 @@ def test_live_systems_stay_in_copilot_studio_draft():
     assert "read-only first" in text
     assert "Stay in Draft." in text
     assert "Azure" not in text
+
+
+def test_every_workshop_offers_the_industry_box_and_keeps_the_standard_prompt():
+    quests = sorted((ROOT / "solutions").glob("*/quest.html"))
+    assert len(quests) >= 65
+    for quest in quests:
+        text = quest.read_text(encoding="utf-8")
+        assert text.count("data-make-it-yours=") == 2, quest.parent.name
+        assert 'const industryKey = "aibast.workshop.industry";' in text, quest.parent.name
+        # The printed default stays the standard phrase the skills handle.
+        assert re.search(r'id="copilot-build-prompt">Give me .+ using Easy Mode and test it for me\.</pre>', text), quest.parent.name
