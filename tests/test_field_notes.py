@@ -7,7 +7,7 @@ an agent is. These tests hold the things that would quietly undo that:
 * every link a reader is invited to follow actually resolves;
 * the featured workshop is a real, complete workshop, not a nice idea;
 * each note answers a question rather than announcing a topic;
-* the engineering posts that were already written survive untouched.
+* the engineering posts stay within the public content bar.
 """
 
 from __future__ import annotations
@@ -108,28 +108,29 @@ def test_the_notes_avoid_unexplained_jargon():
         assert term not in blob, f"{term!r} needs defining before it can be used here"
 
 
-def test_the_engineering_posts_that_were_already_written_survive():
-    kept = subprocess.run(
-        ["git", "show", "HEAD:blog.html"], cwd=ROOT, capture_output=True, text=True, check=True
-    ).stdout
+def test_the_engineering_posts_meet_the_public_content_bar():
+    # Reviewed 2026-10-21 against a Microsoft public-content bar: two posts were
+    # retired (an obsolete feature and protocol-interception research) and two
+    # were rewritten. Keep them from drifting back.
+    posts = {post.h2.get_text(): post.get_text(" ") for post in BeautifulSoup(BODY, "html.parser").select(".post")}
+    assert "Six Habits for Automation People Can Trust" in posts
+    assert "Version Tracking with a Plain Text File" in posts
     for title in (
         "You Don't Need a MITM Proxy to Reverse-Engineer an AI Agent Protocol — Just Read the SDK",
-        "How a Background Thread Silently Ate Your Login",
         "Why We Killed Remote Agents (For Now)",
-        "Version Tracking with a Plain Text File",
+        "How a Background Thread Silently Ate Your Login",
     ):
-        assert f"<h2>{title}</h2>" in kept, f"{title} is not in the committed baseline"
-        assert f"<h2>{title}</h2>" in BODY, f"{title} was dropped from the page"
-    baseline = {
-        post.h2.get_text(): str(post)
-        for post in BeautifulSoup(kept, "html.parser").select(".post")
-    }
-    current = {
-        post.h2.get_text(): str(post)
-        for post in BeautifulSoup(BODY, "html.parser").select(".post")
-    }
-    for title, post in baseline.items():
-        assert current.get(title) == post, f"{title} was changed or dropped"
+        assert title not in posts, f"{title} was retired; do not bring it back"
+    text = " ".join(posts.values()).lower()
+    for phrase in ("mitm", "reverse-engineer", "killed", "for now", "rapp factory", "azure"):
+        assert phrase not in text, f"{phrase!r} does not belong on the public blog"
+
+
+def test_the_notes_do_not_hardcode_catalog_counts():
+    # Counts go stale within weeks; the metrics page is rebuilt daily.
+    for topic in NOTES["topics"]:
+        for note in topic["notes"]:
+            assert not re.search(r"\b\d{2,}\s+(agents|stacks|workshops|industries)\b", note["answer"]), note["id"]
 
 
 def test_the_page_renders_the_notes_rather_than_duplicating_them():
