@@ -595,6 +595,12 @@ html[data-theme="dark"] {
     .prompt-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
     .prompt-heading h3 { margin: 0; }
     .prompt-kicker { margin: 0 0 4px; color: var(--cp-accent); font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .make-it-yours { display: grid; gap: 8px; margin: 14px 0 18px; padding: 14px 16px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface); }
+    .make-it-yours label { display: grid; gap: 4px; }
+    .make-it-yours span { color: var(--cp-text-muted); font-size: 14px; }
+    .make-it-yours-row { display: flex; gap: 8px; }
+    .make-it-yours input { flex: 1; min-width: 0; width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--cp-border-strong); border-radius: 8px; background: var(--cp-bg-elevated); color: var(--cp-text); font: inherit; }
+    .make-it-yours input:focus { outline: 2px solid var(--cp-focus); outline-offset: 1px; }
     .prompt-block { overflow-x: auto; margin: 14px 0 0; padding: 16px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface-soft); color: var(--cp-text); white-space: pre-wrap; word-break: break-word; font-family: Consolas, "Courier New", Courier, monospace; font-size: 13px; line-height: 1.55; }
     .resource-list { columns: 2; padding-left: 22px; }
     .resource-list li { break-inside: avoid; margin-bottom: 10px; }
@@ -752,6 +758,7 @@ html[data-theme="dark"] {
         <header class="learn-step-header"><span>3</span><div><p>Prove the solution locally</p><h3>Ask Easy Mode to build and test Inventory Visibility</h3></div><button class="button report-button" type="button" data-report-location="brainstem lane — step 3: local proof" data-report-expected="Brainstem reports the generic AIBAST Workshop Engine and InventoryVisibilityAgent loaded, with 8/8 locked local cases passed." data-report-evidence="">Report an issue</button></header>
         <div class="learn-step-body">
           <p>This step proves the portable business logic before any Copilot Studio work begins. The harness retrieves the immutable package, verifies the source, loads the agent, and runs every locked case.</p>
+          <div class="make-it-yours"><label for="brainstem-make-it-yours"><strong>Your industry (optional)</strong><span>Type your industry and the message below asks Copilot to adapt this workshop to it after the tests pass. This browser remembers it for every workshop until you clear it. Leave it empty for the standard workshop.</span></label><div class="make-it-yours-row"><input id="brainstem-make-it-yours" type="text" maxlength="120" autocomplete="off" data-make-it-yours="brainstem-build-prompt" data-base-prompt="Give me Inventory Visibility using Easy Mode and test it for me." placeholder="For example: homebuilders, telecom, media"><button class="button" type="button" data-make-it-yours-clear>Clear</button></div></div>
           <div class="prompt-heading"><strong>Send this message</strong><button class="button primary" type="button" data-copy-target="brainstem-build-prompt">Copy message</button></div>
           <pre class="prompt-block" id="brainstem-build-prompt">Give me Inventory Visibility using Easy Mode and test it for me.</pre>
           <div class="expected-panel"><strong>Expected result</strong><p>Brainstem reports the generic AIBAST Workshop Engine and InventoryVisibilityAgent loaded, with 8/8 locked local cases passed.</p><p>Copilot should end by suggesting the next message: <code>Deploy it into Copilot Studio for me.</code></p></div>
@@ -788,6 +795,7 @@ html[data-theme="dark"] {
         <header class="learn-step-header"><span>3</span><div><p>Prove the solution locally</p><h3>Ask Easy Mode to build and test Inventory Visibility</h3></div><button class="button report-button" type="button" data-report-location="copilot lane — step 3: local proof" data-report-expected="Copilot reports the verified mcs-assistant plugin and PAC CLI, an isolated workspace, a verified source hash, and 8/8 locked local cases passed." data-report-evidence="">Report an issue</button></header>
         <div class="learn-step-body">
           <p>This step proves the portable business logic before any Copilot Studio work begins. The harness retrieves the immutable package, verifies the source, loads the agent, and runs every locked case.</p>
+          <div class="make-it-yours"><label for="copilot-make-it-yours"><strong>Your industry (optional)</strong><span>Type your industry and the message below asks Copilot to adapt this workshop to it after the tests pass. This browser remembers it for every workshop until you clear it. Leave it empty for the standard workshop.</span></label><div class="make-it-yours-row"><input id="copilot-make-it-yours" type="text" maxlength="120" autocomplete="off" data-make-it-yours="copilot-build-prompt" data-base-prompt="Give me Inventory Visibility using Easy Mode and test it for me." placeholder="For example: homebuilders, telecom, media"><button class="button" type="button" data-make-it-yours-clear>Clear</button></div></div>
           <div class="prompt-heading"><strong>Send this message</strong><button class="button primary" type="button" data-copy-target="copilot-build-prompt">Copy message</button></div>
           <pre class="prompt-block" id="copilot-build-prompt">Give me Inventory Visibility using Easy Mode and test it for me.</pre>
           <div class="expected-panel"><strong>Expected result</strong><p>Copilot reports the verified mcs-assistant plugin and PAC CLI, an isolated workspace, a verified source hash, and 8/8 locked local cases passed.</p><p>Copilot should end by suggesting the next message: <code>Deploy it into Copilot Studio for me.</code></p></div>
@@ -1967,6 +1975,32 @@ These skill names above are the ONLY valid skill identifiers. Never invent, gues
           nextButton.focus();
         });
       });
+      const industryKey = "aibast.workshop.industry";
+      const makeItYoursInputs = Array.from(document.querySelectorAll("[data-make-it-yours]"));
+      const applyMakeItYours = (value) => {
+        const industry = value.replace(/\s+/g, " ").trim();
+        makeItYoursInputs.forEach((input) => {
+          if (input.value !== value) input.value = value;
+          const target = document.getElementById(input.dataset.makeItYours);
+          if (!target) return;
+          const base = input.dataset.basePrompt || "";
+          target.textContent = industry ? `${base} Then adapt it for the ${industry} industry.` : base;
+        });
+        try {
+          if (industry) window.localStorage.setItem(industryKey, industry);
+          else window.localStorage.removeItem(industryKey);
+        } catch (error) {}
+      };
+      makeItYoursInputs.forEach((input) => {
+        input.addEventListener("input", () => applyMakeItYours(input.value));
+      });
+      document.querySelectorAll("[data-make-it-yours-clear]").forEach((button) => {
+        button.addEventListener("click", () => applyMakeItYours(""));
+      });
+      try {
+        const saved = window.localStorage.getItem(industryKey);
+        if (saved) applyMakeItYours(saved);
+      } catch (error) {}
       document.querySelectorAll("[data-copy-target]").forEach((button) => {
         button.addEventListener("click", () => {
           const target = document.getElementById(button.dataset.copyTarget);
