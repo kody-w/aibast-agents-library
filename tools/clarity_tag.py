@@ -43,12 +43,14 @@ PROJECT_ID_RE = re.compile(r"^[a-z0-9]{6,20}$")
 CONSENT_STORAGE_KEY = "aibast-clarity-consent"
 PRIVACY_STATEMENT_URL = "https://go.microsoft.com/fwlink/?LinkId=521839"
 
-# Published site pages: root HTML plus these directories (see
-# scripts/build_pages_site.py for what GitHub Pages actually serves).
+# Published site pages: root HTML, these directories, and the two retired
+# Frontier aliases that remain live under beta/ (see scripts/build_pages_site.py).
 PUBLIC_DIRECTORIES = ("docs", "reports", "solutions")
+PUBLIC_PAGE_FILES = frozenset({"beta/index.html", "beta/show-mode.html"})
 # Never tagged: the Brainstem UI that installs on users' machines, the
 # Hippocampus docs bundled with the Azure function, local-first tools, and the
-# beta Electron renderer.
+# beta Electron renderer/source. The public retirement aliases are excepted
+# above before these prefixes are checked.
 EXCLUDED_PREFIXES = ("rapp_brainstem/", "rapp_ai/", "tools/", "beta/", "node_modules/")
 
 TAG_TEMPLATE = """<!-- clarity:start -->
@@ -132,6 +134,8 @@ def strip_tag_bytes(data: bytes) -> bytes:
 def is_public_page(relative: str) -> bool:
     if not relative.endswith(".html"):
         return False
+    if relative in PUBLIC_PAGE_FILES:
+        return True
     if relative.startswith(EXCLUDED_PREFIXES):
         return False
     if "/" not in relative:

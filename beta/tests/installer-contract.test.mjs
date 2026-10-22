@@ -8,8 +8,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const unix = readFileSync(path.join(root, "install.sh"), "utf8");
 const windows = readFileSync(path.join(root, "install.cmd"), "utf8");
 const installerPage = readFileSync(path.join(root, "index.html"), "utf8");
-const downloadCenter = readFileSync(path.join(root, "download-center.js"), "utf8");
-const installerSources = `${installerPage}\n${downloadCenter}`;
 const frontierUnix = readFileSync(path.join(root, "frontier.sh"), "utf8");
 const frontierWindows = readFileSync(path.join(root, "frontier.ps1"), "utf8");
 const packageJson = JSON.parse(
@@ -69,7 +67,7 @@ test("beta installers use AIBAST as the canonical source", () => {
   }
 });
 
-test("Frontier is the primary customer-facing launcher identity", () => {
+test("retired source keeps its package and version identity", () => {
   assert.equal(packageJson.name, "@aibast/rapp-brainstem-frontier");
   assert.equal(packageJson.version, "0.1.0-beta.6");
   assert.equal(readFileSync(new URL("../VERSION", import.meta.url), "utf8").trim(), packageJson.version);
@@ -130,69 +128,40 @@ test("released beta installs can pin the launcher and runtime to one commit", ()
   assert.doesNotMatch(windows, /for \/f "delims=" %%H in \('.*rev-parse HEAD.*\)/);
 });
 
-test("dedicated beta page resolves fork releases without changing main install", () => {
-  assert.match(installerSources, /brainstem-beta-v/);
-  assert.match(installerSources, /api\.github\.com\/repos/);
-  assert.match(installerPage, /frontier\.sh/);
-  assert.match(installerPage, /frontier\.ps1/);
-  assert.match(installerPage, /The production installer is unchanged/);
-  assert.match(installerPage, /--cp-bg/);
-  assert.match(installerPage, /data-theme/);
-  assert.match(installerPage, /white-space: pre;/);
-  assert.match(installerPage, /frontier\.sh/);
-  assert.match(installerPage, /frontier\.ps1/);
-  assert.match(installerSources, /BRAINSTEM_BETA_COMMIT/);
-  assert.match(installerPage, /install, update or repair, and launch/);
-  assert.doesNotMatch(installerSources, /\.join\("\\n"\)/);
+test("dedicated beta page is a stamped retirement alias", () => {
+  assert.match(installerPage, /<title>RAPP Brainstem Frontier has been retired<\/title>/);
+  assert.match(installerPage, /The Frontier desktop app is no longer offered or updated/);
+  assert.match(installerPage, /href="\.\.\/index\.html\?view=solutions#workshops"/);
+  assert.match(installerPage, /href="\.\.\/docs\/installer\.html"/);
+  assert.match(installerPage, /<!-- aibast-design:start -->/);
+  assert.match(installerPage, /<!-- clarity:start -->/);
+  assert.doesNotMatch(installerPage, /download-center\.js|frontier\.sh|frontier\.ps1/);
 });
 
-test("dedicated beta page uses the Download Center details structure", () => {
-  assert.match(installerPage, /AIBAST Download Center/);
-  assert.match(installerPage, /Choose your operating system/);
-  assert.match(installerPage, /Choose the download you want/);
-  assert.match(installerPage, />Details</);
-  assert.match(installerPage, />System Requirements</);
-  assert.match(installerPage, />Install Instructions</);
-  assert.match(installerPage, />Additional Information</);
-  assert.match(installerPage, /id="download-dialog"/);
-  assert.match(installerPage, /aria-controls="panel-details"/);
-  assert.match(installerPage, /aria-controls="panel-requirements"/);
-  assert.match(installerPage, /aria-controls="panel-install"/);
-  assert.match(installerPage, /aria-controls="panel-additional"/);
-  assert.match(installerPage, /RAPP-Brainstem-Frontier-Windows\.ps1/);
-  assert.match(installerPage, /RAPP-Brainstem-Frontier-macOS-Linux\.sh/);
-  assert.match(installerSources, /release\.assets/);
-  assert.match(installerSources, /\\\.exe\$/);
-  assert.match(installerSources, /\\\.dmg\$/);
-  assert.match(installerSources, /browser_download_url/);
-  assert.match(installerPage, /id="golden-path-link"/);
-  assert.doesNotMatch(installerPage, /href="GOLDEN_PATH\.md"/);
-});
-
-test("stable Frontier bootstraps resolve and run the latest published release", () => {
+test("stable Frontier aliases fail closed and point to the Brainstem one-liners", () => {
+  const message =
+    "RAPP Brainstem Frontier has been retired. To build from scratch on your own device, install the Brainstem:";
   for (const bootstrap of [frontierUnix, frontierWindows]) {
-    assert.match(bootstrap, /brainstem-beta-v/);
-    assert.match(bootstrap, /api\.github\.com\/repos/);
-    assert.match(bootstrap, /BRAINSTEM_BETA_COMMIT/);
-    assert.match(bootstrap, /BRAINSTEM_BETA_RELEASE_TAG/);
-    assert.match(bootstrap, /BRAINSTEM_BETA_RUNTIME_VERSION_URL/);
-    assert.match(bootstrap, /RAPP_FRONTIER_RESOLVE_ONLY/);
+    assert.match(bootstrap, new RegExp(message.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.match(bootstrap, /exit 1/);
+    assert.doesNotMatch(bootstrap, /api\.github\.com|beta\/install\.(?:sh|cmd)|BRAINSTEM_BETA_/);
   }
-  assert.match(frontierUnix, /beta\/install\.sh/);
-  assert.match(frontierWindows, /beta\/install\.cmd/);
+  assert.match(
+    frontierUnix,
+    /curl -fsSL https:\/\/microsoft\.github\.io\/aibast-agents-library\/install\.sh \| bash/,
+  );
+  assert.match(
+    frontierWindows,
+    /irm https:\/\/microsoft\.github\.io\/aibast-agents-library\/install\.ps1 \| iex/,
+  );
 });
 
-test("dedicated beta page scripts parse", () => {
-  const scripts = [...installerPage.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+test("stamped retirement page scripts parse", () => {
+  const scripts = [...installerPage.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)];
   assert.ok(scripts.length >= 1);
   for (const [, source] of scripts) {
     assert.doesNotThrow(() => new Function(source));
   }
-  assert.doesNotThrow(() => new Function(
-    downloadCenter
-      .replace(/^export\s+/gm, "")
-      .replace(/^import\s+.*$/gm, ""),
-  ));
 });
 
 test("beta launcher reuses the global Brainstem without duplicate toolbar IPC", () => {

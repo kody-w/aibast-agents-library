@@ -55,12 +55,14 @@ test("the click-through sits beside the interview loop and never sends a prompt"
   assert.doesNotMatch(renderer, /openBrowser|openVscode|restart/);
 });
 
-test("the standalone Pages replica drives the same script", () => {
-  assert.match(standalone, /<script src="ui\/show-mode-tour\.js"><\/script>/);
-  assert.match(standalone, /id="explorer"/);
-  assert.match(standalone, /id="surgeon"/);
-  assert.match(standalone, /show-mode-preview/);
-  assert.match(standalone, /rappShowModeTour\.start\(0\)/);
+test("the retired standalone Pages URL points to the replacement paths", () => {
+  assert.match(standalone, /<title>RAPP Brainstem Frontier has been retired<\/title>/);
+  assert.match(standalone, /The Frontier desktop app is no longer offered or updated/);
+  assert.match(standalone, /href="\.\.\/index\.html\?view=solutions#workshops"/);
+  assert.match(standalone, /href="\.\.\/docs\/installer\.html"/);
+  assert.match(standalone, /<!-- aibast-design:start -->/);
+  assert.match(standalone, /<!-- clarity:start -->/);
+  assert.doesNotMatch(standalone, /show-mode-tour\.js|id="explorer"|id="surgeon"/);
 });
 
 test("the UI driver exposes tour and force_mode as top-level commands only", () => {

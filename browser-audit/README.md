@@ -47,9 +47,10 @@ MUTATION_ONLY=css-filter npm run mutations
 Targeted runs write isolated partial reports and are intentionally ineligible
 for release attestation.
 
-## Download Center website gate
+## Frontier retirement alias website gate
 
-The hosted `/beta/` Download Center has a separate required web gate:
+The hosted `/beta/` and `/beta/show-mode.html` retirement aliases have a
+separate required web gate:
 
 ```bash
 cd browser-audit
@@ -64,13 +65,16 @@ and requires a Playwright-managed or system Chromium-compatible browser.
 
 CI must run `npm run test:downloads` as a mandatory step: missing browsers,
 startup failures, page assertion failures, and cleanup failures return nonzero.
-The gate retains all 55 Download Center page assertions and the lifecycle
-regressions for failed startup, failed assertions, and test cancellation.
-Cold browser startup gets Playwright's normal 30-second budget; individual
-CDP commands remain limited to 5 seconds. Event/state waits and process/server
-cleanup remain bounded, and the forced-failure fixtures retain short deadlines.
+The gate checks both aliases with and without JavaScript, at 320, 390, and 640
+pixels, in light and dark mode. It verifies the retirement title and copy, both
+replacement links, zero horizontal overflow, and the absence of the retired
+Download Center and Show Mode controls. The lifecycle regressions for failed
+startup, failed assertions, and test cancellation remain. Cold browser startup
+gets Playwright's normal 30-second budget; individual CDP commands remain
+limited to 5 seconds. Event/state waits and process/server cleanup remain
+bounded, and the forced-failure fixtures retain short deadlines.
 
 These tests validate a hosted website, not the installed desktop runtime.
 They must not run in beta's install-time `npm test` or add a separate Chrome
-prerequisite to desktop installation. Pure Download Center logic/UI unit tests
-and the desktop runtime/installer contracts remain in `beta/tests`.
+prerequisite to desktop installation. Static retirement-page and installer
+alias contracts remain in `beta/tests`.
