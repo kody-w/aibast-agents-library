@@ -1505,13 +1505,19 @@ footer {
   }
   .arch-l2-domain:last-child { border-bottom: 0; }
 }
-  .your-industry { display: grid; gap: 6px; margin: 12px 0 4px; }
-  .your-industry label { font-size: 14px; color: var(--cp-text); }
-  .your-industry label span { color: var(--cp-text-muted); }
-  .your-industry-row { display: flex; align-items: stretch; gap: 8px; max-width: 560px; }
-  .your-industry-row input { min-height: 40px; padding: 8px 12px; }
-  .your-industry-row input { flex: 1; min-width: 0; }
-  .clear-industry { border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text); border-radius: 8px; padding: 0 14px; font: inherit; cursor: pointer; }
+  .industry-selector-head { align-items: center; }
+  .your-industry { position: relative; flex: 0 1 260px; min-width: 0; }
+  .your-industry input { width: 100%; box-sizing: border-box; height: 32px; padding: 0 30px 0 12px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface); color: var(--cp-text); font: inherit; font-size: 0.72rem; }
+  .your-industry input::placeholder { color: var(--cp-text-muted); }
+  .your-industry input:focus { outline: none; border-color: var(--cp-accent); box-shadow: 0 0 0 3px var(--cp-accent-soft); }
+  .your-industry input.has-value { border-color: var(--cp-accent); background: var(--cp-accent-soft); font-weight: 700; }
+  .clear-industry { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 22px; height: 22px; border: 0; border-radius: 999px; background: transparent; color: var(--cp-text-muted); font-size: 16px; line-height: 1; cursor: pointer; }
+  .clear-industry:hover, .clear-industry:focus-visible { background: var(--cp-surface-soft); color: var(--cp-text); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (max-width: 640px) {
+    .industry-selector-head { flex-wrap: wrap; }
+    .your-industry { flex: 1 1 100%; }
+  }
   .adapt-note { display: inline-block; align-self: flex-start; width: fit-content; max-width: 100%; overflow-wrap: anywhere; margin: 2px 0 6px; padding: 2px 9px; border-radius: 999px; background: var(--cp-surface-soft); color: var(--cp-text-muted); font-size: 12px; font-weight: 600; }
   .adapt-note.built { background: var(--cp-accent-soft); color: var(--cp-accent); }
   .more-adapt { grid-column: 1 / -1; margin: 22px 0 0; }
@@ -1592,7 +1598,11 @@ footer {
     <div class="industry-selector">
       <div class="industry-selector-head">
         <strong>Choose an industry</strong>
-        <span>See the proven solutions that can anchor its AI roadmap</span>
+        <div class="your-industry" title="Every template adapts to your industry, and the workshops remember it.">
+          <label class="visually-hidden" for="your-industry">Your industry</label>
+          <input id="your-industry" type="text" maxlength="120" autocomplete="off" placeholder="Not listed? Type your industry">
+          <button class="clear-industry" id="clear-your-industry" type="button" aria-label="Clear your industry" hidden>×</button>
+        </div>
       </div>
       <div class="industry-menu" id="industry-menu"></div>
     </div>
@@ -1602,13 +1612,6 @@ footer {
       <input class="search" id="search" type="search" autocomplete="off" placeholder="Search: claims fraud, permit backlog, plant manager, Dynamics 365...">
       <button class="clear-search" id="clear-search" type="button" data-action="clear-search" aria-label="Clear search">×</button>
       <div class="suggestions" id="suggestions"></div>
-      <div class="your-industry">
-        <label for="your-industry"><strong>Your industry (optional)</strong> <span>Every template adapts to it. Workshops use it too, and this browser remembers it until you clear it.</span></label>
-        <div class="your-industry-row">
-          <input class="field" id="your-industry" type="text" maxlength="120" autocomplete="off" placeholder="For example: homebuilders, telecom, media">
-          <button class="clear-industry" id="clear-your-industry" type="button">Clear</button>
-        </div>
-      </div>
       <div class="popular">
         <span class="popular-label">Browse by goal</span>
         <button class="query-chip" type="button" data-action="query" data-query="grow revenue sales pipeline renewal">Grow revenue</button>
@@ -2122,6 +2125,7 @@ function bindInputs() {
   $("your-industry").addEventListener("input", event => {
     // Save at once so leaving the page never loses it; only the re-render waits.
     writeYourIndustry(event.target.value);
+    paintYourIndustryBox();
     clearTimeout(yourIndustryTimer);
     yourIndustryTimer = setTimeout(render, 250);
   });
@@ -2579,6 +2583,12 @@ function writeYourIndustry(value) {
   state.yourIndustry = cleaned;
 }
 
+function paintYourIndustryBox() {
+  const filled = Boolean($("your-industry").value.trim());
+  $("your-industry").classList.toggle("has-value", filled);
+  $("clear-your-industry").hidden = !filled;
+}
+
 const GENERIC_INDUSTRY_WORDS = new Set(["and", "services", "products", "industry", "cross"]);
 
 function industryWords(value) {
@@ -2631,6 +2641,7 @@ function moreThatAdapt(shownRows) {
 }
 
 function render() {
+  paintYourIndustryBox();
   const firstPartyView = state.view === "first-party";
   const partnersView = state.view === "partners";
   document.body.classList.toggle("first-party-view", firstPartyView);
@@ -3579,8 +3590,17 @@ document.addEventListener("click", event => {
     render();
   } else if (action === "industry-menu") {
     const industry = target.dataset.industry;
+    const industryName = CATEGORY_NAMES[industry] || pretty(industry);
     state.view = "solutions";
     state.industry = state.industry === industry ? "" : industry;
+    // Choosing an industry tile also makes it your industry for the workshops (not the cross-industry tile).
+    if (state.industry && industry !== "general") {
+      writeYourIndustry(industryName);
+      $("your-industry").value = industryName;
+    } else if (!state.industry && state.yourIndustry === industryName) {
+      writeYourIndustry("");
+      $("your-industry").value = "";
+    }
     buildFilters();
     render();
   } else if (action === "clear-filter") {

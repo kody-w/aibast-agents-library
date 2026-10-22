@@ -40,3 +40,13 @@ def test_microsoft_first_party_agents_show_first_for_a_search():
 def test_address_parameters_are_unchanged():
     for param in ('params.get("view")', 'params.get("q")', 'params.get("industry")'):
         assert param in INDEX, param
+
+
+def test_one_industry_control_lives_in_the_industry_panel():
+    panel = INDEX[INDEX.index('<div class="industry-selector">'):INDEX.index('<div class="industry-blueprint"')]
+    assert 'id="your-industry"' in panel
+    assert 'placeholder="Not listed? Type your industry"' in panel
+    assert INDEX.count('id="your-industry"') == 1
+    # Choosing a tile makes it your industry for the workshops, except the cross-industry tile.
+    assert 'if (state.industry && industry !== "general") {' in INDEX
+    assert "writeYourIndustry(industryName);" in INDEX
