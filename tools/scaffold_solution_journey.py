@@ -4613,6 +4613,11 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
           if (industry) window.localStorage.setItem(industryKey, industry);
           else window.localStorage.removeItem(industryKey);
         }} catch (error) {{}}
+        document.querySelectorAll("[data-industry-note]").forEach((note) => {{
+          const text = note.querySelector("[data-industry-note-text]");
+          if (text) text.textContent = industry ? `You set your industry to ${{industry}}.` : "";
+          note.hidden = !industry;
+        }});
       }};
       makeItYoursInputs.forEach((input) => {{
         input.addEventListener("input", () => applyMakeItYours(input.value));
