@@ -22,6 +22,34 @@ specialized instructors, and returns the final evidence verdict.
 Resolve the branch through the GitHub API and pin one immutable commit SHA
 before downloading anything.
 
+## Start from what you need
+
+When the user describes a business need in their own words instead of naming a
+workshop (for example `Our team leads build monthly PowerPoint reports from
+Excel and our finance system`):
+
+1. Fetch `registry.json` from the pinned commit and read the `solution`
+   entries' names and descriptions.
+2. Pick up to three that come closest to the need. Show each as one plain
+   line: the name and why it fits. Say clearly when none is an exact match.
+3. Let the user choose, then continue as
+   `Give me <solution> using Easy Mode and test it for me`.
+4. After the test passes, offer to adapt it to their exact need, using the
+   playbook below.
+5. When nothing comes close, say so and offer two routes: build it yourself
+   with `skills/playbooks/build-it-yourself.md`, or adapt the nearest
+   workshop with `skills/playbooks/adapt-and-connect.md`. The user can also
+   ask the AIBAST team to consider it at
+   `https://microsoft.github.io/aibast-agents-library/request-use-case.html`;
+   never promise that a requested workshop will be built.
+
+## Playbooks
+
+Before each stage, fetch `skills/playbooks/README.md` from the pinned commit
+and follow any playbook whose "use it when" matches the user's situation. The
+playbooks hold the up-to-date, step-by-step guidance; this file only routes to
+them.
+
 ## Choose from the library
 
 When the user asks what is available, or asks for a workshop without naming
@@ -57,6 +85,16 @@ When the user says `Give me <solution> using Easy Mode and test it for me`:
    hot-load the business agent, and run every locked local case.
 8. Return the verdict and:
    `Deploy it into Copilot Studio for me.`
+
+## Adapt it (optional)
+
+When the user says `Adapt it to <what I need>`, describes a different process,
+data, report, or system after a successful test, or asks how to connect live
+systems such as Dynamics 365 Field Service, Excel, or a finance system: follow
+`skills/playbooks/adapt-and-connect.md` from the same pinned commit, step by
+step. It covers adapting the template on fictional data, then the
+optional move to live systems in Copilot Studio. Never accept real customer
+records or credentials.
 
 ## Deploy
 
