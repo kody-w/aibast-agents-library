@@ -27,6 +27,12 @@ def test_library_routes_architecture_into_the_beta_workshop():
     ):
         assert required in text
 
+    assert re.search(
+        r'localStorage\.getItem\("aibast:workshop-engine"\)\s*===\s*"brainstem"'
+        r'\s*\?\s*"GitHub Copilot \+ Brainstem"\s*:\s*"GitHub Copilot"',
+        text,
+    )
+
     for obsolete in (
         "Implementation modes",
         "Try locally — one prompt, no terminal",

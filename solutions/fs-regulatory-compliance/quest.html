@@ -66,9 +66,9 @@
       try {
         backend = globalThis.localStorage;
         const storedEngine =
-          localStorage.getItem("aibast:workshop-engine") === "copilot"
-            ? "copilot"
-            : "brainstem";
+          localStorage.getItem("aibast:workshop-engine") === "brainstem"
+            ? "brainstem"
+            : "copilot";
         memory.set(engineKey, storedEngine);
         const probeKey = "aibast:workshop-storage-probe";
         backend.setItem(probeKey, "1");
@@ -124,7 +124,7 @@
       const storedEngine =
         globalThis.aibastWorkshopStorage.getItem("aibast:workshop-engine");
       const engine =
-        storedEngine === "copilot" ? "copilot" : "brainstem";
+        storedEngine === "brainstem" ? "brainstem" : "copilot";
       document.documentElement.setAttribute("data-workshop-engine", engine);
     })();
   </script>
@@ -595,6 +595,7 @@ html[data-theme="dark"] {
     .prompt-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
     .prompt-heading h3 { margin: 0; }
     .prompt-kicker { margin: 0 0 4px; color: var(--cp-accent); font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .industry-note { margin: 12px 0 18px; padding: 12px 16px; border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-link); border-radius: 10px; background: var(--cp-surface); color: var(--cp-text); font-size: 15px; }
     .make-it-yours { display: grid; gap: 8px; margin: 14px 0 18px; padding: 14px 16px; border: 1px solid var(--cp-border); border-radius: 10px; background: var(--cp-surface); }
     .make-it-yours label { display: grid; gap: 4px; }
     .make-it-yours span { color: var(--cp-text-muted); font-size: 14px; }
@@ -991,6 +992,7 @@ html[data-theme="dark"] {
       </section>
 
       <h2>Build and verify</h2>
+      <div class="industry-note" data-industry-note hidden><strong>These screenshots are click guides.</strong> <span data-industry-note-text></span> They show the standard workshop, so your names and answers will differ; the buttons are the same.</div>
       <article class="step" id="step-1">
         <header><span>1</span><div><h3>Create a blank Copilot Studio agent</h3><p>Step 1 of 26</p></div><button class="button report-button" type="button" data-report-location="Manual mode — step 1: Create a blank Copilot Studio agent" data-report-expected="A blank Copilot Studio agent is visible in the captured Draft workspace." data-report-evidence="solutions/fs-regulatory-compliance/screenshots/manual/01-create-blank-agent.jpg">Report an issue</button></header>
         <div class="step-body">
@@ -1741,9 +1743,9 @@ Use native citations. Never emit literal doc-turn tokens. If citation rendering 
       });
 
       function currentEasyPath() {
-        return localStorage.getItem(globalEngineKey) === "copilot"
-          ? "copilot"
-          : "brainstem";
+        return localStorage.getItem(globalEngineKey) === "brainstem"
+          ? "brainstem"
+          : "copilot";
       }
 
       function requiredEasyBoxes() {
@@ -2117,5 +2119,17 @@ Opening this form does not sync anything. Submit the issue to sync these earned 
       });
     })();
   </script>
+<script>
+  (() => {
+    let industry = "";
+    try { industry = (window.localStorage.getItem("aibast.workshop.industry") || "").trim(); } catch (error) {}
+    if (!industry) return;
+    document.querySelectorAll("[data-industry-note]").forEach((note) => {
+      const text = note.querySelector("[data-industry-note-text]");
+      if (text) text.textContent = `You set your industry to ${industry}.`;
+      note.hidden = false;
+    });
+  })();
+</script>
 </body>
 </html>
