@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from scripts import build_metrics
+from tests.solution_bundles import built_bundle
 
 ROOT = Path(__file__).resolve().parent.parent
 REGISTRY = json.loads((ROOT / "registry.json").read_text(encoding="utf-8"))
@@ -177,7 +178,7 @@ def test_source_bundles_respect_full_or_manual_only_facilitator_scope():
         )
         manifest_paths = {item["path"] for item in manifest["files"]}
         assert expected <= manifest_paths
-        bundle = ROOT / manifest["bundle"]["path"]
+        bundle = built_bundle(row["slug"])
         with zipfile.ZipFile(bundle) as archive:
             names = set(archive.namelist())
         if manifest["bundle"].get("include_paths") is not None:

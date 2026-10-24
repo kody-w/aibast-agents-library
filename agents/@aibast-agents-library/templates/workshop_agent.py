@@ -55,6 +55,7 @@ GITHUB_COMMIT_API = (
 IMMUTABLE_RAW_PREFIX = (
     "https://raw.githubusercontent.com/kody-w/aibast-agents-library/"
 )
+RELEASE_DOWNLOAD_PREFIX = "https://github.com/"
 REGISTRY_PATH = "registry.json"
 PROMOTE_TOOL_PATH = "tools/promote_solution_draft.py"
 UUID_PATTERN = re.compile(
@@ -270,6 +271,39 @@ class AIBASTWorkshopAgent(BasicAgent):
         with urllib.request.urlopen(request, timeout=60) as response:
             return response.read()
 
+    def _fetch_source_bundle(self, manifest):
+        """Return the solution source bundle bytes.
+
+        Older source trees commit the bundle at ``bundle.path``. Current trees
+        publish it as a release asset at ``bundle.download_url`` instead.
+        """
+        bundle = manifest.get("bundle") or {}
+        relative = bundle.get("path")
+        if not relative:
+            raise WorkshopError("export-manifest.json does not define a bundle")
+        try:
+            return self._fetch_bytes(relative)
+        except urllib.error.URLError as error:
+            if isinstance(error, urllib.error.HTTPError) and error.code != 404:
+                raise
+            url = bundle.get("download_url")
+            if not isinstance(url, str) or not url.startswith(
+                RELEASE_DOWNLOAD_PREFIX
+            ):
+                raise WorkshopError(
+                    "The source bundle is not in the source tree and the "
+                    "manifest has no release download URL"
+                ) from error
+        return self._download_release_asset(url)
+
+    def _download_release_asset(self, url):
+        request = urllib.request.Request(
+            url,
+            headers={"User-Agent": "AIBAST-Workshop/1.0"},
+        )
+        with urllib.request.urlopen(request, timeout=120) as response:
+            return response.read()
+
     def _fetch_json(self, relative):
         return json.loads(self._fetch_bytes(relative).decode("utf-8"))
 
@@ -441,11 +475,8 @@ class AIBASTWorkshopAgent(BasicAgent):
     def _prepare_workspace(self, solution, manifest):
         home = self._workshop_home(solution)
         home.mkdir(parents=True, exist_ok=True)
-        bundle_relative = manifest.get("bundle", {}).get("path")
-        if not bundle_relative:
-            raise WorkshopError("export-manifest.json does not define a bundle")
         archive = home / f"{solution['slug']}-source.zip"
-        self._atomic_write(archive, self._fetch_bytes(bundle_relative))
+        self._atomic_write(archive, self._fetch_source_bundle(manifest))
         source_root = home / "source"
         if source_root.exists():
             shutil.rmtree(source_root)
