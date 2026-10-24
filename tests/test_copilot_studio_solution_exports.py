@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.solution_bundles import built_bundle
 from tests.test_library_agent_upvotes import run_library_node
 
 
@@ -53,13 +54,7 @@ def test_historical_native_archives_and_declared_source_bundles_are_intact():
         solution_zip = ROOT / row["zip"]
         settings = ROOT / row["deployment_settings"]
         metadata = ROOT / row["metadata"]
-        source_zip = (
-            ROOT
-            / "solutions"
-            / slug
-            / "exports"
-            / f"{slug}-source.zip"
-        )
+        source_zip = built_bundle(slug)
         draft_evidence = (
             ROOT
             / "solutions"

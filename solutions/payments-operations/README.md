@@ -41,7 +41,7 @@ Upload both Markdown files in `manual/knowledge/`, then upload the 7 `SKILL.md` 
 | Guided Easy/Manual quest | `solutions/payments-operations/quest.html` |
 | Literal browser tutorial | `solutions/payments-operations/manual-tutorial.html` |
 | Raw export manifest | `solutions/payments-operations/export-manifest.json` |
-| Source bundle | `solutions/payments-operations/exports/payments-operations-source.zip` |
+| Source bundle | [`payments-operations-source.zip`](https://github.com/microsoft/aibast-agents-library/releases/download/solution-bundles/payments-operations-source.zip) (release asset) |
 | Manual evidence | `solutions/payments-operations/evals/manual-build-evidence.json` |
 | Manual browserfilm | `solutions/payments-operations/screenshots/manual/browserfilm.json` |
 | Copilot Studio solution ZIP | `solutions/payments-operations/exports/payments-operations-copilot-studio-solution.zip` |

@@ -186,6 +186,57 @@ def accumulate_installer_assets(store, current):
     return store
 
 
+# Solution source bundles are assets on the rolling "solution-bundles" release
+# (see .github/workflows/solution-bundle-assets.yml), one <slug>-source.zip per
+# solution. They are not committed, so GitHub's asset counters are the record.
+SOLUTION_BUNDLE_RELEASE_TAG = "solution-bundles"
+SOLUTION_BUNDLE_ASSET_RE = re.compile(r"^([a-z0-9][a-z0-9-]*)-source\.zip$")
+
+
+def solution_bundle_release_assets(releases):
+    """Current GitHub download counters for the solution source bundle assets."""
+    out = {}
+    if not isinstance(releases, dict):
+        return out
+    for release in releases.get("releases") or []:
+        if not isinstance(release, dict):
+            continue
+        if release.get("tag") != SOLUTION_BUNDLE_RELEASE_TAG:
+            continue
+        for asset in release.get("assets") or []:
+            if not isinstance(asset, dict):
+                continue
+            name = asset.get("name")
+            if isinstance(name, str) and SOLUTION_BUNDLE_ASSET_RE.match(name):
+                count = _nonnegative_int(asset.get("downloads"))
+                if count is not None:
+                    out[name] = count
+    return out
+
+
+def with_release_bundle_downloads(grouped, releases, hist=None):
+    """Add solution-bundle release asset downloads to each workshop's
+    ``bundle_downloads``. Uses the accumulated all-time history when available
+    (an asset is replaced, and its counter restarts, whenever its bundle
+    changes), else the live counters. Without a release read the CDN-derived
+    values are left unchanged. ``grouped`` is mutated and returned."""
+    if not isinstance(releases, dict) or not releases.get("available"):
+        return grouped
+    store = (hist or {}).get("solution_bundle_assets") or {}
+    if store:
+        counts = {
+            name: _nonnegative_int(row.get("all_time")) or 0
+            for name, row in store.items()
+            if isinstance(row, dict)
+        }
+    else:
+        counts = solution_bundle_release_assets(releases)
+    for slug, row in grouped.items():
+        added = counts.get(f"{slug}-source.zip", 0)
+        row["bundle_downloads"] = (row.get("bundle_downloads") or 0) + added
+    return grouped
+
+
 def installer_release_all_time(hist):
     """Sum of accumulated installer asset downloads from a history document."""
     store = (hist or {}).get("installer_assets") or {}
@@ -3081,7 +3132,7 @@ def build_workshop_metrics(
         "rows": rows,
         "usage_definition": (
             "usage_events is the sum of counted GitHub popular-path page views, "
-            "jsDelivr workshop file downloads, jsDelivr source-bundle downloads, "
+            "jsDelivr workshop file downloads, source-bundle downloads, "
             "and public workshop feedback reports. It is an event floor, not users "
             "or unique usage. The sources use mixed measurement windows, and one "
             "person or action can create multiple events."
@@ -3100,8 +3151,13 @@ def build_workshop_metrics(
             },
             {
                 "name": "jsDelivr File Stats",
-                "metric": "paginated workshop files under /solutions/<slug>/ and bundles at /exports/<slug>-source.zip",
+                "metric": "paginated workshop files under /solutions/<slug>/ and legacy bundles at /exports/<slug>-source.zip",
                 "url": f"{JSDELIVR}/stats/packages/gh/{OWNER}/{REPO}@main/files?period=year&limit=100&page=1",
+            },
+            {
+                "name": "GitHub Releases API",
+                "metric": f"all-time downloads of <slug>-source.zip assets on the {SOLUTION_BUNDLE_RELEASE_TAG} release, accumulated across asset replacements",
+                "url": f"{GH_API}/repos/{OWNER}/{REPO}/releases?per_page=100",
             },
             {
                 "name": "GitHub Issues API",
@@ -3456,7 +3512,14 @@ def fetch_jsdelivr(by_file, agents, workshop_slugs=(), pins=None):
 
 # ------------------------------------------------------------------ history
 
-def merge_history(traffic, jsd, history=HISTORY, run_at=None, installer_assets=None):
+def merge_history(
+    traffic,
+    jsd,
+    history=HISTORY,
+    run_at=None,
+    installer_assets=None,
+    bundle_assets=None,
+):
     """Accumulate rolling-window daily rows so totals survive the 14-day cutoff.
 
     Also remembers the last successful traffic read. The Actions GITHUB_TOKEN is
@@ -3501,6 +3564,10 @@ def merge_history(traffic, jsd, history=HISTORY, run_at=None, installer_assets=N
     if installer_assets:
         accumulate_installer_assets(
             hist.setdefault("installer_assets", {}), installer_assets
+        )
+    if bundle_assets:
+        accumulate_installer_assets(
+            hist.setdefault("solution_bundle_assets", {}), bundle_assets
         )
 
     last = hist.setdefault("last_known", {})
@@ -4267,6 +4334,7 @@ def main():
             history,
             run_at=generated_at,
             installer_assets=installer_release_assets(releases),
+            bundle_assets=solution_bundle_release_assets(releases),
         )
         traffic_live = bool(traffic_raw.get("clones"))
         traffic_error = traffic_raw.get("_error")
@@ -4390,8 +4458,12 @@ def main():
         workshops = build_workshop_metrics(
             workshop_catalog,
             path_metrics=path_metrics,
-            download_counts=workshop_downloads_from_file_metrics(
-                file_metrics, workshop_slugs
+            download_counts=with_release_bundle_downloads(
+                workshop_downloads_from_file_metrics(
+                    file_metrics, workshop_slugs
+                ),
+                releases,
+                load_json(history, {}),
             ),
             feedback_counts=workshop_feedback.get("counts", {}),
             agent_upvotes=agent_upvotes["counts"],

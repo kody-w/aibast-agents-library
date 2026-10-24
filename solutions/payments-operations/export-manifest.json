@@ -7,7 +7,7 @@
   "bundle": {
     "label": "Complete Payments Operations Agent source bundle",
     "path": "solutions/payments-operations/exports/payments-operations-source.zip",
-    "raw_url": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/payments-operations/exports/payments-operations-source.zip"
+    "download_url": "https://github.com/microsoft/aibast-agents-library/releases/download/solution-bundles/payments-operations-source.zip"
   },
   "files": [
     {
