@@ -166,6 +166,8 @@ def test_workflow_uploads_only_changed_bundles_and_verifies_them():
     assert "--clobber" in text
     assert "dist/solution-bundles/SHA256SUMS" in text
     assert "DRIFT $name" in text
+    # A replaced asset can be served stale briefly; mismatches are re-downloaded first.
+    assert "for attempt in 1 2 3 4 5 6" in text and "sleep 30" in text
     assert 'test "$fail" = 0' in text
 
 
