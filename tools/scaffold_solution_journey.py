@@ -23,6 +23,7 @@ if str(ROOT) not in sys.path:
 from tools.clarity_tag import current_tag as _clarity_current_tag  # noqa: E402
 from tools.design_tokens import render_tokens as _design_tokens  # noqa: E402
 from tools.design_tokens import stamp as _design_stamp  # noqa: E402
+from tools.solution_bundle_assets import download_url as _bundle_download_url  # noqa: E402
 
 
 def clarity_head_tag() -> str:
@@ -635,6 +636,11 @@ class JourneyContext:
 
     def raw(self, path: str) -> str:
         return f"{self.raw_base}{path}"
+
+    @property
+    def bundle_url(self) -> str:
+        """Release asset URL of the source bundle (not committed to the tree)."""
+        return _bundle_download_url(self.slug)
 
 
 @dataclass
@@ -1817,7 +1823,7 @@ def render_manifest(ctx: JourneyContext, resources: list[Resource]) -> str:
         "bundle": {
             "label": f"Complete {ctx.title} source bundle",
             "path": bundle_path,
-            "raw_url": ctx.raw(bundle_path),
+            "download_url": ctx.bundle_url,
         },
         "files": [
             {
@@ -3045,7 +3051,7 @@ def render_evidence_report_html(ctx: JourneyContext) -> str:
       <a class="button" href="evals/transcripts.json" download>Download source-only transcripts</a>
       <a class="button" href="evals/visual-checkpoints.json" download>Download visual checkpoint contract</a>
       <a class="button" href="export-manifest.json" download>Download export manifest</a>
-      <a class="button" href="exports/{html.escape(ctx.slug)}-source.zip" download>{"Download manual inputs" if ctx.deployment.get("source_bundle", {}).get("kind") == "manual-inputs" else "Download portable bundle"}</a>
+      <a class="button" href="{html.escape(ctx.bundle_url)}" download>{"Download manual inputs" if ctx.deployment.get("source_bundle", {}).get("kind") == "manual-inputs" else "Download portable bundle"}</a>
       {solution_downloads}
       {audit_download}
     </section>
@@ -3334,7 +3340,7 @@ def render_manual_tutorial(
       <div class="brand"><span class="brand-mark">A</span><span>AIBAST manual workshop</span></div>
       <a class="academy-breadcrumb" href="../../academy.html#course/{html.escape(ctx.slug)}">Academy / {html.escape(ctx.title)}</a>
     </div>
-    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button>{gif_button} <a class="button" href="quest.html">Back to workshop</a><a class="button primary" href="exports/{html.escape(ctx.slug)}-source.zip">Download source bundle</a></div>
+    <div class="topbar-actions"><button class="button" type="button" data-theme-toggle aria-pressed="false">Use dark mode</button>{gif_button} <a class="button" href="quest.html">Back to workshop</a><a class="button primary" href="{html.escape(ctx.bundle_url)}">Download source bundle</a></div>
   </header>
   <div class="layout">
     <aside class="sidebar">
@@ -4212,7 +4218,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
           <a class="button" href="evidence-report.html#locked-cases">Locked evidence</a>
           {visual_audit_link}
           <a class="button" href="export-manifest.json" download>Download audit manifest</a>
-          <a class="button" href="exports/{html.escape(ctx.slug)}-source.zip" download>{"Download manual inputs" if ctx.deployment.get("source_bundle", {}).get("kind") == "manual-inputs" else "Download portable bundle"}</a>
+          <a class="button" href="{html.escape(ctx.bundle_url)}" download>{"Download manual inputs" if ctx.deployment.get("source_bundle", {}).get("kind") == "manual-inputs" else "Download portable bundle"}</a>
           {solution_downloads}
           {workshop_agent_link}
         </div>
@@ -4229,7 +4235,7 @@ def render_quest(ctx: JourneyContext, resources: list[Resource]) -> str:
         {manual_content.pending_notice}
         <div class="hard-actions">
           <a class="button" href="manual-tutorial.html" target="_blank" rel="noopener">Open standalone Manual-mode guide ↗</a>
-          <a class="button primary" href="exports/{html.escape(ctx.slug)}-source.zip">Download source bundle</a>
+          <a class="button primary" href="{html.escape(ctx.bundle_url)}">Download source bundle</a>
           {solution_downloads}
         </div>
       </section>
@@ -4805,6 +4811,11 @@ Build `{ctx.slug}-source.zip` with the existing source bundler:
 python3 tools/build_solution_export.py solutions/{ctx.slug}/export-manifest.json
 ```
 
+Download the published bundle: [`{ctx.slug}-source.zip`]({ctx.bundle_url}).
+It is a release asset built from this repository on every change, not a
+committed file. A local build writes `{ctx.slug}-source.zip` to this folder,
+which Git ignores.
+
 This archive contains only the explicit `bundle.include_paths` list in
 the separately published `export-manifest.json`.
 
@@ -4872,6 +4883,11 @@ python3 tools/build_solution_export.py \\
   solutions/{ctx.slug}/export-manifest.json
 ```
 
+Download the published bundle: [`{ctx.slug}-source.zip`]({ctx.bundle_url}).
+It is a release asset built from this repository on every change, not a
+committed file. A local build writes `{ctx.slug}-source.zip` to this folder,
+which Git ignores.
+
 The existing builder includes the complete solution package plus every
 non-pending resource declared by the manifest. Items marked `pending_capture`
 are intentionally excluded until real evidence exists.
@@ -4914,7 +4930,7 @@ def readme_block(ctx: JourneyContext, resources: list[Resource]) -> str:
         ("Guided Easy/Manual quest", f"`solutions/{ctx.slug}/quest.html`"),
         ("Literal browser tutorial", f"`solutions/{ctx.slug}/manual-tutorial.html`"),
         ("Raw export manifest", f"`solutions/{ctx.slug}/export-manifest.json`"),
-        ("Source bundle", f"`solutions/{ctx.slug}/exports/{ctx.slug}-source.zip`"),
+        ("Source bundle", f"[`{ctx.slug}-source.zip`]({ctx.bundle_url}) (release asset)"),
         ("Manual evidence", f"`solutions/{ctx.slug}/evals/manual-build-evidence.json`"),
         (
             "Manual reviewed reference set" if is_reviewed_reference_set(ctx) else "Manual browserfilm",

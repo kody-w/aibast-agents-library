@@ -39,7 +39,7 @@ Upload both Markdown files in `manual/knowledge/`, then upload the 7 `SKILL.md` 
 | Guided Easy/Manual quest | `solutions/field-permit-to-work/quest.html` |
 | Literal browser tutorial | `solutions/field-permit-to-work/manual-tutorial.html` |
 | Raw export manifest | `solutions/field-permit-to-work/export-manifest.json` |
-| Source bundle | `solutions/field-permit-to-work/exports/field-permit-to-work-source.zip` |
+| Source bundle | [`field-permit-to-work-source.zip`](https://github.com/microsoft/aibast-agents-library/releases/download/solution-bundles/field-permit-to-work-source.zip) (release asset) |
 | Manual evidence | `solutions/field-permit-to-work/evals/manual-build-evidence.json` |
 | Manual browserfilm | `solutions/field-permit-to-work/screenshots/manual/browserfilm.json` |
 | Copilot Studio solution ZIP | `solutions/field-permit-to-work/exports/field-permit-to-work-copilot-studio-solution.zip` |

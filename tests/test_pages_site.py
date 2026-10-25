@@ -82,6 +82,9 @@ def create_fixture(root: Path) -> None:
             quest_links += (
                 f'<a href="exports/{slug}-source.zip?download=1#bundle">'
                 "Source bundle</a>"
+                '<a href="https://github.com/microsoft/aibast-agents-library/'
+                f'releases/download/solution-bundles/{slug}-source.zip">'
+                "Release bundle</a>"
                 "<img src=screenshots/walkthrough.gif?autoplay=1#frame>"
                 '<a href="../../agents/template.py">Agent template</a>'
                 '<a href="../../skills/easy/SKILL.md">Easy skill</a>'
@@ -207,11 +210,16 @@ class PagesBuilderFixtureTests(unittest.TestCase):
             docs = (output / "docs" / "index.html").read_text(encoding="utf-8")
 
             raw = f"https://raw.githubusercontent.com/{OWNER}/{REPO}/{REF}"
-            self.assertIn(
-                f"{raw}/solutions/course-01/exports/"
-                "course-01-source.zip?download=1#bundle",
-                quest,
+            release = (
+                f"https://github.com/{OWNER}/{REPO}/releases/download/"
+                "solution-bundles/course-01-source.zip"
             )
+            # Solution source bundles are served from the ring's release,
+            # whether the page links the tree path or the canonical asset.
+            self.assertIn(f'href="{release}?download=1#bundle"', quest)
+            self.assertIn(f'href="{release}"', quest)
+            self.assertNotIn("microsoft/aibast-agents-library", quest)
+            self.assertNotIn("course-01-source.zip", quest.replace(release, ""))
             self.assertIn(
                 f"src={raw}/solutions/course-01/screenshots/"
                 "walkthrough.gif?autoplay=1#frame",
@@ -219,7 +227,7 @@ class PagesBuilderFixtureTests(unittest.TestCase):
             )
             self.assertIn(f"{raw}/agents/template.py", quest)
             self.assertIn(f"{raw}/tools/demo.html", docs)
-            self.assertEqual(manifest["rewritten_link_count"], 4)
+            self.assertEqual(manifest["rewritten_link_count"], 5)
 
     def test_preserves_safe_and_external_links(self):
         with fixture_root() as root:
@@ -332,7 +340,7 @@ class PagesBuilderFixtureTests(unittest.TestCase):
             fetch_metadata.assert_called_once_with(OWNER, REPO, REF)
             self.assertEqual(manifest["excluded"][".zip"]["count"], 1)
             self.assertEqual(manifest["excluded"][".gif"]["count"], 1)
-            self.assertEqual(manifest["rewritten_link_count"], 4)
+            self.assertEqual(manifest["rewritten_link_count"], 5)
             self.assertFalse(
                 (output / "solutions/course-01/exports/course-01-source.zip").exists()
             )
@@ -764,6 +772,28 @@ class FullRepositoryArtifactTests(unittest.TestCase):
             self.assertEqual(ring["rendered_installers"], [])
         else:
             self.assertIn("install.sh", ring["rendered_installers"])
+
+    def test_solution_bundle_links_use_the_ring_release_asset(self):
+        source = self.manifest["source"]
+        release = (
+            f"https://github.com/{source['owner']}/{source['repo']}"
+            "/releases/download/solution-bundles/"
+        )
+        quests = sorted((self.site / "solutions").glob("*/quest.html"))
+        self.assertTrue(quests)
+        for quest in quests:
+            slug = quest.parent.name
+            for page in ("quest.html", "evidence-report.html"):
+                text = (quest.parent / page).read_text(encoding="utf-8")
+                self.assertIn(f'href="{release}{slug}-source.zip"', text, page)
+                self.assertNotIn(f'href="exports/{slug}-source.zip"', text, page)
+                self.assertNotRegex(
+                    text,
+                    r"raw\.githubusercontent\.com/[^\"' ]+-source\.zip",
+                )
+            self.assertFalse(
+                (quest.parent / "exports" / f"{slug}-source.zip").exists()
+            )
 
     def test_library_dynamic_solution_download_uses_immutable_raw_url(self):
         library = (self.site / "index.html").read_text(encoding="utf-8")

@@ -431,8 +431,10 @@ def create_fixture(root: Path) -> Path:
         "raw_base": RAW_BASE,
         "bundle": {
             "path": f"solutions/{SLUG}/exports/{SLUG}-source.zip",
-            "raw_url": RAW_BASE
-            + f"solutions/{SLUG}/exports/{SLUG}-source.zip",
+            "download_url": (
+                "https://github.com/microsoft/aibast-agents-library/"
+                f"releases/download/solution-bundles/{SLUG}-source.zip"
+            ),
         },
         "files": [
             {

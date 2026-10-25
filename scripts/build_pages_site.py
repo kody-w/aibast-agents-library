@@ -78,6 +78,18 @@ BETA_PUBLIC_FILES = frozenset(
 CANONICAL_OWNER = "microsoft"
 CANONICAL_REPO = "aibast-agents-library"
 CANONICAL_BRANCH = "main"
+# Solution source bundles (solutions/<slug>/exports/<slug>-source.zip) are not
+# committed; they are assets on this rolling release of each ring's repository
+# (.github/workflows/solution-bundle-assets.yml). Links to them are rewritten
+# to the serving ring's release.
+SOLUTION_BUNDLE_RELEASE_TAG = "solution-bundles"
+SOLUTION_BUNDLE_PATH_RE = re.compile(
+    r"^solutions/(?P<slug>[a-z0-9][a-z0-9-]*)/exports/(?P=slug)-source\.zip$"
+)
+CANONICAL_SOLUTION_BUNDLE_PREFIX = (
+    f"https://github.com/{CANONICAL_OWNER}/{CANONICAL_REPO}"
+    f"/releases/download/{SOLUTION_BUNDLE_RELEASE_TAG}/"
+)
 INSTALLER_PATHS = frozenset(
     {
         "install.sh",
@@ -779,6 +791,45 @@ def _raw_github_url(
     )
 
 
+def _solution_bundle_url(owner: str, repo: str, slug: str) -> str:
+    return (
+        "https://github.com/"
+        f"{quote(owner, safe='-._~')}/{quote(repo, safe='-._~')}"
+        f"/releases/download/{SOLUTION_BUNDLE_RELEASE_TAG}/"
+        f"{quote(slug, safe='-')}-source.zip"
+    )
+
+
+def _ring_solution_bundle_url(
+    target: PurePosixPath | None,
+    original_value: str,
+    owner: str,
+    repo: str,
+) -> str | None:
+    """Release asset URL for a solution bundle link, or None for other links.
+
+    Handles both a relative link to ``solutions/<slug>/exports/<slug>-source.zip``
+    and the canonical release URL written by the solution scaffold.
+    """
+    parsed = urlsplit(html.unescape(original_value.strip()))
+    slug = None
+    if target is not None:
+        match = SOLUTION_BUNDLE_PATH_RE.match(target.as_posix())
+        slug = match.group("slug") if match else None
+    elif html.unescape(original_value.strip()).startswith(
+        CANONICAL_SOLUTION_BUNDLE_PREFIX
+    ):
+        name = parsed.path.rsplit("/", 1)[-1]
+        match = re.fullmatch(r"(?P<slug>[a-z0-9][a-z0-9-]*)-source\.zip", name)
+        slug = match.group("slug") if match else None
+    if slug is None:
+        return None
+    base = urlsplit(_solution_bundle_url(owner, repo, slug))
+    return urlunsplit(
+        (base.scheme, base.netloc, base.path, parsed.query, parsed.fragment)
+    )
+
+
 def _raw_github_base(owner: str, repo: str, ref: str) -> str:
     raw_path = "/".join(
         (
@@ -831,6 +882,14 @@ def rewrite_html(
                     f"{page}:{_line_number(newlines, absolute_offset)}: {exc}"
                 )
                 return match.group(0)
+            bundle_url = _ring_solution_bundle_url(target, value, owner, repo)
+            if bundle_url is not None:
+                if bundle_url == html.unescape(value.strip()):
+                    return match.group(0)
+                rewritten_count += 1
+                return _render_attribute(
+                    match, html.escape(bundle_url, quote=False)
+                )
             if target is None or _artifact_has_target(target, included):
                 return match.group(0)
 
