@@ -125,7 +125,8 @@
           "Create and verify dedicated Dataverse connection references for Dynamics 365 Customer Service, SharePoint, and Microsoft Teams.",
           "Validate every component filename and schema, run pac copilot push, inspect the generated agent in Copilot Studio, and replay the canned prompts."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/production-line-optimization": {
       "display_name": "Product Line Optimization Agent",
@@ -247,7 +248,8 @@
           "Add Power BI as the reporting destination or linked analytical surface, and verify every connection reference in the target environment.",
           "Validate component schemas and filenames, run pac copilot push, inspect the generated agent in Copilot Studio, and replay the canned prompts."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/fs-regulatory-compliance": {
       "display_name": "Regulatory Compliance Agent",
@@ -383,7 +385,8 @@
           "Implement an explicit approval step before any correction or submission action can call an external connector.",
           "Validate every component schema and filename, run pac copilot push, inspect the generated agent in Copilot Studio, replay all five locked prompts, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/contract-risk-review": {
       "display_name": "Contract Risk Review Agent",
@@ -500,7 +503,8 @@
           "Add approved SharePoint and Microsoft Word connections.",
           "Replay every locked case and verify counsel approval gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/time-entry-billing": {
       "display_name": "Time Entry and Billing Agent",
@@ -629,7 +633,8 @@
           "Add approved finance and collaboration connections.",
           "Replay every locked case and confirm the no-posting and no-send boundaries."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/resource-utilization": {
       "display_name": "Resource Utilization Agent",
@@ -756,7 +761,8 @@
           "Add approved Dynamics 365 and Microsoft Teams connections.",
           "Replay every locked case and verify no staffing side effect occurred."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/client-health-score": {
       "display_name": "Client Health Score Agent",
@@ -885,7 +891,8 @@
           "Add approved Dynamics 365, Microsoft Teams, and Outlook connections.",
           "Replay every locked case and confirm no external side effect occurred."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/fs-customer-onboarding": {
       "display_name": "Customer Onboarding Agent",
@@ -1009,7 +1016,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/portfolio-rebalancing": {
       "display_name": "Portfolio Rebalancing Agent",
@@ -1155,7 +1163,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/underwriting-support": {
       "display_name": "Underwriting Support Agent",
@@ -1326,7 +1335,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/customer-sentiment-churn": {
       "display_name": "Customer Sentiment and Churn Prediction Agent",
@@ -1468,7 +1478,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/fraud-detection-alert": {
       "display_name": "Fraud Detection and Alert Agent",
@@ -1612,7 +1623,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/claims-processing": {
       "display_name": "Claims Processing Agent",
@@ -1767,7 +1779,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/loan-origination-assistant": {
       "display_name": "Loan Origination Assistant",
@@ -1902,7 +1915,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/wealth-insights-generator": {
       "display_name": "Wealth Insights Generator Agent",
@@ -2037,7 +2051,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/financial-advisor-copilot": {
       "display_name": "Financial Advisor Agent",
@@ -2183,7 +2198,8 @@
           "Create only approved least-privilege tools and explicit approval gates for consequential actions.",
           "Validate component schemas, push the draft, replay all locked prompts, document unresolved connector work, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/patient-intake": {
       "display_name": "Patient Intake and Scheduling Agent",
@@ -2339,7 +2355,8 @@
           "Create and verify dedicated read-only connection references with no mutating actions.",
           "Run pac copilot pull before push, inspect all generated YAML, replay the four locked cases, and stop before publication."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/care-gap-closure": {
       "display_name": "Care Gap Closure Agent",
@@ -2515,7 +2532,8 @@
           "Create and verify dedicated read-only connection references with no mutating actions.",
           "Run pac copilot pull before push, inspect all generated YAML, replay the four locked cases, and stop before publication."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/prior-authorization": {
       "display_name": "Prior Authorization Agent",
@@ -2633,7 +2651,8 @@
           "Create and verify dedicated read-only connection references with no mutating actions.",
           "Run pac copilot pull before push, inspect all generated YAML, replay the four locked cases, and stop before publication."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/clinical-notes-summarizer": {
       "display_name": "Clinical Notes Summarizer Agent",
@@ -2747,7 +2766,8 @@
           "Create and verify dedicated read-only connection references with no mutating actions.",
           "Run pac copilot pull before push, inspect all generated YAML, replay the four locked cases, and stop before publication."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/inventory-rebalancing": {
       "display_name": "Inventory Rebalancing Agent",
@@ -2871,7 +2891,8 @@
           "Implement explicit approval and action tools for any future reservation, movement, reorder, return, disposition, or policy change; keep them unavailable in the recommendation-only pilot.",
           "Validate every component schema and filename, run pac copilot push, inspect the generated agent, replay all locked prompts, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/maintenance-scheduling": {
       "display_name": "Maintenance Scheduling Agent",
@@ -2996,7 +3017,8 @@
           "Implement explicit authorization, safety, and action tools for any future equipment command, work creation, assignment, scheduling, dispatch, reservation, or production change; keep them unavailable in the recommendation-only pilot.",
           "Validate every component schema and filename, run pac copilot push, inspect the generated agent, replay all locked prompts, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/supplier-risk-monitoring": {
       "display_name": "Supply Risk Monitoring Agent",
@@ -3121,7 +3143,8 @@
           "Implement explicit procurement approval and action tools for any future outreach, qualification, selection, allocation, contracting, or ordering; keep them unavailable in the recommendation-only pilot.",
           "Validate every component schema and filename, run pac copilot push, inspect the generated agent, replay all locked prompts, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/order-status-communication": {
       "display_name": "Order Status Communications Agent",
@@ -3245,7 +3268,8 @@
           "Implement explicit approval and action tools for any future order, schedule, shipment, recovery, sourcing, logistics, or communication change; keep them unavailable in the draft-only pilot.",
           "Validate every component schema and filename, run pac copilot push, inspect the generated agent, replay all locked prompts, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/ai-customer-assistant": {
       "display_name": "Customer Escalations Agent",
@@ -3361,7 +3385,8 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/procurement-agent": {
       "display_name": "Procurement Agent",
@@ -3476,7 +3501,8 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/procurement-support": {
       "display_name": "Discount Finder Agent",
@@ -3611,7 +3637,8 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/product-feedback-synthesizer": {
       "display_name": "Product Feedback Synthesizer Agent",
@@ -3726,7 +3753,8 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/ask-hr": {
       "display_name": "Ask HR Agent",
@@ -3863,7 +3891,8 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/asset-maintenance-forecast": {
       "display_name": "Asset Maintenance Forecast Agent",
@@ -3988,7 +4017,8 @@
           "Create read tools first; isolate any future write action behind authorization, current-state validation, explicit confirmation, and immutable audit logging.",
           "Validate every component schema and filename, push the Draft, replay every locked prompt, inspect failures, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/permit-license-management": {
       "display_name": "Permit Management Agent",
@@ -4123,7 +4153,8 @@
           "Create read tools first; isolate any future write action behind authorization, current-state validation, explicit confirmation, and immutable audit logging.",
           "Validate every component schema and filename, push the Draft, replay every locked prompt, inspect failures, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/energy-regulatory-reporting": {
       "display_name": "Regulatory Reporting Agent",
@@ -4268,7 +4299,8 @@
           "Create read tools first; isolate any future write action behind authorization, current-state validation, explicit confirmation, and immutable audit logging.",
           "Validate every component schema and filename, push the Draft, replay every locked prompt, inspect failures, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/emission-tracking": {
       "display_name": "Emissions Tracking Agent",
@@ -4403,7 +4435,8 @@
           "Create read tools first; isolate any future write action behind authorization, current-state validation, explicit confirmation, and immutable audit logging.",
           "Validate every component schema and filename, push the Draft, replay every locked prompt, inspect failures, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/field-service-dispatch": {
       "display_name": "Field Service Dispatch Agent",
@@ -4559,7 +4592,8 @@
           "Create read tools first; isolate any future write action behind authorization, current-state validation, explicit confirmation, and immutable audit logging.",
           "Validate every component schema and filename, push the Draft, replay every locked prompt, inspect failures, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/utility-billing-assistance": {
       "display_name": "Utility Billing and Assistance Agent",
@@ -4735,7 +4769,8 @@
           "Create read tools first; isolate any future write action behind authorization, current-state validation, explicit confirmation, and immutable audit logging.",
           "Validate every component schema and filename, push the Draft, replay every locked prompt, inspect failures, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/supply-chain-disruption-alert": {
       "display_name": "Supply Chain Disruption Alert Agent",
@@ -4921,7 +4956,8 @@
           "Create read tools first; isolate any future write action behind authorization, current-state validation, explicit confirmation, and immutable audit logging.",
           "Validate every component schema and filename, push the Draft, replay every locked prompt, inspect failures, and stop before publish."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/deal-progression": {
       "display_name": "Deal Progression Agent",
@@ -5061,7 +5097,8 @@
           "Validate schema, instructions, skills, knowledge, and connection bindings; pull before push and replay every locked case.",
           "Keep the agent in Draft and require explicit confirmation before publish or any external action."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/proposal-generation": {
       "display_name": "Proposal Generation Agent",
@@ -5203,7 +5240,8 @@
           "Validate schema, instructions, skills, knowledge, and connection bindings; pull before push and replay every locked case.",
           "Keep the agent in Draft and require explicit confirmation before publish or any external action."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/account-intelligence": {
       "display_name": "Account Intelligence Agent",
@@ -5344,7 +5382,8 @@
           "Validate schema, instructions, skills, knowledge, and connection bindings; pull before push and replay every locked case.",
           "Keep the agent in Draft and require explicit confirmation before publish or any external action."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/sales-qualification": {
       "display_name": "Sales Qualification Agent",
@@ -5485,7 +5524,8 @@
           "Validate schema, instructions, skills, knowledge, and connection bindings; pull before push and replay every locked case.",
           "Keep the agent in Draft and require explicit confirmation before publish or any external action."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/win-loss-analysis": {
       "display_name": "Win/Loss Analysis Agent",
@@ -5627,7 +5667,8 @@
           "Validate schema, instructions, skills, knowledge, and connection bindings; pull before push and replay every locked case.",
           "Keep the agent in Draft and require explicit confirmation before publish or any external action."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/license-renewal-expansion": {
       "display_name": "License Renewal and Expansion Agent",
@@ -5810,7 +5851,8 @@
           "Validate schema, instructions, skills, knowledge, and connection bindings; pull before push and replay every locked case.",
           "Keep the agent in Draft and require explicit confirmation before publish or any external action."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/cross-selling": {
       "display_name": "Cross-Selling Opportunities Agent",
@@ -5961,7 +6003,8 @@
           "Validate schema, instructions, skills, knowledge, and connection bindings; pull before push and replay every locked case.",
           "Keep the agent in Draft and require explicit confirmation before publish or any external action."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/personalized-marketing": {
       "display_name": "Personalized Marketing Agent",
@@ -6074,7 +6117,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/store-associate-copilot": {
       "display_name": "Retail Store Associate Copilot",
@@ -6187,7 +6231,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/cart-abandonment-recovery": {
       "display_name": "Cart Abandonment Recovery Agent",
@@ -6300,7 +6345,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/omnichannel-engagement": {
       "display_name": "Omnichannel Engagement Agent",
@@ -6463,7 +6509,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/inventory-visibility": {
       "display_name": "Inventory Visibility Agent",
@@ -6576,7 +6623,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/personalized-shopping-assistant": {
       "display_name": "Personalized Shopping Agent",
@@ -6689,7 +6737,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/returns-complaints-resolution": {
       "display_name": "Returns and Complaints Resolution Agent",
@@ -6802,7 +6851,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/customer-loyalty-rewards": {
       "display_name": "Customer Loyalty and Rewards Agent",
@@ -6915,7 +6965,8 @@
           "Bind only approved read-only connections.",
           "Replay every locked case and verify safety gates before publishing."
         ]
-      }
+      },
+      "source": "catalog"
     },
     "@aibast-agents-library/build-materials-compliance": {
       "display_name": "Build Materials Compliance Agent",
@@ -7063,7 +7114,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/order-entry-validation": {
       "display_name": "Order Entry Validation Agent",
@@ -7221,7 +7274,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/ma-target-sourcing": {
       "display_name": "M&A Target Sourcing Agent",
@@ -7362,7 +7417,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/solution-design-review": {
       "display_name": "Solution Design Review Agent",
@@ -7503,7 +7560,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/reporting-package-validation": {
       "display_name": "Reporting Package Validation Agent",
@@ -7644,7 +7703,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/public-correspondence-response": {
       "display_name": "Public Correspondence Agent",
@@ -7783,7 +7844,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/engineering-standards-advisor": {
       "display_name": "Engineering Standards Agent",
@@ -7921,7 +7984,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/field-permit-to-work": {
       "display_name": "Field Permit to Work Agent",
@@ -8071,7 +8136,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/payments-operations": {
       "display_name": "Payments Operations Agent",
@@ -8231,7 +8298,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/supplier-claim-engagement": {
       "display_name": "Supplier Claim Engagement Agent",
@@ -8390,7 +8459,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/benefits-enrollment-assistant": {
       "display_name": "Benefits Enrollment Agent",
@@ -8546,7 +8617,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/warranty-registration": {
       "display_name": "Warranty and Registration Agent",
@@ -8687,7 +8760,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/staffing-territory-planning": {
       "display_name": "Staffing Territory Planning Agent",
@@ -8828,7 +8903,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/briefing-pack-builder": {
       "display_name": "Briefing Pack Builder Agent",
@@ -8969,7 +9046,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/first-time-fix": {
       "display_name": "First-Time Fix Agent",
@@ -9094,7 +9173,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/content-launch-clearance": {
       "display_name": "Content Launch Clearance Agent",
@@ -9209,7 +9290,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/campaign-delivery-optimizer": {
       "display_name": "Campaign Delivery Optimizer Agent",
@@ -9324,7 +9407,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     },
     "@aibast-agents-library/live-event-launch-planner": {
       "display_name": "Live Event Launch Planner Agent",
@@ -9451,7 +9536,9 @@
           "Create dedicated connection references only for approved systems and verify least-privilege access.",
           "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
         ]
-      }
+      },
+      "source": "field",
+      "origin": "both"
     }
   }
 }

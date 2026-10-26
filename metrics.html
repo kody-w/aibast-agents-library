@@ -1886,6 +1886,10 @@ function renderWorkshops() {
     { label: 'Bundle downloads', value: totals.bundle_downloads },
     { label: 'Feedback reports', value: totals.feedback_reports }
   ];
+  // Usage split: solutions that came from customer AIdeate and RAPP sessions vs. the original catalog.
+  const bySource = workshops.by_source || {};
+  if (bySource.field) summary.push({ label: `Usage, ${num(bySource.field.solutions)} from customer sessions`, value: bySource.field.usage_events });
+  if (bySource.catalog) summary.push({ label: `Usage, ${num(bySource.catalog.solutions)} original catalog`, value: bySource.catalog.usage_events });
   $('workshop-summary').innerHTML = summary.map(item =>
     `<div class="workshop-stat"><b>${num(item.value)}</b><span>${esc(item.label)}</span></div>`).join('');
   $('workshop-hint').textContent = totals.workshops === undefined

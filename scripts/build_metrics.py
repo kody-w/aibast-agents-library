@@ -1084,6 +1084,8 @@ def build_workshop_catalog(registry, solution_catalog=None):
             ),
             "quest_url": quest_url,
             "path_rules": rules,
+            "source": (catalog_entry or {}).get("source"),
+            "origin": (catalog_entry or {}).get("origin"),
         })
     return sorted(
         workshops,
@@ -3061,6 +3063,8 @@ def build_workshop_metrics(
             "slug": slug,
             "display_name": workshop["display_name"],
             "quest_url": workshop["quest_url"],
+            "source": workshop.get("source"),
+            "origin": workshop.get("origin"),
             "views_14d": view.get("views_14d"),
             "view_uniques_14d": view.get("view_uniques_14d"),
             "view_observed": bool(view.get("view_observed")),
@@ -3126,9 +3130,24 @@ def build_workshop_metrics(
     row_usage = _sum_available(row["usage_events"] for row in rows)
     if totals["usage_events"] != expected_usage or totals["usage_events"] != row_usage:
         raise ValueError("workshop usage totals do not reconcile")
+    # Field-sourced (from customer AIdeate and RAPP sessions) vs. the original catalog.
+    by_source = {}
+    for row in rows:
+        group = by_source.setdefault(row.get("source") or "unknown", [])
+        group.append(row)
+    by_source = {
+        name: {
+            "solutions": len(group),
+            "usage_events": _sum_available(row["usage_events"] for row in group),
+            "file_downloads": _sum_available(row["file_downloads"] for row in group),
+            "bundle_downloads": _sum_available(row["bundle_downloads"] for row in group),
+        }
+        for name, group in sorted(by_source.items())
+    }
     return {
         "totals": totals,
         "source_totals": source_totals,
+        "by_source": by_source,
         "rows": rows,
         "usage_definition": (
             "usage_events is the sum of counted GitHub popular-path page views, "
