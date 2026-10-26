@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-24T20:13:40.555226+00:00",
+  "generated_at": "2026-10-26T22:29:41.883269+00:00",
   "stats": {
     "total_agents": 90,
     "publishers": 1,
@@ -1081,6 +1081,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Account Intelligence Agent one-pager.pptx",
         "demo_video": "10-Account Intelligence Agent.mp4",
         "has_onepager": true,
@@ -1722,6 +1724,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Deal Progression Agent one-pager.pptx",
         "demo_video": "15-Deal Progression Agent.mp4",
         "has_onepager": true,
@@ -2225,6 +2229,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Proposal Generation Agent one-pager.pptx",
         "demo_video": "20-Proposal Generation Agent.mp4",
         "has_onepager": true,
@@ -2478,6 +2484,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "21. Sales Qualification Agent one-pager.pptx",
         "demo_video": null,
         "has_onepager": true,
@@ -2730,6 +2738,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "22. Win Loss Analysis Agent one-pager.pptx",
         "demo_video": null,
         "has_onepager": true,
@@ -2963,6 +2973,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "25. Cart Abandonment Recovery Agent one-pager.pptx",
         "demo_video": "25-Cart Abandonment Recovery Agent.mp4",
         "has_onepager": true,
@@ -3196,6 +3208,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "45. Customer Loyalty and Rewards Agent one-pager.pptx",
         "demo_video": "45-Customer Loyalty Rewards Agent.mp4",
         "has_onepager": true,
@@ -3476,6 +3490,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "30. Omnichannel Engagement Agent one-pager.pptx",
         "demo_video": "30-Omnichannel Engagement Agent.mp4",
         "has_onepager": true,
@@ -3707,6 +3723,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "41. Personalized Shopping Agent one-pager.pptx",
         "demo_video": "41-Personalized Shopping Agent.mp4",
         "has_onepager": true,
@@ -3948,6 +3966,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Energy Operations Agent Suite one-pager (2).pptx",
         "demo_video": "11-14-Energy Operations Suite.mp4",
         "has_onepager": true,
@@ -4199,6 +4219,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Energy Operations Agent Suite one-pager (2).pptx",
         "demo_video": "11-14-Energy Operations Suite.mp4",
         "has_onepager": true,
@@ -4456,6 +4478,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "59. Engineering Standards Agent one-pager.pptx",
         "demo_video": "59-Engineering Standards Agent.mp4",
         "has_onepager": true,
@@ -4724,6 +4748,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "60. Field Permit to Work Agent one-pager.pptx",
         "demo_video": "60-Field Permit to Work Agent.mp4",
         "has_onepager": true,
@@ -4992,6 +5018,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "23. Field Service Dispatch Agent one-pager.pptx",
         "demo_video": null,
         "has_onepager": true,
@@ -5124,6 +5152,8 @@
         "sample_prompts": [],
         "architecture": null,
         "curated_copy": false,
+        "source": null,
+        "origin": null,
         "onepager": null,
         "demo_video": null,
         "has_onepager": false,
@@ -5371,6 +5401,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Energy Operations Agent Suite one-pager (2).pptx",
         "demo_video": "11-14-Energy Operations Suite.mp4",
         "has_onepager": true,
@@ -5634,6 +5666,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Energy Operations Agent Suite one-pager (2).pptx",
         "demo_video": "11-14-Energy Operations Suite.mp4",
         "has_onepager": true,
@@ -5911,6 +5945,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "39. Claims Processing Agent one-pager.pptx",
         "demo_video": "39-Claims Processing Agent.mp4",
         "has_onepager": true,
@@ -6152,6 +6188,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Customer Onboarding Agent one-pager.pptx",
         "demo_video": "#3-Customer Onboarding Agent.mp4",
         "has_onepager": true,
@@ -6415,6 +6453,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "37. Customer Sentiment and Churn Prediction Agent one-pager.pptx",
         "demo_video": "37-Customer Sentiment and Churn Prediction Agent.mp4",
         "has_onepager": true,
@@ -6679,6 +6719,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "50. Financial Advisor Agent one-pager.pptx",
         "demo_video": "50-Financial Advisor Agent.mp4",
         "has_onepager": true,
@@ -6943,6 +6985,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "38. Fraud Detection and Alert Agent one-pager.pptx",
         "demo_video": "38-Fraud Detection And Alert Agent.mp4",
         "has_onepager": true,
@@ -7198,6 +7242,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "40. Loan Origination Assistant one-pager.pptx",
         "demo_video": "40-Loan Origination Assistant.mp4",
         "has_onepager": true,
@@ -7458,6 +7504,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "55. M&A Target Sourcing Agent one-pager.pptx",
         "demo_video": "55-M&A Target Sourcing Agent.mp4",
         "has_onepager": true,
@@ -7738,6 +7786,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "61. Payments Operations Agent one-pager.pptx",
         "demo_video": "61-Payments Operations Agent.mp4",
         "has_onepager": true,
@@ -8003,6 +8053,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Portfolio Rebalancing Agent one-pager.pptx",
         "demo_video": "#5-Portfolio Rebalancing Agent.mp4",
         "has_onepager": true,
@@ -8259,6 +8311,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "43. Regulatory Compliance Agent one-pager.pptx",
         "demo_video": "43-Regulatory Compliance Agent.mp4",
         "has_onepager": true,
@@ -8519,6 +8573,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "57. Reporting Package Validation Agent one-pager.pptx",
         "demo_video": "57-Reporting Package Validation Agent.mp4",
         "has_onepager": true,
@@ -8806,6 +8862,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "33. Underwriting Support Agent one-pager.pptx",
         "demo_video": "33-Underwriting Support Agent.mp4",
         "has_onepager": true,
@@ -9059,6 +9117,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "42. Wealth Insights Generator Agent one-pager.pptx",
         "demo_video": "42-Wealth Insights Generator Agent.mp4",
         "has_onepager": true,
@@ -9291,6 +9351,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Customer Escalations Agent one-pager.pptx",
         "demo_video": "#4-Customer Escalations Agent.mp4",
         "has_onepager": true,
@@ -9558,6 +9620,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "28. Cross Selling Opportunities Agent one-pager.pptx",
         "demo_video": "28-Cross Selling Opportunities Agent.mp4",
         "has_onepager": true,
@@ -9788,6 +9852,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Procurement Agent one-pager.pptx",
         "demo_video": "#6-Procurement Agent.mp4",
         "has_onepager": true,
@@ -10034,6 +10100,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "29. Discount Finder Agent one-pager.pptx",
         "demo_video": null,
         "has_onepager": true,
@@ -10329,6 +10397,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "32. Care Gap Closure Agent one-pager.pptx",
         "demo_video": "32-Care Gap Closure Agent.mp4",
         "has_onepager": true,
@@ -10558,6 +10628,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "49. Clinical Notes Summarizer Agent one-pager.pptx",
         "demo_video": "49-Clinical Notes Summarizer Agent.mp4",
         "has_onepager": true,
@@ -10831,6 +10903,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "31. Patient Intake and Scheduling Agent one-pager.pptx",
         "demo_video": "31-Patient Intake And Scheduling Agent.mp4",
         "has_onepager": true,
@@ -11065,6 +11139,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "47. Prior Authorization Agent one-pager.pptx",
         "demo_video": "47-Prior Authorization Automation Agent.mp4",
         "has_onepager": true,
@@ -11318,6 +11394,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "48. Ask HR Agent one-pager.pptx",
         "demo_video": "48-Ask HR Agent.mp4",
         "has_onepager": true,
@@ -11590,6 +11668,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "63. Benefits Enrollment Agent one-pager.pptx",
         "demo_video": "63-Benefits Enrollment Agent.mp4",
         "has_onepager": true,
@@ -11857,6 +11937,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "53. Build Materials Compliance Agent one-pager.pptx",
         "demo_video": "53-Build Materials Compliance Agent.mp4",
         "has_onepager": true,
@@ -12097,6 +12179,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Inventory Rebalancing Agent one-pager.pptx",
         "demo_video": "#7-Inventory Rebalancing Agent.mp4",
         "has_onepager": true,
@@ -12338,6 +12422,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Maintenance Scheduling Agent one-pager.pptx",
         "demo_video": "18-Maintenance Scheduling Agent.mp4",
         "has_onepager": true,
@@ -12614,6 +12700,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "54. Order Entry Validation Agent one-pager.pptx",
         "demo_video": "54-Order Entry Validation Agent.mp4",
         "has_onepager": true,
@@ -12855,6 +12943,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "44. Order Status Communications Agent one-pager.pptx",
         "demo_video": "44-Order Status Communication Agent.mp4",
         "has_onepager": true,
@@ -13093,6 +13183,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Product Line Optimization Agent one-pager.pptx",
         "demo_video": "#1-Product Line Optimization Agent.mp4",
         "has_onepager": true,
@@ -13333,6 +13425,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Supply Risk Monitoring Agent one-pager.pptx",
         "demo_video": "9-Supply Risk Monitoring Agent.mp4",
         "has_onepager": true,
@@ -13589,6 +13683,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "64. Warranty and Registration Agent one-pager.pptx",
         "demo_video": "64-Warranty and Registration Agent.mp4",
         "has_onepager": true,
@@ -13831,6 +13927,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Client Health Score Agent one-pager.pptx",
         "demo_video": "16-Client Health Score Agent.mp4",
         "has_onepager": true,
@@ -14061,6 +14159,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Contract Risk Review Agent one-pager.pptx",
         "demo_video": "#2-Contract Risk Review Agent.mp4",
         "has_onepager": true,
@@ -14303,6 +14403,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Resource Utilization Agent one-pager.pptx",
         "demo_video": "17-Resource Utilization Agent.mp4",
         "has_onepager": true,
@@ -14561,6 +14663,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "56. Solution Design Review Agent one-pager.pptx",
         "demo_video": "56-Solution Design Review Agent.mp4",
         "has_onepager": true,
@@ -14818,6 +14922,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "65. Staffing Territory Planning Agent one-pager.pptx",
         "demo_video": "65-Staffing Territory Planning Agent.mp4",
         "has_onepager": true,
@@ -15062,6 +15168,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Time and Entry Billing Agent one-pager.pptx",
         "demo_video": "#8-Time Entry & Billing Agent.mp4",
         "has_onepager": true,
@@ -15292,6 +15400,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "34. Inventory Visibility Agent one-pager.pptx",
         "demo_video": "34-Inventory Visibility Agent.mp4",
         "has_onepager": true,
@@ -15518,6 +15628,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "Personalized Marketing Agent one-pager.pptx",
         "demo_video": "19-Personalized Marketing Agent.mp4",
         "has_onepager": true,
@@ -15747,6 +15859,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "51. Returns and Complaints Resolution Agent one-pager 2026 02 23.pptx",
         "demo_video": "51-Returns and Complaints Resolution Agent.mp4",
         "has_onepager": true,
@@ -15977,6 +16091,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "24. Retail Store Associate Copilot one-pager.pptx",
         "demo_video": "24-Store Associate Copilot.mp4",
         "has_onepager": true,
@@ -16255,6 +16371,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "62. Supplier Claim Engagement Agent one-pager.pptx",
         "demo_video": "62-Supplier Claim Engagement Agent.mp4",
         "has_onepager": true,
@@ -16552,6 +16670,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "35. Supply Chain Disruption Alert Agent one-pager.pptx",
         "demo_video": null,
         "has_onepager": true,
@@ -16819,6 +16939,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "66. Briefing Pack Builder Agent one-pager.pptx",
         "demo_video": "66-Briefing Pack Builder Agent.mp4",
         "has_onepager": true,
@@ -17062,6 +17184,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "46. Building Permit Processing Agent one-pager.pptx",
         "demo_video": "46-Building Permit Processing Agent.mp4",
         "has_onepager": true,
@@ -17321,6 +17445,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "58. Public Correspondence Agent one-pager.pptx",
         "demo_video": "58-Public Correspondence Agent.mp4",
         "has_onepager": true,
@@ -17615,6 +17741,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "27. Utility Billing and Assistance Agent one-pager.pptx",
         "demo_video": "27-Utility Billing and Assistance Agent.mp4",
         "has_onepager": true,
@@ -17923,6 +18051,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "36. License Renewal and Expansion Agent one-pager.pptx",
         "demo_video": "36-License Renewal and Expansion Agent.mp4",
         "has_onepager": true,
@@ -18155,6 +18285,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
         "onepager": "26. Product Feedback Synthesizer Agent one-pager.pptx",
         "demo_video": "26-Product Feedback Synthesizer Agent.mp4",
         "has_onepager": true,
@@ -18388,6 +18520,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "69. Campaign Delivery Optimizer Agent one-pager.pptx",
         "demo_video": "69-Campaign Delivery Optimizer Agent.mp4",
         "has_onepager": true,
@@ -18622,6 +18756,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "68. Content Launch Clearance Agent one-pager.pptx",
         "demo_video": "68-Content Launch Clearance Agent.mp4",
         "has_onepager": true,
@@ -18864,6 +19000,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "67. First-Time Fix Agent one-pager.pptx",
         "demo_video": "67-First-Time Fix Agent.mp4",
         "has_onepager": true,
@@ -19108,6 +19246,8 @@
           ]
         },
         "curated_copy": true,
+        "source": "field",
+        "origin": "both",
         "onepager": "70. Live Event Launch Planner Agent one-pager.pptx",
         "demo_video": "70-Live Event Launch Planner Agent.mp4",
         "has_onepager": true,

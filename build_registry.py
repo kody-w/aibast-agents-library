@@ -657,6 +657,10 @@ def build_registry():
                 "sample_prompts": curated.get("sample_prompts", []),
                 "architecture": curated.get("architecture"),
                 "curated_copy": bool(curated),
+                # Where the solution came from: the original catalog, or the field
+                # (a customer AIdeate or RAPP session). Wheel metrics split on it.
+                "source": curated.get("source"),
+                "origin": curated.get("origin"),
                 "onepager": sol.get("onepager"),
                 "demo_video": sol.get("demo_video"),
                 "has_onepager": bool(sol.get("onepager")),
