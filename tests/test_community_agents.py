@@ -270,7 +270,7 @@ console.log(JSON.stringify({
 """,
     )
     assert result["errors"] == []
-    assert result["demos"].count('class="demo-card"') == 2
+    assert result["demos"].count('class="demo-card"') == len(DEMOS) + 2
     assert "Sample Team" in result["demos"]
     assert "Healthcare" in result["demos"]
     assert 'target="_blank"' in result["demos"]
