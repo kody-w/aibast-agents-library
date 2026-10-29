@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-29T01:23:03.609735+00:00",
+  "generated_at": "2026-10-29T01:25:18.611312+00:00",
   "stats": {
     "total_agents": 91,
     "publishers": 1,
@@ -11217,6 +11217,7 @@
       "_stack": "tiered_huddle_board",
       "_stack_vertical": "healthcare",
       "_synthetic_data": true,
+      "_added_at": "2026-10-28T18:25:15-07:00",
       "_solution": {
         "advertised_name": "Tiered Huddle Board Agent",
         "sharepoint_list_name": "Tiered Huddle Board Agent",

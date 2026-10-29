@@ -1,17 +1,17 @@
 {
  "schema": "aibast-metrics/1.0",
- "generated_at": "2026-10-28T05:27:20Z",
+ "generated_at": "2026-10-29T01:30:04Z",
  "repo": {
   "stars": 8,
   "forks": 8,
   "watchers": 0,
   "open_issues": 17,
-  "size_kb": 5455560,
+  "size_kb": 5456751,
   "created_at": "2025-10-17T16:17:53Z",
-  "pushed_at": "2026-10-28T05:21:52Z",
+  "pushed_at": "2026-10-28T05:27:46Z",
   "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
   "homepage": null,
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "carried_forward": false,
   "owner": "microsoft",
   "name": "aibast-agents-library",
@@ -19,32 +19,32 @@
   "site": "https://microsoft.github.io/aibast-agents-library/"
  },
  "totals": {
-  "downloads": 22297,
-  "clones": 20862,
+  "downloads": 22574,
+  "clones": 21138,
   "cdn_hits": 519,
-  "release_downloads": 916,
+  "release_downloads": 917,
   "agent_file_downloads": 689,
-  "installer_downloads": 230,
+  "installer_downloads": 231,
   "skill_downloads": 99,
   "agent_upvotes": null,
   "agent_acquisitions": null,
-  "clones_excluding_ci_estimate": 20862,
+  "clones_excluding_ci_estimate": 21138,
   "ci_clone_estimate": 0,
-  "page_views": 1194,
-  "clone_uniques_14d": 699,
-  "view_uniques_14d": 34,
-  "clone_uniques_daily_sum": 2584,
-  "view_uniques_daily_sum": 284,
-  "days_tracked": 83,
+  "page_views": 1197,
+  "clone_uniques_14d": 706,
+  "view_uniques_14d": 35,
+  "clone_uniques_daily_sum": 2631,
+  "view_uniques_daily_sum": 287,
+  "days_tracked": 84,
   "tracking_since": "2026-07-26",
   "global_agent_distribution_fetch_events": 689,
-  "agents": 90,
-  "stacks": 70,
+  "agents": 91,
+  "stacks": 71,
   "verticals": 13,
   "publishers": 1,
   "categories": 13,
-  "total_lines": 48735,
-  "total_kb": 2451.9
+  "total_lines": 49213,
+  "total_kb": 2476.9
  },
  "daily": [
   {
@@ -627,6 +627,13 @@
    "clone_uniques": 66,
    "views": 8,
    "cdn": 0
+  },
+  {
+   "date": "2026-10-27",
+   "clones": 276,
+   "clone_uniques": 47,
+   "views": 3,
+   "cdn": 0
   }
  ],
  "traffic": {
@@ -635,18 +642,18 @@
     "path": "/microsoft/aibast-agents-library",
     "title": "Overview",
     "count": 23,
-    "uniques": 16
+    "uniques": 17
    },
    {
     "path": "/microsoft/aibast-agents-library/pulls",
     "title": "/pulls",
-    "count": 10,
+    "count": 8,
     "uniques": 7
    },
    {
     "path": "/microsoft/aibast-agents-library/issues",
     "title": "/issues",
-    "count": 7,
+    "count": 5,
     "uniques": 4
    },
    {
@@ -680,16 +687,16 @@
     "uniques": 2
    },
    {
-    "path": "/microsoft/aibast-agents-library/discussions/49",
-    "title": "/discussions/49",
-    "count": 2,
-    "uniques": 2
-   },
-   {
     "path": "/microsoft/aibast-agents-library/tree/main",
     "title": "/tree/main",
     "count": 2,
     "uniques": 2
+   },
+   {
+    "path": "/microsoft/aibast-agents-library/blob/main/request-info.html",
+    "title": "/blob/main/request-info.html",
+    "count": 2,
+    "uniques": 1
    }
   ],
   "referrers": [
@@ -714,10 +721,10 @@
     "uniques": 1
    }
   ],
-  "clones_14d": 4548,
-  "views_14d": 129,
+  "clones_14d": 4719,
+  "views_14d": 125,
   "live": true,
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "unavailable_reason": null,
   "carried_forward": false
  },
@@ -726,7 +733,7 @@
   "bandwidth": 379086,
   "rank": null,
   "agent_hits": 689,
-  "installer_hits": 230,
+  "installer_hits": 231,
   "files": [
    {
     "file": "/registry.json",
@@ -1009,12 +1016,12 @@
     "kind": "agent"
    }
   ],
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "carried_forward": false
  },
  "releases": {
   "available": true,
-  "total_downloads": 916,
+  "total_downloads": 917,
   "count": 6,
   "releases": [
    {
@@ -1374,7 +1381,7 @@
     "tag": "installers",
     "name": "AIBAST Installers",
     "published_at": "2026-09-02T01:31:52Z",
-    "downloads": 217,
+    "downloads": 218,
     "assets": [
      {
       "name": "community_rapp-install.ps1",
@@ -1388,7 +1395,7 @@
      },
      {
       "name": "install.ps1",
-      "downloads": 76,
+      "downloads": 77,
       "size": 59817
      }
     ]
@@ -2143,7 +2150,7 @@
     "assets": []
    }
   ],
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "carried_forward": false
  },
  "leaderboards": {
@@ -2554,6 +2561,26 @@
     "catalog_kind": "solution"
    },
    {
+    "name": "@aibast-agents-library/workshop",
+    "display_name": "AIBAST Workshop Engine",
+    "publisher": "@aibast-agents-library",
+    "category": "general",
+    "tier": "pilot",
+    "downloads": 7,
+    "upvotes": 0,
+    "acquisitions": 0,
+    "upvote_discussion_url": "https://github.com/microsoft/aibast-agents-library/discussions/161",
+    "acquisition_discussion_url": "https://github.com/microsoft/aibast-agents-library/discussions/162",
+    "lines": 949,
+    "size_kb": 33.9,
+    "added_at": "2026-08-15T22:26:47Z",
+    "file": "agents/@aibast-agents-library/templates/workshop_agent.py",
+    "description": "Discovers any packaged AIBAST solution, hot-loads and tests its business agent, prepares its Copilot Studio Draft, and validates the real Preview evidence.",
+    "stack": null,
+    "vertical": null,
+    "catalog_kind": "template"
+   },
+   {
     "name": "@aibast-agents-library/building-permit-processing",
     "display_name": "Building Permit Processing Agent",
     "publisher": "@aibast-agents-library",
@@ -2572,26 +2599,6 @@
     "stack": "building_permit_processing",
     "vertical": "slg_government",
     "catalog_kind": "solution"
-   },
-   {
-    "name": "@aibast-agents-library/workshop",
-    "display_name": "AIBAST Workshop Engine",
-    "publisher": "@aibast-agents-library",
-    "category": "general",
-    "tier": "pilot",
-    "downloads": 7,
-    "upvotes": 0,
-    "acquisitions": 0,
-    "upvote_discussion_url": "https://github.com/microsoft/aibast-agents-library/discussions/161",
-    "acquisition_discussion_url": "https://github.com/microsoft/aibast-agents-library/discussions/162",
-    "lines": 918,
-    "size_kb": 32.7,
-    "added_at": "2026-08-15T22:26:47Z",
-    "file": "agents/@aibast-agents-library/templates/workshop_agent.py",
-    "description": "Discovers any packaged AIBAST solution, hot-loads and tests its business agent, prepares its Copilot Studio Draft, and validates the real Preview evidence.",
-    "stack": null,
-    "vertical": null,
-    "catalog_kind": "template"
    },
    {
     "name": "@aibast-agents-library/returns-complaints-resolution",
@@ -2835,6 +2842,26 @@
    }
   ],
   "newest": [
+   {
+    "name": "@aibast-agents-library/tiered-huddle-board",
+    "display_name": "Tiered Huddle Board Agent",
+    "publisher": "@aibast-agents-library",
+    "category": "healthcare",
+    "tier": "verified",
+    "downloads": 0,
+    "upvotes": null,
+    "acquisitions": null,
+    "upvote_discussion_url": null,
+    "acquisition_discussion_url": null,
+    "lines": 447,
+    "size_kb": 23.8,
+    "added_at": "2026-10-28T18:25:15-07:00",
+    "file": "agents/@aibast-agents-library/healthcare_stacks/tiered_huddle_board_stack/tiered_huddle_board_agent.py",
+    "description": "Run a hospital's daily tiered huddles from one live board built on a synthetic snapshot: every lane from Tier 1 through the Executive tier with each issue's clock against its tier's target, what is past target and what is waiting on the person asking, an escalation draft that restarts the clock at the next tier's target with the reason the next tier reads first and the people to page by name, the closure check that keeps mitigated items open until the person who raised them confirms the fix held, and the decisions the leadership huddle needs today. The agent never escalates, pages, closes or changes an issue; an authorized person confirms every step through future authenticated tools.",
+    "stack": "tiered_huddle_board",
+    "vertical": "healthcare",
+    "catalog_kind": "solution"
+   },
    {
     "name": "@aibast-agents-library/campaign-delivery-optimizer",
     "display_name": "Campaign Delivery Optimizer Agent",
@@ -3114,26 +3141,6 @@
     "stack": "solution_design_review",
     "vertical": "professional_services",
     "catalog_kind": "solution"
-   },
-   {
-    "name": "@aibast-agents-library/staffing-territory-planning",
-    "display_name": "Staffing Territory Planning Agent",
-    "publisher": "@aibast-agents-library",
-    "category": "professional_services",
-    "tier": "verified",
-    "downloads": 2,
-    "upvotes": null,
-    "acquisitions": null,
-    "upvote_discussion_url": null,
-    "acquisition_discussion_url": null,
-    "lines": 373,
-    "size_kb": 18.7,
-    "added_at": "2026-10-08T01:53:29-04:00",
-    "file": "agents/@aibast-agents-library/professional_services_stacks/staffing_territory_planning_stack/staffing_territory_planning_agent.py",
-    "description": "Help staffing sales leaders size their territory, find where demand outruns recruiter coverage, read the competition and labor trends, and walk into the quarter with a draft plan grounded in the numbers.",
-    "stack": "staffing_territory_planning",
-    "vertical": "professional_services",
-    "catalog_kind": "solution"
    }
   ],
   "stacks": [
@@ -3347,7 +3354,7 @@
     "name": "general",
     "agents": 6,
     "downloads": 42,
-    "lines": 3731
+    "lines": 3762
    },
    {
     "name": "professional_services",
@@ -3362,16 +3369,16 @@
     "lines": 4722
    },
    {
+    "name": "healthcare",
+    "agents": 5,
+    "downloads": 30,
+    "lines": 2356
+   },
+   {
     "name": "b2c_sales",
     "agents": 4,
     "downloads": 42,
     "lines": 2231
-   },
-   {
-    "name": "healthcare",
-    "agents": 4,
-    "downloads": 30,
-    "lines": 1909
    },
    {
     "name": "slg_government",
@@ -3436,6 +3443,12 @@
     "stacks": 6
    },
    {
+    "name": "healthcare",
+    "agents": 5,
+    "downloads": 30,
+    "stacks": 5
+   },
+   {
     "name": "b2c_sales",
     "agents": 4,
     "downloads": 42,
@@ -3443,12 +3456,6 @@
    },
    {
     "name": "general",
-    "agents": 4,
-    "downloads": 30,
-    "stacks": 4
-   },
-   {
-    "name": "healthcare",
     "agents": 4,
     "downloads": 30,
     "stacks": 4
@@ -3479,7 +3486,7 @@
    }
   ],
   "tiers": {
-   "verified": 88,
+   "verified": 89,
    "pilot": 1
   }
  },
@@ -4551,6 +4558,19 @@
    "catalog_kind": "solution"
   },
   {
+   "name": "@aibast-agents-library/tiered-huddle-board",
+   "display_name": "Tiered Huddle Board Agent",
+   "downloads": 0,
+   "upvotes": null,
+   "acquisitions": null,
+   "upvote_discussion_url": null,
+   "acquisition_discussion_url": null,
+   "file": "agents/@aibast-agents-library/healthcare_stacks/tiered_huddle_board_stack/tiered_huddle_board_agent.py",
+   "category": "healthcare",
+   "stack": "tiered_huddle_board",
+   "catalog_kind": "solution"
+  },
+  {
    "name": "@aibast-agents-library/time-entry-billing",
    "display_name": "Time and Entry Billing Agent",
    "downloads": 7,
@@ -4657,7 +4677,7 @@
  ],
  "agent_discussion_coverage": {
   "status": "partial",
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "pages": 2,
   "discussions_scanned": 144,
   "diagnostics": {
@@ -4673,22 +4693,22 @@
    "upvote": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 18
+    "missing_discussions": 19
    },
    "acquisition": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 18
+    "missing_discussions": 19
    }
   }
  },
  "agent_upvote_coverage": {
   "status": "partial",
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 18,
+  "missing_discussions": 19,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -4701,11 +4721,11 @@
  },
  "agent_acquisition_coverage": {
   "status": "partial",
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 18,
+  "missing_discussions": 19,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -4719,32 +4739,32 @@
  "file_metrics": {
   "schema": "aibast-file-metrics/1.0",
   "source_status": "complete",
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "carried_forward": false,
   "totals": {
-   "files": 9756,
-   "observed_files": 9756,
+   "files": 9787,
+   "observed_files": 9787,
    "downloads": 263,
    "by_kind": {
     "agent": {
-     "files": 90,
-     "observed_files": 90,
+     "files": 91,
+     "observed_files": 91,
      "downloads": 134
     },
     "skill": {
-     "files": 505,
-     "observed_files": 505,
+     "files": 509,
+     "observed_files": 509,
      "downloads": 99
     },
     "workshop": {
-     "files": 8320,
-     "observed_files": 8320,
+     "files": 8411,
+     "observed_files": 8411,
      "downloads": 0
     },
     "source_bundle": {
-     "files": 69,
-     "observed_files": 69,
-     "downloads": 0
+     "files": 0,
+     "observed_files": 0,
+     "downloads": null
     },
     "installer": {
      "files": 10,
@@ -4762,13 +4782,13 @@
      "downloads": 14
     },
     "code": {
-     "files": 305,
-     "observed_files": 305,
+     "files": 307,
+     "observed_files": 307,
      "downloads": 3
     },
     "asset": {
-     "files": 357,
-     "observed_files": 357,
+     "files": 359,
+     "observed_files": 359,
      "downloads": 0
     }
    }
@@ -5491,6 +5511,14 @@
     "kind": "agent",
     "agent_name": "@aibast-agents-library/prior-authorization",
     "workshop_slug": "prior-authorization",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "agents/@aibast-agents-library/healthcare_stacks/tiered_huddle_board_stack/tiered_huddle_board_agent.py",
+    "kind": "agent",
+    "agent_name": "@aibast-agents-library/tiered-huddle-board",
+    "workshop_slug": "tiered-huddle-board",
     "downloads": 0,
     "status": "observed_zero"
    },
@@ -9623,14 +9651,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/account-intelligence/exports/account-intelligence-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "account-intelligence",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/account-intelligence/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -10561,14 +10581,6 @@
    {
     "path": "solutions/ai-customer-assistant/exports/ai-customer-assistant-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "ai-customer-assistant",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/ai-customer-assistant/exports/ai-customer-assistant-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "ai-customer-assistant",
     "downloads": 0,
@@ -11631,14 +11643,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/ask-hr/exports/ask-hr-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "ask-hr",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/ask-hr/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -12679,14 +12683,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/asset-maintenance-forecast/exports/asset-maintenance-forecast-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "asset-maintenance-forecast",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/asset-maintenance-forecast/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -13465,14 +13461,6 @@
    {
     "path": "solutions/benefits-enrollment-assistant/exports/benefits-enrollment-assistant-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "benefits-enrollment-assistant",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/benefits-enrollment-assistant/exports/benefits-enrollment-assistant-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "benefits-enrollment-assistant",
     "downloads": 0,
@@ -14455,14 +14443,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/briefing-pack-builder/exports/briefing-pack-builder-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "briefing-pack-builder",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/briefing-pack-builder/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -15377,14 +15357,6 @@
    {
     "path": "solutions/build-materials-compliance/exports/build-materials-compliance-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "build-materials-compliance",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/build-materials-compliance/exports/build-materials-compliance-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "build-materials-compliance",
     "downloads": 0,
@@ -16385,14 +16357,6 @@
    {
     "path": "solutions/building-permit-processing/exports/building-permit-processing-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "building-permit-processing",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/building-permit-processing/exports/building-permit-processing-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "building-permit-processing",
     "downloads": 0,
@@ -17879,14 +17843,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/campaign-delivery-optimizer/exports/campaign-delivery-optimizer-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "campaign-delivery-optimizer",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/campaign-delivery-optimizer/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -18681,14 +18637,6 @@
    {
     "path": "solutions/care-gap-closure/exports/care-gap-closure-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "care-gap-closure",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/care-gap-closure/exports/care-gap-closure-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "care-gap-closure",
     "downloads": 0,
@@ -19855,14 +19803,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/cart-abandonment-recovery/exports/cart-abandonment-recovery-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "cart-abandonment-recovery",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/cart-abandonment-recovery/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -20863,14 +20803,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/claims-processing/exports/claims-processing-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "claims-processing",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/claims-processing/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -21857,14 +21789,6 @@
    {
     "path": "solutions/client-health-score/exports/client-health-score-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "client-health-score",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/client-health-score/exports/client-health-score-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "client-health-score",
     "downloads": 0,
@@ -22951,14 +22875,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/clinical-notes-summarizer/exports/clinical-notes-summarizer-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "clinical-notes-summarizer",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/clinical-notes-summarizer/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -24007,14 +23923,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/content-launch-clearance/exports/content-launch-clearance-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "content-launch-clearance",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/content-launch-clearance/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -24753,14 +24661,6 @@
    {
     "path": "solutions/contract-risk-review/exports/contract-risk-review-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "contract-risk-review",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/contract-risk-review/exports/contract-risk-review-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "contract-risk-review",
     "downloads": 0,
@@ -25871,14 +25771,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/cross-selling/exports/cross-selling-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "cross-selling",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/cross-selling/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -26889,14 +26781,6 @@
    {
     "path": "solutions/customer-loyalty-rewards/exports/customer-loyalty-rewards-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "customer-loyalty-rewards",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/customer-loyalty-rewards/exports/customer-loyalty-rewards-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "customer-loyalty-rewards",
     "downloads": 0,
@@ -28223,14 +28107,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/customer-sentiment-churn/exports/customer-sentiment-churn-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "customer-sentiment-churn",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/customer-sentiment-churn/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -29153,14 +29029,6 @@
    {
     "path": "solutions/deal-progression/exports/deal-progression-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "deal-progression",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/deal-progression/exports/deal-progression-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "deal-progression",
     "downloads": 0,
@@ -30103,14 +29971,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/emission-tracking/exports/emission-tracking-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "emission-tracking",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/emission-tracking/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -30961,14 +30821,6 @@
    {
     "path": "solutions/energy-regulatory-reporting/exports/energy-regulatory-reporting-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "energy-regulatory-reporting",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/energy-regulatory-reporting/exports/energy-regulatory-reporting-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "energy-regulatory-reporting",
     "downloads": 0,
@@ -31889,14 +31741,6 @@
    {
     "path": "solutions/engineering-standards-advisor/exports/engineering-standards-advisor-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "engineering-standards-advisor",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/engineering-standards-advisor/exports/engineering-standards-advisor-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "engineering-standards-advisor",
     "downloads": 0,
@@ -32825,14 +32669,6 @@
    {
     "path": "solutions/field-permit-to-work/exports/field-permit-to-work-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "field-permit-to-work",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/field-permit-to-work/exports/field-permit-to-work-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "field-permit-to-work",
     "downloads": 0,
@@ -33841,14 +33677,6 @@
    {
     "path": "solutions/field-service-dispatch/exports/field-service-dispatch-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "field-service-dispatch",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/field-service-dispatch/exports/field-service-dispatch-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "field-service-dispatch",
     "downloads": 0,
@@ -34881,14 +34709,6 @@
    {
     "path": "solutions/financial-advisor-copilot/exports/financial-advisor-copilot-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "financial-advisor-copilot",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/financial-advisor-copilot/exports/financial-advisor-copilot-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "financial-advisor-copilot",
     "downloads": 0,
@@ -36135,14 +35955,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/first-time-fix/exports/first-time-fix-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "first-time-fix",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/first-time-fix/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -36921,14 +36733,6 @@
    {
     "path": "solutions/fraud-detection-alert/exports/fraud-detection-alert-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "fraud-detection-alert",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/fraud-detection-alert/exports/fraud-detection-alert-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "fraud-detection-alert",
     "downloads": 0,
@@ -37977,14 +37781,6 @@
    {
     "path": "solutions/fs-customer-onboarding/exports/fs-customer-onboarding-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "fs-customer-onboarding",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/fs-customer-onboarding/exports/fs-customer-onboarding-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "fs-customer-onboarding",
     "downloads": 0,
@@ -39103,14 +38899,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/fs-regulatory-compliance/exports/fs-regulatory-compliance-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "fs-regulatory-compliance",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/fs-regulatory-compliance/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -40137,14 +39925,6 @@
    {
     "path": "solutions/inventory-rebalancing/exports/inventory-rebalancing-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "inventory-rebalancing",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/inventory-rebalancing/exports/inventory-rebalancing-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "inventory-rebalancing",
     "downloads": 0,
@@ -41527,14 +41307,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/inventory-visibility/exports/inventory-visibility-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "inventory-visibility",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/inventory-visibility/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -42601,14 +42373,6 @@
    {
     "path": "solutions/license-renewal-expansion/exports/license-renewal-expansion-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "license-renewal-expansion",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/license-renewal-expansion/exports/license-renewal-expansion-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "license-renewal-expansion",
     "downloads": 0,
@@ -43743,14 +43507,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/live-event-launch-planner/exports/live-event-launch-planner-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "live-event-launch-planner",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/live-event-launch-planner/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -44545,14 +44301,6 @@
    {
     "path": "solutions/loan-origination-assistant/exports/loan-origination-assistant-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "loan-origination-assistant",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/loan-origination-assistant/exports/loan-origination-assistant-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "loan-origination-assistant",
     "downloads": 0,
@@ -45591,14 +45339,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/ma-target-sourcing/exports/ma-target-sourcing-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "ma-target-sourcing",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/ma-target-sourcing/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -46529,14 +46269,6 @@
    {
     "path": "solutions/maintenance-scheduling/exports/maintenance-scheduling-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "maintenance-scheduling",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/maintenance-scheduling/exports/maintenance-scheduling-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "maintenance-scheduling",
     "downloads": 0,
@@ -47545,14 +47277,6 @@
    {
     "path": "solutions/omnichannel-engagement/exports/omnichannel-engagement-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "omnichannel-engagement",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/omnichannel-engagement/exports/omnichannel-engagement-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "omnichannel-engagement",
     "downloads": 0,
@@ -48655,14 +48379,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/order-entry-validation/exports/order-entry-validation-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "order-entry-validation",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/order-entry-validation/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -49649,14 +49365,6 @@
    {
     "path": "solutions/order-status-communication/exports/order-status-communication-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "order-status-communication",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/order-status-communication/exports/order-status-communication-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "order-status-communication",
     "downloads": 0,
@@ -50657,14 +50365,6 @@
    {
     "path": "solutions/patient-intake/exports/patient-intake-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "patient-intake",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/patient-intake/exports/patient-intake-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "patient-intake",
     "downloads": 0,
@@ -51711,14 +51411,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/payments-operations/exports/payments-operations-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "payments-operations",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/payments-operations/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -52711,14 +52403,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/permit-license-management/exports/permit-license-management-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "permit-license-management",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/permit-license-management/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -53561,14 +53245,6 @@
    {
     "path": "solutions/personalized-marketing/exports/personalized-marketing-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "personalized-marketing",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/personalized-marketing/exports/personalized-marketing-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "personalized-marketing",
     "downloads": 0,
@@ -54545,14 +54221,6 @@
    {
     "path": "solutions/personalized-shopping-assistant/exports/personalized-shopping-assistant-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "personalized-shopping-assistant",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/personalized-shopping-assistant/exports/personalized-shopping-assistant-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "personalized-shopping-assistant",
     "downloads": 0,
@@ -55617,14 +55285,6 @@
    {
     "path": "solutions/portfolio-rebalancing/exports/portfolio-rebalancing-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "portfolio-rebalancing",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/portfolio-rebalancing/exports/portfolio-rebalancing-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "portfolio-rebalancing",
     "downloads": 0,
@@ -56929,14 +56589,6 @@
    {
     "path": "solutions/prior-authorization/exports/prior-authorization-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "prior-authorization",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/prior-authorization/exports/prior-authorization-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "prior-authorization",
     "downloads": 0,
@@ -58503,14 +58155,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/procurement-agent/exports/procurement-agent-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "procurement-agent",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/procurement-agent/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -59551,14 +59195,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/procurement-support/exports/procurement-support-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "procurement-support",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/procurement-support/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -60487,14 +60123,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/product-feedback-synthesizer/exports/product-feedback-synthesizer-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "product-feedback-synthesizer",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/product-feedback-synthesizer/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -61407,14 +61035,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/product-line-optimization/exports/product-line-optimization-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "product-line-optimization",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/product-line-optimization/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -62177,14 +61797,6 @@
    {
     "path": "solutions/proposal-generation/exports/proposal-generation-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "proposal-generation",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/proposal-generation/exports/proposal-generation-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "proposal-generation",
     "downloads": 0,
@@ -63111,14 +62723,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/public-correspondence-response/exports/public-correspondence-response-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "public-correspondence-response",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/public-correspondence-response/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -64033,14 +63637,6 @@
    {
     "path": "solutions/reporting-package-validation/exports/reporting-package-validation-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "reporting-package-validation",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/reporting-package-validation/exports/reporting-package-validation-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "reporting-package-validation",
     "downloads": 0,
@@ -64977,14 +64573,6 @@
    {
     "path": "solutions/resource-utilization/exports/resource-utilization-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "resource-utilization",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/resource-utilization/exports/resource-utilization-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "resource-utilization",
     "downloads": 0,
@@ -66057,14 +65645,6 @@
    {
     "path": "solutions/returns-complaints-resolution/exports/returns-complaints-resolution-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "returns-complaints-resolution",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/returns-complaints-resolution/exports/returns-complaints-resolution-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "returns-complaints-resolution",
     "downloads": 0,
@@ -67223,14 +66803,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/sales-qualification/exports/sales-qualification-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "sales-qualification",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/sales-qualification/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -68151,14 +67723,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/solution-design-review/exports/solution-design-review-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "solution-design-review",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/solution-design-review/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -69073,14 +68637,6 @@
    {
     "path": "solutions/staffing-territory-planning/exports/staffing-territory-planning-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "staffing-territory-planning",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/staffing-territory-planning/exports/staffing-territory-planning-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "staffing-territory-planning",
     "downloads": 0,
@@ -70017,14 +69573,6 @@
    {
     "path": "solutions/store-associate-copilot/exports/store-associate-copilot-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "store-associate-copilot",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/store-associate-copilot/exports/store-associate-copilot-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "store-associate-copilot",
     "downloads": 0,
@@ -71009,14 +70557,6 @@
    {
     "path": "solutions/supplier-claim-engagement/exports/supplier-claim-engagement-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "supplier-claim-engagement",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/supplier-claim-engagement/exports/supplier-claim-engagement-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "supplier-claim-engagement",
     "downloads": 0,
@@ -72017,14 +71557,6 @@
    {
     "path": "solutions/supplier-risk-monitoring/exports/supplier-risk-monitoring-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "supplier-risk-monitoring",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/supplier-risk-monitoring/exports/supplier-risk-monitoring-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "supplier-risk-monitoring",
     "downloads": 0,
@@ -73119,14 +72651,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/supply-chain-disruption-alert/exports/supply-chain-disruption-alert-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "supply-chain-disruption-alert",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/supply-chain-disruption-alert/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -74031,6 +73555,766 @@
     "status": "observed_zero"
    },
    {
+    "path": "solutions/tiered-huddle-board/EASY-MODE-COPILOT-CHAT.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/EASY-MODE-PERSONLESS.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/FIELD-GUIDE.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/agent.sync.yaml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/behaviors/aibast_board-view.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/behaviors/aibast_closure-check.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/behaviors/aibast_escalation-draft.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/behaviors/aibast_leadership-decisions.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/capabilities/knowledge/files/aibast_tiered-huddle-board-rules-and-guardrails.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/capabilities/knowledge/files/aibast_tiered-huddle-board-rules-and-guardrails.md.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/capabilities/knowledge/files/aibast_tiered-huddle-board-synthetic-records.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/capabilities/knowledge/files/aibast_tiered-huddle-board-synthetic-records.md.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/copilot-studio/settings.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/deployment.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evals/copilot-studio-preview-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evals/dataverse-draft-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evals/manual-build-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evals/onepager-map.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evals/source-audit.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evals/transcripts.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evals/visual-checkpoints.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/evidence-report.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/export-manifest.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/exports/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/exports/tiered-huddle-board-copilot-studio-solution.zip",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/exports/tiered-huddle-board-deployment-settings.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/exports/tiered-huddle-board-solution-export.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/field-guide.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual-tutorial.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual/GLOBAL-INSTRUCTIONS.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual/knowledge/aibast_tiered-huddle-board-rules-and-guardrails.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual/knowledge/aibast_tiered-huddle-board-synthetic-records.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual/skills/aibast_board-view_01/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual/skills/aibast_closure-check_03/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual/skills/aibast_escalation-draft_02/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/manual/skills/aibast_leadership-decisions_04/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/quest.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/01-review-build.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/02-thb-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/03-thb-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/04-thb-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/05-thb-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/06-confirm-draft.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/annotated/01-review-build.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/annotated/02-thb-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/annotated/03-thb-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/annotated/04-thb-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/annotated/05-thb-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/annotated/06-confirm-draft.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/browserfilm.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/copilot-assisted-contact-sheet.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/assisted/copilot-assisted-walkthrough.gif",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/01-create-blank-agent.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/02-name-agent.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/03-enter-instructions.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/04-save-instructions.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/05-remove-web-search.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/06-add-aibast-tiered-huddle-board-rules-and-guardrails.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/07-add-aibast-tiered-huddle-board-synthetic-records.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/08-add-aibast-board-view-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/09-add-aibast-closure-check-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/10-add-aibast-escalation-draft-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/11-add-aibast-leadership-decisions-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/12-review-inventory.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/13-open-preview.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/14-thb-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/15-thb-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/16-thb-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/17-thb-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/18-confirm-draft.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/01-create-blank-agent.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/02-name-agent.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/03-enter-instructions.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/04-save-instructions.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/05-remove-web-search.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/06-add-aibast-tiered-huddle-board-rules-and-guardrails.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/07-add-aibast-tiered-huddle-board-synthetic-records.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/08-add-aibast-board-view-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/09-add-aibast-closure-check-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/10-add-aibast-escalation-draft-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/11-add-aibast-leadership-decisions-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/12-review-inventory.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/13-open-preview.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/14-thb-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/15-thb-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/16-thb-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/17-thb-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/annotated/18-confirm-draft.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/browserfilm.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/manual-build-contact-sheet.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/tiered-huddle-board/screenshots/manual/manual-build-walkthrough.gif",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "tiered-huddle-board",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "solutions/time-entry-billing/EASY-MODE-COPILOT-CHAT.md",
     "kind": "workshop",
     "agent_name": null,
@@ -74297,14 +74581,6 @@
    {
     "path": "solutions/time-entry-billing/exports/time-entry-billing-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "time-entry-billing",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/time-entry-billing/exports/time-entry-billing-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "time-entry-billing",
     "downloads": 0,
@@ -75425,14 +75701,6 @@
    {
     "path": "solutions/underwriting-support/exports/underwriting-support-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "underwriting-support",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/underwriting-support/exports/underwriting-support-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "underwriting-support",
     "downloads": 0,
@@ -76575,14 +76843,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/utility-billing-assistance/exports/utility-billing-assistance-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "utility-billing-assistance",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/utility-billing-assistance/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -77671,14 +77931,6 @@
     "status": "observed_zero"
    },
    {
-    "path": "solutions/warranty-registration/exports/warranty-registration-source.zip",
-    "kind": "source_bundle",
-    "agent_name": null,
-    "workshop_slug": "warranty-registration",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
     "path": "solutions/warranty-registration/field-guide.html",
     "kind": "workshop",
     "agent_name": null,
@@ -78617,14 +78869,6 @@
    {
     "path": "solutions/wealth-insights-generator/exports/wealth-insights-generator-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "wealth-insights-generator",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/wealth-insights-generator/exports/wealth-insights-generator-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "wealth-insights-generator",
     "downloads": 0,
@@ -79721,14 +79965,6 @@
    {
     "path": "solutions/win-loss-analysis/exports/win-loss-analysis-solution-export.json",
     "kind": "workshop",
-    "agent_name": null,
-    "workshop_slug": "win-loss-analysis",
-    "downloads": 0,
-    "status": "observed_zero"
-   },
-   {
-    "path": "solutions/win-loss-analysis/exports/win-loss-analysis-source.zip",
-    "kind": "source_bundle",
     "agent_name": null,
     "workshop_slug": "win-loss-analysis",
     "downloads": 0,
@@ -80935,6 +81171,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "state/architecture_level2_sources/tiered-huddle-board.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "state/architecture_level2_sources/time-entry-billing.json",
     "kind": "asset",
     "agent_name": null,
@@ -81615,6 +81859,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/demo_cases/tiered-huddle-board.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/demo_cases/time-entry-billing.json",
     "kind": "asset",
     "agent_name": null,
@@ -81680,6 +81932,14 @@
    },
    {
     "path": "tests/preflight_public_installers.sh",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/solution_bundles.py",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -82351,6 +82611,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_solution_sources.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_speed_barriers.py",
     "kind": "code",
     "agent_name": null,
@@ -82834,12 +83102,12 @@
  },
  "workshops": {
   "totals": {
-   "workshops": 69,
-   "usage_events": 225,
+   "workshops": 70,
+   "usage_events": 367,
    "views_14d": 3,
    "view_uniques_14d": 2,
    "file_downloads": 222,
-   "bundle_downloads": 0,
+   "bundle_downloads": 142,
    "feedback_reports": 0,
    "feedback_open": 0,
    "feedback_closed": 0,
@@ -82848,8 +83116,22 @@
   "source_totals": {
    "views_14d": 3,
    "file_downloads": 222,
-   "bundle_downloads": 0,
+   "bundle_downloads": 142,
    "feedback_reports": 0
+  },
+  "by_source": {
+   "catalog": {
+    "solutions": 52,
+    "usage_events": 311,
+    "file_downloads": 204,
+    "bundle_downloads": 104
+   },
+   "field": {
+    "solutions": 18,
+    "usage_events": 56,
+    "file_downloads": 18,
+    "bundle_downloads": 38
+   }
   },
   "rows": [
    {
@@ -82858,16 +83140,18 @@
     "slug": "account-intelligence",
     "display_name": "Account Intelligence Agent",
     "quest_url": "solutions/account-intelligence/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": 3,
     "view_uniques_14d": 2,
     "view_observed": true,
     "file_downloads": 46,
-    "bundle_downloads": 0,
+    "bundle_downloads": 3,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 1,
-    "usage_events": 49
+    "usage_events": 52
    },
    {
     "catalog_key": "@aibast-agents-library/deal-progression",
@@ -82875,16 +83159,18 @@
     "slug": "deal-progression",
     "display_name": "Deal Progression Agent",
     "quest_url": "solutions/deal-progression/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 30,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 30
+    "usage_events": 32
    },
    {
     "catalog_key": "@aibast-agents-library/ask-hr",
@@ -82892,16 +83178,18 @@
     "slug": "ask-hr",
     "display_name": "Ask HR Agent",
     "quest_url": "solutions/ask-hr/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 18,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 18
+    "usage_events": 20
    },
    {
     "catalog_key": "@aibast-agents-library/portfolio-rebalancing",
@@ -82909,16 +83197,18 @@
     "slug": "portfolio-rebalancing",
     "display_name": "Portfolio Rebalancing Agent",
     "quest_url": "solutions/portfolio-rebalancing/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 15,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 15
+    "usage_events": 17
    },
    {
     "catalog_key": "@aibast-agents-library/ai-customer-assistant",
@@ -82926,16 +83216,18 @@
     "slug": "ai-customer-assistant",
     "display_name": "Customer Escalations Agent",
     "quest_url": "solutions/ai-customer-assistant/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 12,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 12
+    "usage_events": 14
    },
    {
     "catalog_key": "@aibast-agents-library/procurement-agent",
@@ -82943,33 +83235,18 @@
     "slug": "procurement-agent",
     "display_name": "Procurement Agent",
     "quest_url": "solutions/procurement-agent/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 11,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 11
-   },
-   {
-    "catalog_key": "@aibast-agents-library/fs-customer-onboarding",
-    "agent_name": "@aibast-agents-library/fs-customer-onboarding",
-    "slug": "fs-customer-onboarding",
-    "display_name": "Customer Onboarding Agent",
-    "quest_url": "solutions/fs-customer-onboarding/quest.html",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 9,
-    "bundle_downloads": 0,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 9
+    "usage_events": 13
    },
    {
     "catalog_key": "@aibast-agents-library/prior-authorization",
@@ -82977,16 +83254,37 @@
     "slug": "prior-authorization",
     "display_name": "Prior Authorization Agent",
     "quest_url": "solutions/prior-authorization/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 9,
-    "bundle_downloads": 0,
+    "bundle_downloads": 3,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 9
+    "usage_events": 12
+   },
+   {
+    "catalog_key": "@aibast-agents-library/fs-customer-onboarding",
+    "agent_name": "@aibast-agents-library/fs-customer-onboarding",
+    "slug": "fs-customer-onboarding",
+    "display_name": "Customer Onboarding Agent",
+    "quest_url": "solutions/fs-customer-onboarding/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 9,
+    "bundle_downloads": 2,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 11
    },
    {
     "catalog_key": "@aibast-agents-library/win-loss-analysis",
@@ -82994,15 +83292,55 @@
     "slug": "win-loss-analysis",
     "display_name": "Win/Loss Analysis Agent",
     "quest_url": "solutions/win-loss-analysis/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 6,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
+    "usage_events": 8
+   },
+   {
+    "catalog_key": "@aibast-agents-library/campaign-delivery-optimizer",
+    "agent_name": "@aibast-agents-library/campaign-delivery-optimizer",
+    "slug": "campaign-delivery-optimizer",
+    "display_name": "Campaign Delivery Optimizer Agent",
+    "quest_url": "solutions/campaign-delivery-optimizer/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 3,
+    "bundle_downloads": 3,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 6
+   },
+   {
+    "catalog_key": "@aibast-agents-library/first-time-fix",
+    "agent_name": "@aibast-agents-library/first-time-fix",
+    "slug": "first-time-fix",
+    "display_name": "First-Time Fix Agent",
+    "quest_url": "solutions/first-time-fix/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 3,
+    "bundle_downloads": 3,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
     "usage_events": 6
    },
    {
@@ -83011,16 +83349,18 @@
     "slug": "asset-maintenance-forecast",
     "display_name": "Asset Maintenance Forecast Agent",
     "quest_url": "solutions/asset-maintenance-forecast/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/building-permit-processing",
@@ -83028,33 +83368,18 @@
     "slug": "building-permit-processing",
     "display_name": "Building Permit Processing Agent",
     "quest_url": "solutions/building-permit-processing/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 1,
-    "usage_events": 3
-   },
-   {
-    "catalog_key": "@aibast-agents-library/campaign-delivery-optimizer",
-    "agent_name": "@aibast-agents-library/campaign-delivery-optimizer",
-    "slug": "campaign-delivery-optimizer",
-    "display_name": "Campaign Delivery Optimizer Agent",
-    "quest_url": "solutions/campaign-delivery-optimizer/quest.html",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 3,
-    "bundle_downloads": 0,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": null,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/cart-abandonment-recovery",
@@ -83062,16 +83387,18 @@
     "slug": "cart-abandonment-recovery",
     "display_name": "Cart Abandonment Recovery Agent",
     "quest_url": "solutions/cart-abandonment-recovery/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/customer-loyalty-rewards",
@@ -83079,16 +83406,18 @@
     "slug": "customer-loyalty-rewards",
     "display_name": "Customer Loyalty and Rewards Agent",
     "quest_url": "solutions/customer-loyalty-rewards/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/customer-sentiment-churn",
@@ -83096,16 +83425,18 @@
     "slug": "customer-sentiment-churn",
     "display_name": "Customer Sentiment and Churn Prediction Agent",
     "quest_url": "solutions/customer-sentiment-churn/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/emission-tracking",
@@ -83113,16 +83444,18 @@
     "slug": "emission-tracking",
     "display_name": "Emissions Tracking Agent",
     "quest_url": "solutions/emission-tracking/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/engineering-standards-advisor",
@@ -83130,16 +83463,18 @@
     "slug": "engineering-standards-advisor",
     "display_name": "Engineering Standards Agent",
     "quest_url": "solutions/engineering-standards-advisor/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/field-permit-to-work",
@@ -83147,16 +83482,18 @@
     "slug": "field-permit-to-work",
     "display_name": "Field Permit to Work Agent",
     "quest_url": "solutions/field-permit-to-work/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/field-service-dispatch",
@@ -83164,16 +83501,18 @@
     "slug": "field-service-dispatch",
     "display_name": "Field Service Dispatch Agent",
     "quest_url": "solutions/field-service-dispatch/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/financial-advisor-copilot",
@@ -83181,33 +83520,18 @@
     "slug": "financial-advisor-copilot",
     "display_name": "Financial Advisor Agent",
     "quest_url": "solutions/financial-advisor-copilot/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
-   },
-   {
-    "catalog_key": "@aibast-agents-library/first-time-fix",
-    "agent_name": "@aibast-agents-library/first-time-fix",
-    "slug": "first-time-fix",
-    "display_name": "First-Time Fix Agent",
-    "quest_url": "solutions/first-time-fix/quest.html",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 3,
-    "bundle_downloads": 0,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": null,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/fraud-detection-alert",
@@ -83215,16 +83539,18 @@
     "slug": "fraud-detection-alert",
     "display_name": "Fraud Detection and Alert Agent",
     "quest_url": "solutions/fraud-detection-alert/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/license-renewal-expansion",
@@ -83232,16 +83558,18 @@
     "slug": "license-renewal-expansion",
     "display_name": "License Renewal and Expansion Agent",
     "quest_url": "solutions/license-renewal-expansion/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/live-event-launch-planner",
@@ -83249,16 +83577,18 @@
     "slug": "live-event-launch-planner",
     "display_name": "Live Event Launch Planner Agent",
     "quest_url": "solutions/live-event-launch-planner/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/omnichannel-engagement",
@@ -83266,16 +83596,18 @@
     "slug": "omnichannel-engagement",
     "display_name": "Omnichannel Engagement Agent",
     "quest_url": "solutions/omnichannel-engagement/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/order-status-communication",
@@ -83283,16 +83615,18 @@
     "slug": "order-status-communication",
     "display_name": "Order Status Communications Agent",
     "quest_url": "solutions/order-status-communication/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/payments-operations",
@@ -83300,16 +83634,18 @@
     "slug": "payments-operations",
     "display_name": "Payments Operations Agent",
     "quest_url": "solutions/payments-operations/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/permit-license-management",
@@ -83317,16 +83653,18 @@
     "slug": "permit-license-management",
     "display_name": "Permit Management Agent",
     "quest_url": "solutions/permit-license-management/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/personalized-shopping-assistant",
@@ -83334,16 +83672,18 @@
     "slug": "personalized-shopping-assistant",
     "display_name": "Personalized Shopping Agent",
     "quest_url": "solutions/personalized-shopping-assistant/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/proposal-generation",
@@ -83351,16 +83691,18 @@
     "slug": "proposal-generation",
     "display_name": "Proposal Generation Agent",
     "quest_url": "solutions/proposal-generation/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/sales-qualification",
@@ -83368,16 +83710,18 @@
     "slug": "sales-qualification",
     "display_name": "Sales Qualification Agent",
     "quest_url": "solutions/sales-qualification/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 3
+    "usage_events": 5
    },
    {
     "catalog_key": "@aibast-agents-library/benefits-enrollment-assistant",
@@ -83385,16 +83729,18 @@
     "slug": "benefits-enrollment-assistant",
     "display_name": "Benefits Enrollment Agent",
     "quest_url": "solutions/benefits-enrollment-assistant/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/briefing-pack-builder",
@@ -83402,16 +83748,18 @@
     "slug": "briefing-pack-builder",
     "display_name": "Briefing Pack Builder Agent",
     "quest_url": "solutions/briefing-pack-builder/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/build-materials-compliance",
@@ -83419,16 +83767,18 @@
     "slug": "build-materials-compliance",
     "display_name": "Build Materials Compliance Agent",
     "quest_url": "solutions/build-materials-compliance/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/care-gap-closure",
@@ -83436,16 +83786,18 @@
     "slug": "care-gap-closure",
     "display_name": "Care Gap Closure Agent",
     "quest_url": "solutions/care-gap-closure/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 1,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/claims-processing",
@@ -83453,16 +83805,18 @@
     "slug": "claims-processing",
     "display_name": "Claims Processing Agent",
     "quest_url": "solutions/claims-processing/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/client-health-score",
@@ -83470,16 +83824,18 @@
     "slug": "client-health-score",
     "display_name": "Client Health Score Agent",
     "quest_url": "solutions/client-health-score/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/clinical-notes-summarizer",
@@ -83487,16 +83843,18 @@
     "slug": "clinical-notes-summarizer",
     "display_name": "Clinical Notes Summarizer Agent",
     "quest_url": "solutions/clinical-notes-summarizer/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/content-launch-clearance",
@@ -83504,16 +83862,18 @@
     "slug": "content-launch-clearance",
     "display_name": "Content Launch Clearance Agent",
     "quest_url": "solutions/content-launch-clearance/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/contract-risk-review",
@@ -83521,16 +83881,18 @@
     "slug": "contract-risk-review",
     "display_name": "Contract Risk Review Agent",
     "quest_url": "solutions/contract-risk-review/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/cross-selling",
@@ -83538,16 +83900,18 @@
     "slug": "cross-selling",
     "display_name": "Cross-Selling Opportunities Agent",
     "quest_url": "solutions/cross-selling/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/procurement-support",
@@ -83555,16 +83919,18 @@
     "slug": "procurement-support",
     "display_name": "Discount Finder Agent",
     "quest_url": "solutions/procurement-support/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/inventory-rebalancing",
@@ -83572,16 +83938,18 @@
     "slug": "inventory-rebalancing",
     "display_name": "Inventory Rebalancing Agent",
     "quest_url": "solutions/inventory-rebalancing/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/inventory-visibility",
@@ -83589,16 +83957,18 @@
     "slug": "inventory-visibility",
     "display_name": "Inventory Visibility Agent",
     "quest_url": "solutions/inventory-visibility/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/loan-origination-assistant",
@@ -83606,16 +83976,18 @@
     "slug": "loan-origination-assistant",
     "display_name": "Loan Origination Assistant",
     "quest_url": "solutions/loan-origination-assistant/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/ma-target-sourcing",
@@ -83623,16 +83995,18 @@
     "slug": "ma-target-sourcing",
     "display_name": "M&A Target Sourcing Agent",
     "quest_url": "solutions/ma-target-sourcing/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/maintenance-scheduling",
@@ -83640,16 +84014,18 @@
     "slug": "maintenance-scheduling",
     "display_name": "Maintenance Scheduling Agent",
     "quest_url": "solutions/maintenance-scheduling/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/order-entry-validation",
@@ -83657,16 +84033,18 @@
     "slug": "order-entry-validation",
     "display_name": "Order Entry Validation Agent",
     "quest_url": "solutions/order-entry-validation/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/patient-intake",
@@ -83674,16 +84052,18 @@
     "slug": "patient-intake",
     "display_name": "Patient Intake and Scheduling Agent",
     "quest_url": "solutions/patient-intake/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/personalized-marketing",
@@ -83691,16 +84071,18 @@
     "slug": "personalized-marketing",
     "display_name": "Personalized Marketing Agent",
     "quest_url": "solutions/personalized-marketing/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/product-feedback-synthesizer",
@@ -83708,16 +84090,18 @@
     "slug": "product-feedback-synthesizer",
     "display_name": "Product Feedback Synthesizer Agent",
     "quest_url": "solutions/product-feedback-synthesizer/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/production-line-optimization",
@@ -83725,16 +84109,18 @@
     "slug": "product-line-optimization",
     "display_name": "Product Line Optimization Agent",
     "quest_url": "solutions/product-line-optimization/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/public-correspondence-response",
@@ -83742,16 +84128,18 @@
     "slug": "public-correspondence-response",
     "display_name": "Public Correspondence Agent",
     "quest_url": "solutions/public-correspondence-response/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/fs-regulatory-compliance",
@@ -83759,16 +84147,18 @@
     "slug": "fs-regulatory-compliance",
     "display_name": "Regulatory Compliance Agent",
     "quest_url": "solutions/fs-regulatory-compliance/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/energy-regulatory-reporting",
@@ -83776,16 +84166,18 @@
     "slug": "energy-regulatory-reporting",
     "display_name": "Regulatory Reporting Agent",
     "quest_url": "solutions/energy-regulatory-reporting/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/reporting-package-validation",
@@ -83793,16 +84185,18 @@
     "slug": "reporting-package-validation",
     "display_name": "Reporting Package Validation Agent",
     "quest_url": "solutions/reporting-package-validation/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/resource-utilization",
@@ -83810,16 +84204,18 @@
     "slug": "resource-utilization",
     "display_name": "Resource Utilization Agent",
     "quest_url": "solutions/resource-utilization/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/store-associate-copilot",
@@ -83827,16 +84223,18 @@
     "slug": "store-associate-copilot",
     "display_name": "Retail Store Associate Copilot",
     "quest_url": "solutions/store-associate-copilot/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/returns-complaints-resolution",
@@ -83844,16 +84242,18 @@
     "slug": "returns-complaints-resolution",
     "display_name": "Returns and Complaints Resolution Agent",
     "quest_url": "solutions/returns-complaints-resolution/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/solution-design-review",
@@ -83861,16 +84261,18 @@
     "slug": "solution-design-review",
     "display_name": "Solution Design Review Agent",
     "quest_url": "solutions/solution-design-review/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/staffing-territory-planning",
@@ -83878,16 +84280,18 @@
     "slug": "staffing-territory-planning",
     "display_name": "Staffing Territory Planning Agent",
     "quest_url": "solutions/staffing-territory-planning/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/supplier-claim-engagement",
@@ -83895,16 +84299,18 @@
     "slug": "supplier-claim-engagement",
     "display_name": "Supplier Claim Engagement Agent",
     "quest_url": "solutions/supplier-claim-engagement/quest.html",
+    "source": "field",
+    "origin": "both",
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/supply-chain-disruption-alert",
@@ -83912,16 +84318,18 @@
     "slug": "supply-chain-disruption-alert",
     "display_name": "Supply Chain Disruption Alert Agent",
     "quest_url": "solutions/supply-chain-disruption-alert/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/supplier-risk-monitoring",
@@ -83929,16 +84337,18 @@
     "slug": "supplier-risk-monitoring",
     "display_name": "Supply Risk Monitoring Agent",
     "quest_url": "solutions/supplier-risk-monitoring/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/time-entry-billing",
@@ -83946,16 +84356,18 @@
     "slug": "time-entry-billing",
     "display_name": "Time Entry and Billing Agent",
     "quest_url": "solutions/time-entry-billing/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/underwriting-support",
@@ -83963,16 +84375,18 @@
     "slug": "underwriting-support",
     "display_name": "Underwriting Support Agent",
     "quest_url": "solutions/underwriting-support/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 1,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/utility-billing-assistance",
@@ -83980,16 +84394,18 @@
     "slug": "utility-billing-assistance",
     "display_name": "Utility Billing and Assistance Agent",
     "quest_url": "solutions/utility-billing-assistance/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 0,
+    "bundle_downloads": 2,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 0
+    "usage_events": 2
    },
    {
     "catalog_key": "@aibast-agents-library/warranty-registration",
@@ -83997,6 +84413,46 @@
     "slug": "warranty-registration",
     "display_name": "Warranty and Registration Agent",
     "quest_url": "solutions/warranty-registration/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 0,
+    "bundle_downloads": 2,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 2
+   },
+   {
+    "catalog_key": "@aibast-agents-library/wealth-insights-generator",
+    "agent_name": "@aibast-agents-library/wealth-insights-generator",
+    "slug": "wealth-insights-generator",
+    "display_name": "Wealth Insights Generator Agent",
+    "quest_url": "solutions/wealth-insights-generator/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 0,
+    "bundle_downloads": 2,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 2
+   },
+   {
+    "catalog_key": "@aibast-agents-library/tiered-huddle-board",
+    "agent_name": "@aibast-agents-library/tiered-huddle-board",
+    "slug": "tiered-huddle-board",
+    "display_name": "Tiered Huddle Board Agent",
+    "quest_url": "solutions/tiered-huddle-board/quest.html",
+    "source": "catalog",
+    "origin": null,
     "views_14d": null,
     "view_uniques_14d": null,
     "view_observed": false,
@@ -84007,32 +84463,15 @@
     "feedback_closed": 0,
     "agent_upvotes": null,
     "usage_events": 0
-   },
-   {
-    "catalog_key": "@aibast-agents-library/wealth-insights-generator",
-    "agent_name": "@aibast-agents-library/wealth-insights-generator",
-    "slug": "wealth-insights-generator",
-    "display_name": "Wealth Insights Generator Agent",
-    "quest_url": "solutions/wealth-insights-generator/quest.html",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 0,
-    "bundle_downloads": 0,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 0
    }
   ],
-  "usage_definition": "usage_events is the sum of counted GitHub popular-path page views, jsDelivr workshop file downloads, jsDelivr source-bundle downloads, and public workshop feedback reports. It is an event floor, not users or unique usage. The sources use mixed measurement windows, and one person or action can create multiple events.",
+  "usage_definition": "usage_events is the sum of counted GitHub popular-path page views, jsDelivr workshop file downloads, source-bundle downloads, and public workshop feedback reports. It is an event floor, not users or unique usage. The sources use mixed measurement windows, and one person or action can create multiple events.",
   "coverage": {
    "status": "partial",
    "mixed_windows": true,
    "views": {
     "status": "live popular-path response",
-    "as_of": "2026-10-28T05:27:20Z",
+    "as_of": "2026-10-29T01:30:04Z",
     "censored": true,
     "diagnostics": {
      "duplicate_rows": 0,
@@ -84046,7 +84485,7 @@
    },
    "downloads": {
     "status": "complete paginated jsDelivr file response",
-    "as_of": "2026-10-28T05:27:20Z",
+    "as_of": "2026-10-29T01:30:04Z",
     "pages": 1,
     "pagination": "complete",
     "diagnostics": {
@@ -84059,7 +84498,7 @@
    },
    "feedback": {
     "status": "workshop-feedback label + body marker union",
-    "as_of": "2026-10-28T05:27:20Z",
+    "as_of": "2026-10-29T01:30:04Z",
     "issues_scanned": 0,
     "pages": 3,
     "diagnostics": {
@@ -84071,7 +84510,7 @@
    },
    "agent_upvotes": {
     "status": "partial",
-    "as_of": "2026-10-28T05:27:20Z",
+    "as_of": "2026-10-29T01:30:04Z",
     "scope": "Native upvotes on each primary agent's canonical rating Discussion. This preference signal is separate from usage_events and acquisition Discussions."
    }
   },
@@ -84083,8 +84522,13 @@
    },
    {
     "name": "jsDelivr File Stats",
-    "metric": "paginated workshop files under /solutions/<slug>/ and bundles at /exports/<slug>-source.zip",
+    "metric": "paginated workshop files under /solutions/<slug>/ and legacy bundles at /exports/<slug>-source.zip",
     "url": "https://data.jsdelivr.com/v1/stats/packages/gh/microsoft/aibast-agents-library@main/files?period=year&limit=100&page=1"
+   },
+   {
+    "name": "GitHub Releases API",
+    "metric": "all-time downloads of <slug>-source.zip assets on the solution-bundles release, accumulated across asset replacements",
+    "url": "https://api.github.com/repos/microsoft/aibast-agents-library/releases?per_page=100"
    },
    {
     "name": "GitHub Issues API",
@@ -84102,13 +84546,13 @@
     "url": "https://microsoft.github.io/aibast-agents-library/registry.json"
    }
   ],
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "carried_forward": false
  },
  "achievements": {
   "schema": "aibast-achievements/2.0",
   "status": "available",
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "carried_forward": false,
   "caveat": "Verified achievement points are server-scored from opt-in public GitHub progress claims. Each explicitly claimed achievement has a fixed value: started 5, local-proof 15, draft-builder 20, preview-proven 25, workshop-completed 35, and hard-mode-completed 50, for at most 150 points per workshop. Re-syncing unions achievement IDs without duplicating points. Profiles are public by explicit submission consent. GitHub verification confirms authenticated issue authorship and canonical claim format only; achievement completion remains self-reported and is not independently proven. Verified public achievements remain separate from local self-paced state, repository stars, agent upvotes, downloads, and workshop usage events.",
   "totals": {
@@ -85531,6 +85975,28 @@
     "achievement_completion_rate": 0.0
    },
    {
+    "slug": "tiered-huddle-board",
+    "display_name": "Tiered Huddle Board Agent",
+    "agent_name": "@aibast-agents-library/tiered-huddle-board",
+    "participants": 0,
+    "points": 0,
+    "achievements": 0,
+    "starts": 0,
+    "workshop_completions": 0,
+    "hard_completions": 0,
+    "achievement_counts": {
+     "started": 0,
+     "local-proof": 0,
+     "draft-builder": 0,
+     "preview-proven": 0,
+     "workshop-completed": 0,
+     "hard-mode-completed": 0
+    },
+    "completion_rate": 0.0,
+    "hard_completion_rate": 0.0,
+    "achievement_completion_rate": 0.0
+   },
+   {
     "slug": "time-entry-billing",
     "display_name": "Time Entry and Billing Agent",
     "agent_name": "@aibast-agents-library/time-entry-billing",
@@ -85737,7 +86203,7 @@
  "workshop_certification": {
   "schema": "aibast-workshop-certification/1.0",
   "status": "available",
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "carried_forward": false,
   "totals": {
    "cohort_submissions": 0,
@@ -86382,6 +86848,16 @@
     "qualified_profiles": 0
    },
    {
+    "slug": "tiered-huddle-board",
+    "display_name": "Tiered Huddle Board Agent",
+    "agent_name": "@aibast-agents-library/tiered-huddle-board",
+    "cohort_submissions": 0,
+    "verified_cohorts": 0,
+    "attendees_reported": 0,
+    "qualification_submissions": 0,
+    "qualified_profiles": 0
+   },
+   {
     "slug": "time-entry-billing",
     "display_name": "Time Entry and Billing Agent",
     "agent_name": "@aibast-agents-library/time-entry-billing",
@@ -86462,7 +86938,7 @@
  "ecosystem": {
   "schema": "aibast-ecosystem-metrics/1.0",
   "status": "available",
-  "as_of": "2026-10-28T05:27:20Z",
+  "as_of": "2026-10-29T01:30:04Z",
   "sources": {
    "aibast": {
     "status": "available",
@@ -86476,8 +86952,8 @@
   "totals": {
    "aibast_direct_agent_fetches": 689,
    "combined_agent_distribution_fetch_events": 689,
-   "distribution_entries": 90,
-   "logical_agents": 90,
+   "distribution_entries": 91,
+   "logical_agents": 91,
    "overlap_agents": 0
   },
   "agents": [
@@ -87380,6 +87856,16 @@
     ],
     "aibast_direct_agent_fetches": 1,
     "combined_distribution_fetch_events": 1
+   },
+   {
+    "logical_name": "@aibast-agents-library/tiered-huddle-board",
+    "display_name": "Tiered Huddle Board Agent",
+    "publisher": "@aibast-agents-library",
+    "channels": [
+     "aibast"
+    ],
+    "aibast_direct_agent_fetches": 0,
+    "combined_distribution_fetch_events": 0
    }
   ],
   "caveat": "This snapshot counts only AIBAST library channels. Direct agent fetches are observable jsDelivr events, not people, and raw GitHub or raw.githubusercontent.com transfers remain unobservable."

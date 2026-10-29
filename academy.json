@@ -1,13 +1,13 @@
 {
   "schema": "aibast-academy/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-26T22:29:41.883269+00:00",
+  "generated_at": "2026-10-29T01:25:18.611312+00:00",
   "title": "Microsoft AI Academy",
   "description": "A hands-on catalog for exploring experimental AIBAST agents through scenario quests, guided builds, evidence reviews, and portable Microsoft implementation patterns.",
   "disclaimer": "Microsoft AI Academy is an experimental AIBAST learning experience. It is not an official Microsoft credential, certification, training program, or replacement for Microsoft Learn. Activities use synthetic data and self-reported milestones unless a course states otherwise.",
   "summary": {
-    "courses": 69,
-    "skills": 499,
+    "courses": 70,
+    "skills": 503,
     "paths": 6,
     "industries": 13,
     "points_per_course": 150
@@ -193,11 +193,12 @@
         "prior-authorization",
         "public-correspondence-response",
         "reporting-package-validation",
+        "tiered-huddle-board",
         "underwriting-support",
         "utility-billing-assistance",
         "wealth-insights-generator"
       ],
-      "course_count": 21
+      "course_count": 22
     },
     {
       "id": "workforce-professional-productivity",
@@ -6031,6 +6032,79 @@
       "primary_path": "sales-customer-growth",
       "path_ids": [
         "sales-customer-growth"
+      ]
+    },
+    {
+      "slug": "tiered-huddle-board",
+      "agent": "@aibast-agents-library/tiered-huddle-board",
+      "title": "Tiered Huddle Board Agent",
+      "description": "Give nurse managers, department directors and hospital leaders one conversational view of the huddle board: every lane and clock, what is past target, escalations drafted with the reason and the people to page, and mitigated issues held open until the fix is confirmed.",
+      "category": "healthcare",
+      "industry": "Healthcare",
+      "journey_stage": "Optimize",
+      "personas": [
+        "Chief Nursing Officer",
+        "Department Director",
+        "Nurse Manager"
+      ],
+      "platforms": [
+        "Microsoft Copilot Studio",
+        "Microsoft Dataverse",
+        "Microsoft Teams",
+        "Power Apps"
+      ],
+      "tags": [
+        "escalation",
+        "healthcare",
+        "hospital-operations",
+        "nursing-operations",
+        "tiered-huddles"
+      ],
+      "outcomes": [
+        "Closed issues only when the fix had truly held",
+        "Escalated unresolved issues faster, with nothing lost",
+        "Gave the 10:30 huddle a clear list of decisions",
+        "Ran every huddle tier from one live board"
+      ],
+      "quest_url": "solutions/tiered-huddle-board/quest.html",
+      "field_guide_url": "solutions/tiered-huddle-board/field-guide.html",
+      "manual_url": "solutions/tiered-huddle-board/manual-tutorial.html",
+      "evidence_url": "solutions/tiered-huddle-board/evidence-report.html",
+      "added_at": "2026-10-28T18:25:15-07:00",
+      "has_demo_video": false,
+      "has_onepager": true,
+      "demo_cases": 4,
+      "manual_steps": 18,
+      "skills": [
+        {
+          "name": "board-view",
+          "title": "Whole board view",
+          "description": "Use when a nurse manager, charge nurse or director asks for the huddle board, every lane and clock, what is past target, or what is waiting on them.",
+          "path": "solutions/tiered-huddle-board/manual/skills/aibast_board-view_01/SKILL.md"
+        },
+        {
+          "name": "closure-check",
+          "title": "Closure check",
+          "description": "Use when someone asks whether a fixed or mitigated issue can be closed or taken off the board; mitigated is not closed until the person who raised it confirms the fix held.",
+          "path": "solutions/tiered-huddle-board/manual/skills/aibast_closure-check_03/SKILL.md"
+        },
+        {
+          "name": "escalation-draft",
+          "title": "Escalation draft",
+          "description": "Use when someone says the unit or department cannot fix an issue and asks to escalate it, move it up a tier, or who would be paged; returns an escalation draft that is never sent.",
+          "path": "solutions/tiered-huddle-board/manual/skills/aibast_escalation-draft_02/SKILL.md"
+        },
+        {
+          "name": "leadership-decisions",
+          "title": "Leadership huddle decisions",
+          "description": "Use when a leader asks what the 10:30 leadership huddle needs to decide today, with the reason and clock for each item.",
+          "path": "solutions/tiered-huddle-board/manual/skills/aibast_leadership-decisions_04/SKILL.md"
+        }
+      ],
+      "skill_count": 4,
+      "primary_path": "regulated-public-services",
+      "path_ids": [
+        "regulated-public-services"
       ]
     },
     {

@@ -97,7 +97,7 @@ def test_all_scope_skips_the_reviewed_billing_reference():
 
     targets, skipped = select_targets(advertised, slug=None, all_packages=True)
 
-    assert len(targets) == 68
+    assert len(targets) == 69
     assert "time-entry-billing" not in {item.slug for item in targets}
     assert skipped == [
         {
