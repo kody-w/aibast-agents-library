@@ -309,6 +309,10 @@ def load_community_tools(errors: list) -> list:
         if not isinstance(entry, dict):
             errors.append(f"{COMMUNITY_TOOLS_FILE}: every tool must be an object")
             continue
+        if entry.get("kind", "tool") != "tool":
+            # Community agents (kind "demo") stay out of the agent library
+            # until one graduates into a full template.
+            continue
         label = entry.get("id") or entry.get("name") or "<unnamed>"
         missing = [f for f in REQUIRED_COMMUNITY_TOOL_FIELDS if not entry.get(f)]
         if missing:
