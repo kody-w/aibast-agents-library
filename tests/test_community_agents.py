@@ -277,7 +277,7 @@ console.log(JSON.stringify({
     assert "<iframe" not in result["demos"]
     assert "&lt;b&gt;" in result["demos"]
     assert "javascript:" not in result["demos"]
-    assert 'href="solution.html?id=tiered-huddle-board">Now in the library' in result["demos"]
+    assert 'href="solutions/tiered-huddle-board/quest.html">Now in the library' in result["demos"]
     assert SAMPLE_DEMO["url"] not in result["tools"]
     # The harness serves the page from kody-w.github.io, so the form link follows it.
     assert result["submit"] == (
@@ -337,6 +337,13 @@ def test_no_demo_appears_in_library_catalogs_academy_or_metrics(demo):
     for path in _library_surfaces():
         text = path.read_text(encoding="utf-8")
         assert f'"{demo["id"]}"' not in text, path.relative_to(ROOT)
+
+
+@pytest.mark.parametrize("demo", [d for d in DEMOS if d.get("graduated_to")] or [None], ids=lambda d: d["id"] if d else "none")
+def test_graduated_demo_links_to_a_real_library_solution(demo):
+    if demo is None:
+        pytest.skip("no graduated demos yet")
+    assert (ROOT / "solutions" / demo["graduated_to"] / "quest.html").is_file()
 
 
 def test_library_page_only_links_community_agents_from_the_footer():
