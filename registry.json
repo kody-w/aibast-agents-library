@@ -1,23 +1,23 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-26T22:29:41.883269+00:00",
+  "generated_at": "2026-10-29T01:25:18.611312+00:00",
   "stats": {
-    "total_agents": 90,
+    "total_agents": 91,
     "publishers": 1,
     "categories": 13,
-    "total_stacks": 70,
+    "total_stacks": 71,
     "total_multi_agent_stacks": 2,
-    "total_solution_containers": 68,
+    "total_solution_containers": 69,
     "total_verticals": 13,
-    "advertised_solutions": 70,
-    "demo_proven_agents": 70,
-    "source_verified_solutions": 69,
-    "curated_copy_solutions": 69,
-    "solution_onepagers": 69,
+    "advertised_solutions": 71,
+    "demo_proven_agents": 71,
+    "source_verified_solutions": 70,
+    "curated_copy_solutions": 70,
+    "solution_onepagers": 70,
     "solution_demo_videos": 64,
-    "total_lines": 48766,
-    "total_kb": 2453.1,
+    "total_lines": 49213,
+    "total_kb": 2476.9,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -63,7 +63,7 @@
       "telecom_media_gaming"
     ],
     "tier_counts": {
-      "verified": 89,
+      "verified": 90,
       "pilot": 1
     }
   },
@@ -500,6 +500,17 @@
       "path": "agents/@aibast-agents-library/healthcare_stacks/prior_authorization_stack",
       "agents": [
         "@aibast-agents-library/prior-authorization"
+      ],
+      "agent_count": 1,
+      "stack_type": "solution_container"
+    },
+    {
+      "stack": "tiered_huddle_board",
+      "vertical": "healthcare",
+      "display_name": "Tiered Huddle Board",
+      "path": "agents/@aibast-agents-library/healthcare_stacks/tiered_huddle_board_stack",
+      "agents": [
+        "@aibast-agents-library/tiered-huddle-board"
       ],
       "agent_count": 1,
       "stack_type": "solution_container"
@@ -11167,6 +11178,253 @@
           "What evidence is present or missing for synthetic request SYN-AUTH-001?",
           "Show the synthetic criteria checklist for SYN-AUTH-001 without deciding medical necessity.",
           "What workflow state is recorded for SYN-AUTH-001, and what does it not mean?"
+        ]
+      },
+      "_catalog_kind": "solution",
+      "_readiness": [
+        "Demo proven",
+        "Conversation tested",
+        "Synthetic data",
+        "Production pattern"
+      ]
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/tiered-huddle-board",
+      "version": "1.0.0",
+      "display_name": "Tiered Huddle Board Agent",
+      "description": "Run a hospital's daily tiered huddles from one live board built on a synthetic snapshot: every lane from Tier 1 through the Executive tier with each issue's clock against its tier's target, what is past target and what is waiting on the person asking, an escalation draft that restarts the clock at the next tier's target with the reason the next tier reads first and the people to page by name, the closure check that keeps mitigated items open until the person who raised them confirms the fix held, and the decisions the leadership huddle needs today. The agent never escalates, pages, closes or changes an issue; an authorized person confirms every step through future authenticated tools.",
+      "author": "AIBAST",
+      "tags": [
+        "healthcare",
+        "tiered-huddles",
+        "nursing-operations",
+        "escalation",
+        "hospital-operations"
+      ],
+      "category": "healthcare",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/healthcare_stacks/tiered_huddle_board_stack/tiered_huddle_board_agent.py",
+      "_size_kb": 23.8,
+      "_lines": 447,
+      "_sha256": "9b909a45fcddb7212a4ef4bf5ebb11d3bac0f6b03e65ef5715f08d0865317909",
+      "_install_prefix": "tiered_huddle_board__",
+      "_install_filename": "tiered_huddle_board__9b909a45fcdd_agent.py",
+      "_stack": "tiered_huddle_board",
+      "_stack_vertical": "healthcare",
+      "_synthetic_data": true,
+      "_added_at": "2026-10-28T18:25:15-07:00",
+      "_solution": {
+        "advertised_name": "Tiered Huddle Board Agent",
+        "sharepoint_list_name": "Tiered Huddle Board Agent",
+        "slot": 71,
+        "executive_summary": "Help a hospital run its daily tiered huddles from one live board: every lane and clock, what is past target and waiting on the person asking, escalations drafted with the restarted clock, the reason and the people to page, mitigated issues kept open until the person who raised them confirms the fix held, and the decisions the leadership huddle needs today.",
+        "industries": [
+          "Healthcare",
+          "Hospitals & Health Systems"
+        ],
+        "personas": [
+          "Nurse Manager",
+          "Department Director",
+          "Chief Nursing Officer"
+        ],
+        "featured_tools": [
+          "Microsoft Dataverse",
+          "Microsoft Teams",
+          "Power Apps"
+        ],
+        "agent_requirements": [
+          "Microsoft Copilot Studio"
+        ],
+        "capabilities": [
+          "Show every lane, clock and item waiting on the person asking",
+          "Draft each escalation with its reason, new clock and pages",
+          "Keep mitigated items open until the originator confirms",
+          "Bring leadership every decision with its reason and clock"
+        ],
+        "outcomes": [
+          "Ran every huddle tier from one live board",
+          "Escalated unresolved issues faster, with nothing lost",
+          "Closed issues only when the fix had truly held",
+          "Gave the 10:30 huddle a clear list of decisions"
+        ],
+        "customer_scenario": [
+          "Tiers, targets and paging lists lived in a paper binder",
+          "Nurse managers could not see the board between patients",
+          "Escalations lost their reason and clock on the way up",
+          "Mitigated issues were closed before the fix had held"
+        ],
+        "slide_title": "Tiered Huddle Board Agent",
+        "slide_summary": "Gives every huddle tier one live board, drafts escalations for a person to confirm, and keeps issues open until the fix holds.",
+        "scenario_name": "A community hospital",
+        "challenge_intro": "A community hospital struggled to run its daily tiered huddles:",
+        "actions_intro": "The hospital leveraged the Tiered Huddle Board Agent to:",
+        "outcomes_intro": "With the agent\u2019s help, the hospital:",
+        "opportunity_statements": [
+          "Show the whole board with every lane, clock and item waiting on the person asking, from Copilot between patients",
+          "Escalate with one confirmation, restarting the clock at the next tier with the reason and the right people paged",
+          "Keep mitigated items open until the person who raised them confirms the fix held, and show leadership what to decide"
+        ],
+        "module_name": null,
+        "module_description": null,
+        "source_verified": true,
+        "sales_headline": "Run every tier of the daily huddle from one live board",
+        "card_pitch": "Give nurse managers, department directors and hospital leaders one conversational view of the huddle board: every lane and clock, what is past target, escalations drafted with the reason and the people to page, and mitigated issues held open until the fix is confirmed.",
+        "why_try": "The demo lets a nurse manager ask between patients what is past target and waiting on her, then draft an escalation that a person confirms, and shows the 10:30 leadership huddle exactly what needs a decision.",
+        "customer_challenge_copy": "Hospitals run tiered huddles from binders and whiteboards, so escalations lose their reason and clock on the way up, the right people are paged late, and issues are closed before anyone confirms the fix held.",
+        "microsoft_ai_story": "Copilot Studio gives each tier a conversational view of the board in Microsoft Teams or Microsoft 365 Copilot; Microsoft Dataverse holds the issues, tiers, clocks and paging roster behind a Power Apps board, and Teams carries the pages once a person confirms the escalation.",
+        "business_value": [
+          "Shows every lane and clock, so past-target items surface before the huddle.",
+          "Escalates with the reason, a restarted clock and the right people paged after one confirmation.",
+          "Keeps mitigated issues open until the person who raised them confirms the fix held."
+        ],
+        "search_terms": [
+          "Chief Nursing Officer",
+          "Department Director",
+          "Microsoft Copilot Studio",
+          "Microsoft Dataverse",
+          "Microsoft Teams",
+          "Nurse Manager",
+          "Power Apps",
+          "Tiered Huddle Board Agent",
+          "board_view",
+          "closure_check",
+          "daily safety huddle",
+          "escalation",
+          "escalation_draft",
+          "hospital operations",
+          "huddle board",
+          "leadership huddle",
+          "leadership_decisions",
+          "nursing operations",
+          "paging",
+          "tiered huddle"
+        ],
+        "journey_stage": "Optimize",
+        "blueprint_role": "Separates board visibility and escalation preparation from protected escalation, paging, closure and leadership decisions.",
+        "sample_prompts": [
+          {
+            "label": "Nurse Manager: Whole board view",
+            "prompt": "I'm between patients. Show me the huddle board: what's past target and what's waiting on me?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-board-view"
+          },
+          {
+            "label": "Nurse Manager: Escalation draft",
+            "prompt": "4 West can't fix the IV pump problem at our level. Get the escalation ready for the next tier, but don't page anyone until I confirm.",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-escalation-draft"
+          },
+          {
+            "label": "Nurse Manager: Closure check",
+            "prompt": "Biomed fixed the bed alarm in room 412 yesterday. Can we take it off the board?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-closure-check"
+          },
+          {
+            "label": "Chief Nursing Officer: Leadership huddle decisions",
+            "prompt": "For the 10:30 leadership huddle, what needs a decision from us today?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-leadership-decisions"
+          }
+        ],
+        "architecture": {
+          "business_flow": [
+            "Nurse managers, department directors and hospital leaders",
+            "Microsoft Teams or Microsoft 365 Copilot",
+            "Tiered Huddle Board Agent",
+            "Microsoft Dataverse huddle board: issues, tiers and clocks",
+            "Paging roster by tier and issue category",
+            "Authorized escalation and closure step on the Power Apps board"
+          ],
+          "capabilities": [
+            {
+              "operation": "board_view",
+              "name": "Whole board view",
+              "purpose": "Use when a nurse manager, charge nurse or director asks for the huddle board, every lane and clock, what is past target, or what is waiting on them."
+            },
+            {
+              "operation": "escalation_draft",
+              "name": "Escalation draft",
+              "purpose": "Use when someone says the unit or department cannot fix an issue and asks to escalate it or who would be paged; returns an escalation draft that is never sent."
+            },
+            {
+              "operation": "closure_check",
+              "name": "Closure check",
+              "purpose": "Use when someone asks whether a fixed or mitigated issue can be closed; mitigated is not closed until the person who raised it confirms the fix held."
+            },
+            {
+              "operation": "leadership_decisions",
+              "name": "Leadership huddle decisions",
+              "purpose": "Use when a leader asks what the 10:30 leadership huddle needs to decide today, with the reason and clock for each item."
+            }
+          ],
+          "easy_mode": [
+            "Verify Power Platform CLI 2.9.3 or newer and authenticate to the approved target environment.",
+            "Initialize a modern cli-copilot project with an approved publisher prefix and preserve the generated identity settings.",
+            "Upload the two packaged synthetic knowledge files and every operation-specific SKILL.md.",
+            "Bind only approved least-privilege production connections after security, privacy, and business-owner review.",
+            "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
+          ],
+          "local_install_prompt": "Install Tiered Huddle Board Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/tiered-huddle-board/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect hospital systems or execute external actions.",
+          "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Tiered Huddle Board Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/tiered-huddle-board/deployment.json. Upload the two synthetic knowledge files and 4 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+          "required_connections": [
+            "Use only approved, least-privilege production connections; the packaged demonstration uses synthetic knowledge files.",
+            "Microsoft Dataverse huddle board tables: issues, tiers, clocks and paging roster (read-only)",
+            "Microsoft Teams for escalation pages, sent only by the board's authorized escalation step",
+            "Microsoft Entra ID user identity for 'waiting on me' and the issue-owner confirmation"
+          ],
+          "manual_commands": [
+            "pac auth create",
+            "pac copilot init --name \"Tiered Huddle Board Agent\" --publisher-prefix <PREFIX> --authoring-mode cli-copilot --project-dir \"<PROJECT_DIR>\" --environment \"<ENVIRONMENT_ID>\"",
+            "pac connection list --environment \"<ENVIRONMENT_ID>\"",
+            "pac copilot pull --project-dir \"<PROJECT_DIR>\"",
+            "pac copilot push --project-dir \"<PROJECT_DIR>\"",
+            "pac copilot publish --bot \"<BOT_ID_OR_SCHEMA_NAME>\" --environment \"<ENVIRONMENT_ID>\""
+          ],
+          "acceptance_checks": [
+            "Every exposed operation has one persona-language case and one SKILL.md.",
+            "Exactly two synthetic knowledge files are present.",
+            "Responses state the relevant human confirmation or review boundary.",
+            "No operation claims an escalation, page, closure, decision or record change.",
+            "Publishing remains a separate user-approved step."
+          ],
+          "hard_mode": [
+            "Run pac copilot init and verify settings.mcs.yml before authoring components.",
+            "Author global instructions that preserve the packaged synthetic-only and human-confirmation boundaries.",
+            "Add the two knowledge files and one skill for every exposed operation.",
+            "Create dedicated connection references only for approved systems and verify least-privilege access.",
+            "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
+          ]
+        },
+        "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
+        "onepager": "71. Tiered Huddle Board Agent one-pager.pptx",
+        "demo_video": null,
+        "has_onepager": true,
+        "has_demo_video": false,
+        "promise_coverage": 100,
+        "is_primary": true,
+        "aliases": [],
+        "package": {
+          "slug": "tiered-huddle-board",
+          "quest_url": "solutions/tiered-huddle-board/quest.html",
+          "manual_tutorial_url": "solutions/tiered-huddle-board/manual-tutorial.html",
+          "export_manifest_url": "solutions/tiered-huddle-board/export-manifest.json"
+        }
+      },
+      "_demo": {
+        "slug": "tiered-huddle-board",
+        "case_count": 4,
+        "personas": [
+          "Chief Nursing Officer",
+          "Nurse Manager"
+        ],
+        "prompts": [
+          "I'm between patients. Show me the huddle board: what's past target and what's waiting on me?",
+          "4 West can't fix the IV pump problem at our level. Get the escalation ready for the next tier, but don't page anyone until I confirm.",
+          "Biomed fixed the bed alarm in room 412 yesterday. Can we take it off the board?"
         ]
       },
       "_catalog_kind": "solution",

@@ -6,8 +6,8 @@
     "solutions/*/evals/transcripts.json"
   ],
   "summary": {
-    "scenarios": 374,
-    "recorded": 364,
+    "scenarios": 378,
+    "recorded": 368,
     "not_recorded": 10
   },
   "agents": {
@@ -657,6 +657,15 @@
         "supply-chain-disruption-alert-risk-assessment",
         "supply-chain-disruption-alert-mitigation-plan",
         "supply-chain-disruption-alert-supplier-alternatives"
+      ]
+    },
+    "@aibast-agents-library/tiered-huddle-board": {
+      "name": "Tiered Huddle Board Agent",
+      "scenarios": [
+        "tiered-huddle-board-board-view",
+        "tiered-huddle-board-escalation-draft",
+        "tiered-huddle-board-closure-check",
+        "tiered-huddle-board-leadership-decisions"
       ]
     },
     "@aibast-agents-library/time-entry-billing": {
@@ -3441,6 +3450,38 @@
       "prompt": "Show Electronics alternatives without activating a supplier.",
       "folder": "supply-chain-disruption-alert",
       "case_id": "SUPPLY_CHAIN_DISRUPTION_ALERT-04",
+      "recorded": true
+    },
+    "tiered-huddle-board-board-view": {
+      "agent_id": "@aibast-agents-library/tiered-huddle-board",
+      "title": "Nurse Manager: Whole board view",
+      "prompt": "I'm between patients. Show me the huddle board: what's past target and what's waiting on me?",
+      "folder": "tiered-huddle-board",
+      "case_id": "THB-01",
+      "recorded": true
+    },
+    "tiered-huddle-board-closure-check": {
+      "agent_id": "@aibast-agents-library/tiered-huddle-board",
+      "title": "Nurse Manager: Closure check",
+      "prompt": "Biomed fixed the bed alarm in room 412 yesterday. Can we take it off the board?",
+      "folder": "tiered-huddle-board",
+      "case_id": "THB-03",
+      "recorded": true
+    },
+    "tiered-huddle-board-escalation-draft": {
+      "agent_id": "@aibast-agents-library/tiered-huddle-board",
+      "title": "Nurse Manager: Escalation draft",
+      "prompt": "4 West can't fix the IV pump problem at our level. Get the escalation ready for the next tier, but don't page anyone until I confirm.",
+      "folder": "tiered-huddle-board",
+      "case_id": "THB-02",
+      "recorded": true
+    },
+    "tiered-huddle-board-leadership-decisions": {
+      "agent_id": "@aibast-agents-library/tiered-huddle-board",
+      "title": "Chief Nursing Officer: Leadership huddle decisions",
+      "prompt": "For the 10:30 leadership huddle, what needs a decision from us today?",
+      "folder": "tiered-huddle-board",
+      "case_id": "THB-04",
       "recorded": true
     },
     "underwriting-support-compliance-check": {

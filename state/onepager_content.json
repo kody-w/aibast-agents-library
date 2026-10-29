@@ -3,7 +3,7 @@
   "generated_at": "2026-10-08T02:18:13.327046+00:00",
   "source": "Approved AI BAST Agents Library one-pager PowerPoint export",
   "stats": {
-    "onepagers": 66,
+    "onepagers": 67,
     "with_modules": 1
   },
   "onepagers": {
@@ -3722,6 +3722,64 @@
         "Build the launch timeline with every milestone, from communications approval to launch day",
         "Compile readiness across teams so live ops, community, and marketing see what is still open",
         "Check and draft player announcements and hold them until publishing is approved"
+      ],
+      "modules": []
+    },
+    "71. Tiered Huddle Board Agent one-pager.pptx": {
+      "source_file": "71. Tiered Huddle Board Agent one-pager.pptx",
+      "source_sha256": "d70ba64acea5be19a3d7f1e3294bb68f8837766890f0c1c7f57e637d41993cdd",
+      "slide_count": 1,
+      "title": "Tiered Huddle Board Agent",
+      "executive_summary": "Gives every huddle tier one live board, drafts escalations for a person to confirm, and keeps issues open until the fix holds.",
+      "industries": [
+        "Healthcare",
+        "Hospitals & Health Systems"
+      ],
+      "personas": [
+        "Nurse Manager",
+        "Department Director",
+        "Chief Nursing Officer"
+      ],
+      "agent_requirements": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Microsoft Dataverse",
+        "Microsoft Teams",
+        "Power Apps"
+      ],
+      "scenario_name": "A community hospital",
+      "customer_challenge": {
+        "intro": "A community hospital struggled to run its daily tiered huddles:",
+        "items": [
+          "Tiers, targets and paging lists lived in a paper binder",
+          "Nurse managers could not see the board between patients",
+          "Escalations lost their reason and clock on the way up",
+          "Mitigated issues were closed before the fix had held"
+        ]
+      },
+      "agent_actions": {
+        "intro": "The hospital leveraged the Tiered Huddle Board Agent to:",
+        "items": [
+          "Show every lane, clock and item waiting on the person asking",
+          "Draft each escalation with its reason, new clock and pages",
+          "Keep mitigated items open until the originator confirms",
+          "Bring leadership every decision with its reason and clock"
+        ]
+      },
+      "business_outcomes": {
+        "intro": "With the agent\u2019s help, the hospital:",
+        "items": [
+          "Ran every huddle tier from one live board",
+          "Escalated unresolved issues faster, with nothing lost",
+          "Closed issues only when the fix had truly held",
+          "Gave the 10:30 huddle a clear list of decisions"
+        ]
+      },
+      "opportunity_statements": [
+        "Show the whole board with every lane, clock and item waiting on the person asking, from Copilot between patients",
+        "Escalate with one confirmation, restarting the clock at the next tier with the reason and the right people paged",
+        "Keep mitigated items open until the person who raised them confirms the fix held, and show leadership what to decide"
       ],
       "modules": []
     }

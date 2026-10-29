@@ -338,6 +338,10 @@
   "2026-10-26": {
    "count": 256,
    "uniques": 66
+  },
+  "2026-10-27": {
+   "count": 276,
+   "uniques": 47
   }
  },
  "installer_assets": {
@@ -350,29 +354,29 @@
    "last": 69
   },
   "install.ps1": {
-   "all_time": 76,
-   "last": 76
+   "all_time": 77,
+   "last": 77
   }
  },
  "last_known": {
-  "at": "2026-10-28T05:27:36Z",
-  "clone_uniques_14d": 699,
-  "clones_14d": 4548,
+  "at": "2026-10-29T01:30:23Z",
+  "clone_uniques_14d": 706,
+  "clones_14d": 4719,
   "paths": [
    {
     "count": 23,
     "path": "/microsoft/aibast-agents-library",
     "title": "Overview",
-    "uniques": 16
+    "uniques": 17
    },
    {
-    "count": 10,
+    "count": 8,
     "path": "/microsoft/aibast-agents-library/pulls",
     "title": "/pulls",
     "uniques": 7
    },
    {
-    "count": 7,
+    "count": 5,
     "path": "/microsoft/aibast-agents-library/issues",
     "title": "/issues",
     "uniques": 4
@@ -409,18 +413,18 @@
    },
    {
     "count": 2,
-    "path": "/microsoft/aibast-agents-library/discussions/49",
-    "title": "/discussions/49",
+    "path": "/microsoft/aibast-agents-library/tree/main",
+    "title": "/tree/main",
     "uniques": 2
    },
    {
     "count": 2,
-    "path": "/microsoft/aibast-agents-library/tree/main",
-    "title": "/tree/main",
-    "uniques": 2
+    "path": "/microsoft/aibast-agents-library/blob/main/request-info.html",
+    "title": "/blob/main/request-info.html",
+    "uniques": 1
    }
   ],
-  "paths_at": "2026-10-28T05:27:36Z",
+  "paths_at": "2026-10-29T01:30:23Z",
   "referrers": [
    {
     "count": 12,
@@ -443,8 +447,8 @@
     "uniques": 1
    }
   ],
-  "view_uniques_14d": 34,
-  "views_14d": 129
+  "view_uniques_14d": 35,
+  "views_14d": 125
  },
  "snapshots": [
   {
@@ -2030,14 +2034,303 @@
    "installer_release_downloads_all_time": 217,
    "view_uniques_all_time": 284,
    "views_all_time": 1194
+  },
+  {
+   "at": "2026-10-29T01:30:04Z",
+   "cdn_all_time": 519,
+   "clone_uniques_all_time": 2631,
+   "clones_all_time": 21138,
+   "days_tracked": 84,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 218,
+   "view_uniques_all_time": 287,
+   "views_all_time": 1197
   }
  ],
+ "solution_bundle_assets": {
+  "account-intelligence-source.zip": {
+   "all_time": 3,
+   "last": 3
+  },
+  "ai-customer-assistant-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "ask-hr-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "asset-maintenance-forecast-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "benefits-enrollment-assistant-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "briefing-pack-builder-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "build-materials-compliance-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "building-permit-processing-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "campaign-delivery-optimizer-source.zip": {
+   "all_time": 3,
+   "last": 3
+  },
+  "care-gap-closure-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "cart-abandonment-recovery-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "claims-processing-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "client-health-score-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "clinical-notes-summarizer-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "content-launch-clearance-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "contract-risk-review-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "cross-selling-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "customer-loyalty-rewards-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "customer-sentiment-churn-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "deal-progression-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "emission-tracking-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "energy-regulatory-reporting-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "engineering-standards-advisor-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "field-permit-to-work-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "field-service-dispatch-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "financial-advisor-copilot-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "first-time-fix-source.zip": {
+   "all_time": 3,
+   "last": 3
+  },
+  "fraud-detection-alert-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "fs-customer-onboarding-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "fs-regulatory-compliance-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "inventory-rebalancing-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "inventory-visibility-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "license-renewal-expansion-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "live-event-launch-planner-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "loan-origination-assistant-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "ma-target-sourcing-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "maintenance-scheduling-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "omnichannel-engagement-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "order-entry-validation-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "order-status-communication-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "patient-intake-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "payments-operations-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "permit-license-management-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "personalized-marketing-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "personalized-shopping-assistant-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "portfolio-rebalancing-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "prior-authorization-source.zip": {
+   "all_time": 3,
+   "last": 3
+  },
+  "procurement-agent-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "procurement-support-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "product-feedback-synthesizer-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "product-line-optimization-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "proposal-generation-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "public-correspondence-response-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "reporting-package-validation-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "resource-utilization-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "returns-complaints-resolution-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "sales-qualification-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "solution-design-review-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "staffing-territory-planning-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "store-associate-copilot-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "supplier-claim-engagement-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "supplier-risk-monitoring-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "supply-chain-disruption-alert-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "time-entry-billing-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "underwriting-support-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "utility-billing-assistance-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "warranty-registration-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "wealth-insights-generator-source.zip": {
+   "all_time": 2,
+   "last": 2
+  },
+  "win-loss-analysis-source.zip": {
+   "all_time": 2,
+   "last": 2
+  }
+ },
  "tracking": {
-  "cdn_last": "2026-10-28",
+  "cdn_last": "2026-10-29",
   "cdn_since": "2026-08-06",
-  "clones_last": "2026-10-28",
+  "clones_last": "2026-10-29",
   "clones_since": "2026-07-26",
-  "views_last": "2026-10-28",
+  "views_last": "2026-10-29",
   "views_since": "2026-07-26"
  },
  "views": {
@@ -2372,6 +2665,10 @@
   "2026-10-26": {
    "count": 8,
    "uniques": 5
+  },
+  "2026-10-27": {
+   "count": 3,
+   "uniques": 3
   }
  }
 }
