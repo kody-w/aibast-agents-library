@@ -342,32 +342,36 @@
   "2026-10-27": {
    "count": 276,
    "uniques": 47
+  },
+  "2026-10-28": {
+   "count": 215,
+   "uniques": 59
   }
  },
  "installer_assets": {
   "community_rapp-install.ps1": {
-   "all_time": 72,
-   "last": 72
+   "all_time": 73,
+   "last": 73
   },
   "community_rapp-install.sh": {
-   "all_time": 69,
-   "last": 69
+   "all_time": 70,
+   "last": 70
   },
   "install.ps1": {
-   "all_time": 77,
-   "last": 77
+   "all_time": 78,
+   "last": 78
   }
  },
  "last_known": {
-  "at": "2026-10-29T01:30:23Z",
-  "clone_uniques_14d": 706,
-  "clones_14d": 4719,
+  "at": "2026-10-29T21:19:54Z",
+  "clone_uniques_14d": 736,
+  "clones_14d": 4777,
   "paths": [
    {
-    "count": 23,
+    "count": 28,
     "path": "/microsoft/aibast-agents-library",
     "title": "Overview",
-    "uniques": 17
+    "uniques": 22
    },
    {
     "count": 8,
@@ -389,15 +393,15 @@
    },
    {
     "count": 4,
-    "path": "/microsoft/aibast-agents-library/compare/main...kody-w:aibast-agents-library:staging",
-    "title": "/compare/main...kody-w:aibast-agents-library:staging",
-    "uniques": 1
-   },
-   {
-    "count": 3,
     "path": "/microsoft/aibast-agents-library/tree/main/solutions/account-intelligence/manual/skills",
     "title": "/tree/main/solutions/account-intelligence/manual/skills",
     "uniques": 2
+   },
+   {
+    "count": 4,
+    "path": "/microsoft/aibast-agents-library/compare/main...kody-w:aibast-agents-library:staging",
+    "title": "/compare/main...kody-w:aibast-agents-library:staging",
+    "uniques": 1
    },
    {
     "count": 3,
@@ -424,12 +428,17 @@
     "uniques": 1
    }
   ],
-  "paths_at": "2026-10-29T01:30:23Z",
+  "paths_at": "2026-10-29T21:19:54Z",
   "referrers": [
    {
-    "count": 12,
+    "count": 14,
     "referrer": "github.com",
-    "uniques": 7
+    "uniques": 9
+   },
+   {
+    "count": 4,
+    "referrer": "teams.public.onecdn.static.microsoft",
+    "uniques": 2
    },
    {
     "count": 3,
@@ -438,8 +447,8 @@
    },
    {
     "count": 3,
-    "referrer": "teams.public.onecdn.static.microsoft",
-    "uniques": 2
+    "referrer": "aocr.org",
+    "uniques": 3
    },
    {
     "count": 1,
@@ -447,8 +456,8 @@
     "uniques": 1
    }
   ],
-  "view_uniques_14d": 35,
-  "views_14d": 125
+  "view_uniques_14d": 43,
+  "views_14d": 130
  },
  "snapshots": [
   {
@@ -2036,7 +2045,7 @@
    "views_all_time": 1194
   },
   {
-   "at": "2026-10-29T01:30:04Z",
+   "at": "2026-10-29T05:14:48Z",
    "cdn_all_time": 519,
    "clone_uniques_all_time": 2631,
    "clones_all_time": 21138,
@@ -2045,6 +2054,28 @@
    "installer_release_downloads_all_time": 218,
    "view_uniques_all_time": 287,
    "views_all_time": 1197
+  },
+  {
+   "at": "2026-10-29T05:30:11Z",
+   "cdn_all_time": 519,
+   "clone_uniques_all_time": 2631,
+   "clones_all_time": 21138,
+   "days_tracked": 84,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 221,
+   "view_uniques_all_time": 287,
+   "views_all_time": 1197
+  },
+  {
+   "at": "2026-10-29T21:19:36Z",
+   "cdn_all_time": 519,
+   "clone_uniques_all_time": 2690,
+   "clones_all_time": 21353,
+   "days_tracked": 85,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 221,
+   "view_uniques_all_time": 297,
+   "views_all_time": 1208
   }
  ],
  "solution_bundle_assets": {
@@ -2669,6 +2700,10 @@
   "2026-10-27": {
    "count": 3,
    "uniques": 3
+  },
+  "2026-10-28": {
+   "count": 11,
+   "uniques": 10
   }
  }
 }
