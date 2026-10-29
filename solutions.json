@@ -1,6 +1,6 @@
 {
  "schema": "aibast-solutions/1.0",
- "count": 73,
+ "count": 74,
  "note": "Approved industry-solution catalog as advertised on the AIBAST SharePoint Agents Library. The repo aligns to this; it is not derived from the repo.",
  "solutions": [
   {
@@ -3223,6 +3223,51 @@
    "source": "AIBAST Agents Library \u2014 catalog template",
    "advertised_display": "Tiered Huddle Board Agent",
    "sharepoint_list_name": "Tiered Huddle Board Agent",
+   "is_primary": true
+  },
+  {
+   "slot": 72,
+   "advertised_name": "Predictive Asset Maintenance Intelligence Agent",
+   "canonical_name": "Predictive Asset Maintenance Intelligence Agent",
+   "repo_agent": "@aibast-agents-library/grid-asset-maintenance",
+   "executive_summary": "Help an electricity distribution company maintain its grid by condition, not by calendar: rank transformers, switchgear, cables and overhead lines by 30, 90 and 180-day failure probability, draft preventive work orders with the parts and crew they need, check field records before the asset register changes, and show the replacement plan and capital by year.",
+   "industries": [
+    "Energy and Utilities"
+   ],
+   "personas": [
+    "Reliability Engineer",
+    "Maintenance Planner",
+    "Asset Manager"
+   ],
+   "featured_tools": [
+    "Microsoft Copilot Studio",
+    "Dynamics 365 Field Service",
+    "Microsoft Dataverse",
+    "Power BI"
+   ],
+   "customer_scenario": [
+    "Condition data from substations sat unused between fixed maintenance cycles.",
+    "Long-lead parts were ordered after the work was already due.",
+    "Field records reached the asset register with tests missing.",
+    "Replacement plans were built on asset age instead of condition."
+   ],
+   "outcomes": [
+    "Crews work on the grid assets most likely to fail in the next 30, 90 and 180 days.",
+    "Preventive work orders arrive with history, materials and the long-lead parts to order first.",
+    "The asset register changes only when the field record is complete, and leadership sees the replacement plan and capital by year."
+   ],
+   "capabilities": [
+    "Risk ranking",
+    "Work order draft",
+    "Register update check",
+    "Replacement plan"
+   ],
+   "onepager": "72. Predictive Asset Maintenance Intelligence Agent one-pager.pptx",
+   "demo_video": null,
+   "promise_coverage": 100,
+   "source": "AIBAST Agents Library \u2014 catalog template",
+   "advertised_display": "Predictive Asset Maintenance Intelligence Agent",
+   "sharepoint_list_name": "Predictive Asset Maintenance Intelligence Agent",
    "is_primary": true
   }
  ]

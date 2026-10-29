@@ -9668,6 +9668,140 @@
         ]
       },
       "source": "catalog"
+    },
+    "@aibast-agents-library/grid-asset-maintenance": {
+      "display_name": "Predictive Asset Maintenance Intelligence Agent",
+      "sales_headline": "Find the grid assets most likely to fail and plan the work before they do",
+      "card_pitch": "Give reliability engineers, maintenance planners and asset managers one conversational view of grid asset health: transformers, switchgear, cables and overhead lines ranked by 30, 90 and 180-day failure risk, preventive work orders drafted with the parts and crew they need, field records checked before the asset register changes, and the replacement plan with its capital.",
+      "why_try": "The demo ranks a distribution company's grid assets by failure probability, drafts the work order for the riskiest transformer with the long-lead part to order first, holds a register update that is missing a test result, and shows the investment committee the replacement plan.",
+      "customer_challenge": "Distribution companies still maintain much of their grid on fixed cycles or after failures, so condition data sits unused, long-lead parts are ordered too late, field records reach the asset register incomplete, and replacement plans rest on age instead of condition.",
+      "microsoft_ai_story": "Power Automate brings the condition-monitoring feed into Microsoft Dataverse, Copilot Studio ranks the risk and drafts the work in Microsoft Teams or Microsoft 365 Copilot, Dynamics 365 Field Service carries the approved work orders, Power Apps captures the field record, and Power BI shows fleet health and the replacement pipeline.",
+      "business_value": [
+        "Ranks grid assets by 30, 90 and 180-day failure probability, so crews work on the riskiest assets first.",
+        "Drafts preventive work orders with history, materials and the long-lead parts to order first.",
+        "Holds asset register updates until the field record is complete, and shows the replacement capital by year."
+      ],
+      "search_terms": [
+        "Asset Manager",
+        "Dynamics 365 Field Service",
+        "Maintenance Planner",
+        "Microsoft Copilot Studio",
+        "Microsoft Dataverse",
+        "Power Apps",
+        "Power Automate",
+        "Power BI",
+        "Predictive Asset Maintenance Intelligence Agent",
+        "Reliability Engineer",
+        "asset health",
+        "asset register",
+        "condition-based maintenance",
+        "distribution network",
+        "failure probability",
+        "grid assets",
+        "overhead lines",
+        "register_update",
+        "replacement_plan",
+        "risk_ranking",
+        "switchgear",
+        "transformers",
+        "underground cables",
+        "work_order_draft"
+      ],
+      "journey_stage": "Optimize",
+      "blueprint_role": "Separates risk ranking and work preparation from protected work order, parts, crew, register and capital decisions.",
+      "sample_prompts": [
+        {
+          "label": "Reliability Engineer: Risk ranking",
+          "prompt": "Which of our grid assets are most likely to fail in the next 90 days, and what's driving it?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=grid-asset-maintenance-risk-ranking"
+        },
+        {
+          "label": "Maintenance Planner: Work order draft",
+          "prompt": "Get a preventive work order ready for the Millbrook transformer, with the parts and crew we need. Don't raise it yet.",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=grid-asset-maintenance-work-order-draft"
+        },
+        {
+          "label": "Reliability Engineer: Register update check",
+          "prompt": "The Mill Lane cable joint job closed yesterday. Is the field record complete enough to update the asset register?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=grid-asset-maintenance-register-update"
+        },
+        {
+          "label": "Director of Asset Management: Replacement plan",
+          "prompt": "For the investment committee, how healthy is the fleet and what replacements and capital do we need over the next few years?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=grid-asset-maintenance-replacement-plan"
+        }
+      ],
+      "architecture": {
+        "business_flow": [
+          "Reliability engineers, maintenance planners and asset managers",
+          "Microsoft Teams or Microsoft 365 Copilot",
+          "Predictive Asset Maintenance Intelligence Agent",
+          "Microsoft Dataverse asset health tables filled by Power Automate",
+          "Dynamics 365 Field Service work orders and the Power Apps field job form",
+          "Authorized approval by the planner, reliability engineer and investment committee"
+        ],
+        "capabilities": [
+          {
+            "operation": "risk_ranking",
+            "name": "Risk ranking",
+            "purpose": "Use when a reliability engineer or planner asks which grid assets are most likely to fail in the next 30, 90 or 180 days, what is driving the risk, or what the maintenance backlog should be."
+          },
+          {
+            "operation": "work_order_draft",
+            "name": "Work order draft",
+            "purpose": "Use when a maintenance planner asks to prepare a preventive work order for an asset, with its history, materials, long-lead parts, crew or outage; returns a draft that is never raised."
+          },
+          {
+            "operation": "register_update",
+            "name": "Register update check",
+            "purpose": "Use when someone asks whether a completed maintenance job's field record is complete enough to update the asset register or fixed asset register."
+          },
+          {
+            "operation": "replacement_plan",
+            "name": "Replacement plan",
+            "purpose": "Use when an asset manager or director asks about fleet health by asset class, the replacement pipeline, or capital needed by year."
+          }
+        ],
+        "easy_mode": [
+          "Verify Power Platform CLI 2.9.3 or newer and authenticate to the approved target environment.",
+          "Initialize a modern cli-copilot project with an approved publisher prefix and preserve the generated identity settings.",
+          "Upload the two packaged synthetic knowledge files and every operation-specific SKILL.md.",
+          "Bind only approved least-privilege production connections after security, privacy, and business-owner review.",
+          "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
+        ],
+        "local_install_prompt": "Install Predictive Asset Maintenance Intelligence Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/grid-asset-maintenance/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect utility systems or execute external actions.",
+        "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Predictive Asset Maintenance Intelligence Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/grid-asset-maintenance/deployment.json. Upload the two synthetic knowledge files and 4 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+        "required_connections": [
+          "Use only approved, least-privilege production connections; the packaged demonstration uses synthetic knowledge files.",
+          "Microsoft Dataverse asset health tables filled by Power Automate from the condition-monitoring system (read-only)",
+          "Dynamics 365 Field Service for preventive work orders, raised only after a maintenance planner approves the draft",
+          "ERP stores and fixed asset register through Power Automate, written only after a reliability engineer approves the update",
+          "Microsoft Entra ID user identity for the approving planner and engineer"
+        ],
+        "manual_commands": [
+          "pac auth create",
+          "pac copilot init --name \"Predictive Asset Maintenance Intelligence Agent\" --publisher-prefix <PREFIX> --authoring-mode cli-copilot --project-dir \"<PROJECT_DIR>\" --environment \"<ENVIRONMENT_ID>\"",
+          "pac connection list --environment \"<ENVIRONMENT_ID>\"",
+          "pac copilot pull --project-dir \"<PROJECT_DIR>\"",
+          "pac copilot push --project-dir \"<PROJECT_DIR>\"",
+          "pac copilot publish --bot \"<BOT_ID_OR_SCHEMA_NAME>\" --environment \"<ENVIRONMENT_ID>\""
+        ],
+        "acceptance_checks": [
+          "Every exposed operation has one persona-language case and one SKILL.md.",
+          "Exactly two synthetic knowledge files are present.",
+          "Responses state the relevant human approval or review boundary.",
+          "No operation claims a work order, part order, crew assignment, register change or capital decision.",
+          "Publishing remains a separate user-approved step."
+        ],
+        "hard_mode": [
+          "Run pac copilot init and verify settings.mcs.yml before authoring components.",
+          "Author global instructions that preserve the packaged synthetic-only and engineer-approval boundaries.",
+          "Add the two knowledge files and one skill for every exposed operation.",
+          "Create dedicated connection references only for approved systems and verify least-privilege access.",
+          "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
+        ]
+      },
+      "source": "catalog"
     }
   }
 }

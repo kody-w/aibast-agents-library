@@ -6,8 +6,8 @@
     "solutions/*/evals/transcripts.json"
   ],
   "summary": {
-    "scenarios": 378,
-    "recorded": 368,
+    "scenarios": 382,
+    "recorded": 372,
     "not_recorded": 10
   },
   "agents": {
@@ -315,6 +315,15 @@
         "regulatory-trade-surveillance",
         "regulatory-algorithm-go-live",
         "regulatory-board-evidence"
+      ]
+    },
+    "@aibast-agents-library/grid-asset-maintenance": {
+      "name": "Predictive Asset Maintenance Intelligence Agent",
+      "scenarios": [
+        "grid-asset-maintenance-risk-ranking",
+        "grid-asset-maintenance-work-order-draft",
+        "grid-asset-maintenance-register-update",
+        "grid-asset-maintenance-replacement-plan"
       ]
     },
     "@aibast-agents-library/inventory-rebalancing": {
@@ -1938,6 +1947,38 @@
       "prompt": "Where is the onboarding queue stuck, and who owns each application?",
       "folder": "fs-customer-onboarding",
       "case_id": "FCO-04",
+      "recorded": true
+    },
+    "grid-asset-maintenance-register-update": {
+      "agent_id": "@aibast-agents-library/grid-asset-maintenance",
+      "title": "Reliability Engineer: Register update check",
+      "prompt": "The Mill Lane cable joint job closed yesterday. Is the field record complete enough to update the asset register?",
+      "folder": "grid-asset-maintenance",
+      "case_id": "GAM-03",
+      "recorded": true
+    },
+    "grid-asset-maintenance-replacement-plan": {
+      "agent_id": "@aibast-agents-library/grid-asset-maintenance",
+      "title": "Director of Asset Management: Replacement plan",
+      "prompt": "For the investment committee, how healthy is the fleet and what replacements and capital do we need over the next few years?",
+      "folder": "grid-asset-maintenance",
+      "case_id": "GAM-04",
+      "recorded": true
+    },
+    "grid-asset-maintenance-risk-ranking": {
+      "agent_id": "@aibast-agents-library/grid-asset-maintenance",
+      "title": "Reliability Engineer: Risk ranking",
+      "prompt": "Which of our grid assets are most likely to fail in the next 90 days, and what's driving it?",
+      "folder": "grid-asset-maintenance",
+      "case_id": "GAM-01",
+      "recorded": true
+    },
+    "grid-asset-maintenance-work-order-draft": {
+      "agent_id": "@aibast-agents-library/grid-asset-maintenance",
+      "title": "Maintenance Planner: Work order draft",
+      "prompt": "Get a preventive work order ready for the Millbrook transformer, with the parts and crew we need. Don't raise it yet.",
+      "folder": "grid-asset-maintenance",
+      "case_id": "GAM-02",
       "recorded": true
     },
     "inventory-capacity-review": {

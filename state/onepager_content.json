@@ -3,7 +3,7 @@
   "generated_at": "2026-10-08T02:18:13.327046+00:00",
   "source": "Approved AI BAST Agents Library one-pager PowerPoint export",
   "stats": {
-    "onepagers": 67,
+    "onepagers": 68,
     "with_modules": 1
   },
   "onepagers": {
@@ -3780,6 +3780,63 @@
         "Show the whole board with every lane, clock and item waiting on the person asking, from Copilot between patients",
         "Escalate with one confirmation, restarting the clock at the next tier with the reason and the right people paged",
         "Keep mitigated items open until the person who raised them confirms the fix held, and show leadership what to decide"
+      ],
+      "modules": []
+    },
+    "72. Predictive Asset Maintenance Intelligence Agent one-pager.pptx": {
+      "source_file": "72. Predictive Asset Maintenance Intelligence Agent one-pager.pptx",
+      "source_sha256": "6ba374f5e4a2562775ed2bd4da8500473ed6fee3ab0b626e7915ebdd10bf0349",
+      "slide_count": 1,
+      "title": "Predictive Asset Maintenance Intelligence Agent",
+      "executive_summary": "Ranks grid assets by failure risk, drafts the preventive work with its parts and crew, and keeps the asset register honest.",
+      "industries": [
+        "Energy and Utilities"
+      ],
+      "personas": [
+        "Reliability Engineer",
+        "Maintenance Planner",
+        "Asset Manager"
+      ],
+      "agent_requirements": [
+        "Microsoft Copilot Studio"
+      ],
+      "featured_tools": [
+        "Dynamics 365 Field Service",
+        "Microsoft Dataverse",
+        "Power BI"
+      ],
+      "scenario_name": "A regional distribution company",
+      "customer_challenge": {
+        "intro": "A regional distribution company struggled to maintain its grid by condition:",
+        "items": [
+          "Substation condition data sat unused between cycles",
+          "Long-lead parts were ordered after work was due",
+          "Field records reached the register with tests missing",
+          "Replacement plans rested on age, not condition"
+        ]
+      },
+      "agent_actions": {
+        "intro": "The company leveraged the Predictive Asset Maintenance Intelligence Agent to:",
+        "items": [
+          "Rank assets by 30, 90 and 180-day failure risk",
+          "Draft work orders with history, parts and crew",
+          "Hold register updates until the record is complete",
+          "Show fleet health and replacement capital by year"
+        ]
+      },
+      "business_outcomes": {
+        "intro": "With the agent\u2019s help, the company:",
+        "items": [
+          "Sent crews to the riskiest assets first",
+          "Ordered long-lead parts in time for the work",
+          "Kept the asset register complete and current",
+          "Built its replacement plan on condition data"
+        ]
+      },
+      "opportunity_statements": [
+        "Rank transformers, switchgear, cables and lines by failure probability over 30, 90 and 180 days, with the anomaly behind each risk",
+        "Draft preventive work orders with asset history, materials, long-lead parts to order first, and the crew and outage plan",
+        "Keep the asset register complete by checking field records before updates, and show the replacement plan and capital by year"
       ],
       "modules": []
     }
