@@ -381,7 +381,7 @@ function demoCard(demo) {
     ? `<a class="button small" href="${esc(demo.onepager)}" target="_blank" rel="noopener noreferrer">One-pager</a>`
     : "";
   const graduated = typeof demo.graduated_to === "string" && /^[a-z0-9][a-z0-9-]*$/.test(demo.graduated_to)
-    ? `<a class="graduated" href="solution.html?id=${encodeURIComponent(demo.graduated_to)}">Now in the library</a>`
+    ? `<a class="graduated" href="solutions/${encodeURIComponent(demo.graduated_to)}/quest.html">Now in the library</a>`
     : "";
   return `
       <article class="demo-card" data-demo-id="${esc(demo.id)}">
