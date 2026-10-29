@@ -1641,7 +1641,7 @@ footer {
     <a href="academy.html">Academy</a> ·
     <a href="front-page.html">Front Page</a> ·
           <a href="request-info.html">Request one-pagers &amp; videos</a> ·
-    <a href="community-tools.html">Community tools</a> ·
+    <a href="community-agents.html">Community agents</a> ·
     <a href="achievements.html">Achievements</a> ·
     <a href="https://github.com/microsoft/aibast-agents-library" target="_blank" rel="noopener">Source</a>
   </footer>
@@ -1910,7 +1910,10 @@ async function getCommunityTools() {
       throw new Error("Community tool links must be public HTTPS URLs");
     }
   }
-  return doc;
+  // Community agents (kind "demo") stay out of the library and its export
+  // until one graduates into a full template.
+  const tools = doc.tools.filter(tool => (tool.kind || "tool") === "tool");
+  return { ...doc, tools, count: tools.length };
 }
 
 async function exportRappWorkspace() {
