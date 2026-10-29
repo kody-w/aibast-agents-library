@@ -85,7 +85,7 @@ def rollout_fixture(tmp_path, *, assisted=True):
 def test_catalog_scope_is_exact_and_excludes_registry_only_grid():
     advertised = resolve_advertised_solutions(ROOT)
 
-    assert len(advertised) == 69
+    assert len(advertised) == 70
     assert "grid-outage-response" not in advertised
     assert "time-entry-billing" in advertised
     assert "product-line-optimization" in advertised

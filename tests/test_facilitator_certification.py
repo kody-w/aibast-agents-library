@@ -87,7 +87,7 @@ def issue_bodies_from_field_guide(page):
 
 
 def test_every_canonical_field_guide_contains_the_gated_flow():
-    assert len(WORKSHOPS) == 69
+    assert len(WORKSHOPS) == 70
     for row in WORKSHOPS:
         package = ROOT / "solutions" / row["slug"]
         markdown = (package / "FIELD-GUIDE.md").read_text(encoding="utf-8")

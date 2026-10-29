@@ -9539,6 +9539,135 @@
       },
       "source": "field",
       "origin": "both"
+    },
+    "@aibast-agents-library/tiered-huddle-board": {
+      "display_name": "Tiered Huddle Board Agent",
+      "sales_headline": "Run every tier of the daily huddle from one live board",
+      "card_pitch": "Give nurse managers, department directors and hospital leaders one conversational view of the huddle board: every lane and clock, what is past target, escalations drafted with the reason and the people to page, and mitigated issues held open until the fix is confirmed.",
+      "why_try": "The demo lets a nurse manager ask between patients what is past target and waiting on her, then draft an escalation that a person confirms, and shows the 10:30 leadership huddle exactly what needs a decision.",
+      "customer_challenge": "Hospitals run tiered huddles from binders and whiteboards, so escalations lose their reason and clock on the way up, the right people are paged late, and issues are closed before anyone confirms the fix held.",
+      "microsoft_ai_story": "Copilot Studio gives each tier a conversational view of the board in Microsoft Teams or Microsoft 365 Copilot; Microsoft Dataverse holds the issues, tiers, clocks and paging roster behind a Power Apps board, and Teams carries the pages once a person confirms the escalation.",
+      "business_value": [
+        "Shows every lane and clock, so past-target items surface before the huddle.",
+        "Escalates with the reason, a restarted clock and the right people paged after one confirmation.",
+        "Keeps mitigated issues open until the person who raised them confirms the fix held."
+      ],
+      "search_terms": [
+        "Chief Nursing Officer",
+        "Department Director",
+        "Microsoft Copilot Studio",
+        "Microsoft Dataverse",
+        "Microsoft Teams",
+        "Nurse Manager",
+        "Power Apps",
+        "Tiered Huddle Board Agent",
+        "board_view",
+        "closure_check",
+        "daily safety huddle",
+        "escalation",
+        "escalation_draft",
+        "hospital operations",
+        "huddle board",
+        "leadership huddle",
+        "leadership_decisions",
+        "nursing operations",
+        "paging",
+        "tiered huddle"
+      ],
+      "journey_stage": "Optimize",
+      "blueprint_role": "Separates board visibility and escalation preparation from protected escalation, paging, closure and leadership decisions.",
+      "sample_prompts": [
+        {
+          "label": "Nurse Manager: Whole board view",
+          "prompt": "I'm between patients. Show me the huddle board: what's past target and what's waiting on me?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-board-view"
+        },
+        {
+          "label": "Nurse Manager: Escalation draft",
+          "prompt": "4 West can't fix the IV pump problem at our level. Get the escalation ready for the next tier, but don't page anyone until I confirm.",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-escalation-draft"
+        },
+        {
+          "label": "Nurse Manager: Closure check",
+          "prompt": "Biomed fixed the bed alarm in room 412 yesterday. Can we take it off the board?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-closure-check"
+        },
+        {
+          "label": "Chief Nursing Officer: Leadership huddle decisions",
+          "prompt": "For the 10:30 leadership huddle, what needs a decision from us today?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=tiered-huddle-board-leadership-decisions"
+        }
+      ],
+      "architecture": {
+        "business_flow": [
+          "Nurse managers, department directors and hospital leaders",
+          "Microsoft Teams or Microsoft 365 Copilot",
+          "Tiered Huddle Board Agent",
+          "Microsoft Dataverse huddle board: issues, tiers and clocks",
+          "Paging roster by tier and issue category",
+          "Authorized escalation and closure step on the Power Apps board"
+        ],
+        "capabilities": [
+          {
+            "operation": "board_view",
+            "name": "Whole board view",
+            "purpose": "Use when a nurse manager, charge nurse or director asks for the huddle board, every lane and clock, what is past target, or what is waiting on them."
+          },
+          {
+            "operation": "escalation_draft",
+            "name": "Escalation draft",
+            "purpose": "Use when someone says the unit or department cannot fix an issue and asks to escalate it or who would be paged; returns an escalation draft that is never sent."
+          },
+          {
+            "operation": "closure_check",
+            "name": "Closure check",
+            "purpose": "Use when someone asks whether a fixed or mitigated issue can be closed; mitigated is not closed until the person who raised it confirms the fix held."
+          },
+          {
+            "operation": "leadership_decisions",
+            "name": "Leadership huddle decisions",
+            "purpose": "Use when a leader asks what the 10:30 leadership huddle needs to decide today, with the reason and clock for each item."
+          }
+        ],
+        "easy_mode": [
+          "Verify Power Platform CLI 2.9.3 or newer and authenticate to the approved target environment.",
+          "Initialize a modern cli-copilot project with an approved publisher prefix and preserve the generated identity settings.",
+          "Upload the two packaged synthetic knowledge files and every operation-specific SKILL.md.",
+          "Bind only approved least-privilege production connections after security, privacy, and business-owner review.",
+          "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
+        ],
+        "local_install_prompt": "Install Tiered Huddle Board Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/tiered-huddle-board/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect hospital systems or execute external actions.",
+        "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Tiered Huddle Board Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/tiered-huddle-board/deployment.json. Upload the two synthetic knowledge files and 4 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+        "required_connections": [
+          "Use only approved, least-privilege production connections; the packaged demonstration uses synthetic knowledge files.",
+          "Microsoft Dataverse huddle board tables: issues, tiers, clocks and paging roster (read-only)",
+          "Microsoft Teams for escalation pages, sent only by the board's authorized escalation step",
+          "Microsoft Entra ID user identity for 'waiting on me' and the issue-owner confirmation"
+        ],
+        "manual_commands": [
+          "pac auth create",
+          "pac copilot init --name \"Tiered Huddle Board Agent\" --publisher-prefix <PREFIX> --authoring-mode cli-copilot --project-dir \"<PROJECT_DIR>\" --environment \"<ENVIRONMENT_ID>\"",
+          "pac connection list --environment \"<ENVIRONMENT_ID>\"",
+          "pac copilot pull --project-dir \"<PROJECT_DIR>\"",
+          "pac copilot push --project-dir \"<PROJECT_DIR>\"",
+          "pac copilot publish --bot \"<BOT_ID_OR_SCHEMA_NAME>\" --environment \"<ENVIRONMENT_ID>\""
+        ],
+        "acceptance_checks": [
+          "Every exposed operation has one persona-language case and one SKILL.md.",
+          "Exactly two synthetic knowledge files are present.",
+          "Responses state the relevant human confirmation or review boundary.",
+          "No operation claims an escalation, page, closure, decision or record change.",
+          "Publishing remains a separate user-approved step."
+        ],
+        "hard_mode": [
+          "Run pac copilot init and verify settings.mcs.yml before authoring components.",
+          "Author global instructions that preserve the packaged synthetic-only and human-confirmation boundaries.",
+          "Add the two knowledge files and one skill for every exposed operation.",
+          "Create dedicated connection references only for approved systems and verify least-privilege access.",
+          "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
+        ]
+      },
+      "source": "catalog"
     }
   }
 }

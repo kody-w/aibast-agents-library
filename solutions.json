@@ -1,6 +1,6 @@
 {
  "schema": "aibast-solutions/1.0",
- "count": 72,
+ "count": 73,
  "note": "Approved industry-solution catalog as advertised on the AIBAST SharePoint Agents Library. The repo aligns to this; it is not derived from the repo.",
  "solutions": [
   {
@@ -3177,6 +3177,52 @@
    "source": "AIBAST Agents Library \u2014 wave 3 (field-pattern template)",
    "advertised_display": "Live Event Launch Planner Agent",
    "sharepoint_list_name": "Live Event Launch Planner Agent",
+   "is_primary": true
+  },
+  {
+   "slot": 71,
+   "advertised_name": "Tiered Huddle Board Agent",
+   "canonical_name": "Tiered Huddle Board Agent",
+   "repo_agent": "@aibast-agents-library/tiered-huddle-board",
+   "executive_summary": "Help a hospital run its daily tiered huddles from one live board: every lane and clock, what is past target and waiting on the person asking, escalations drafted with the restarted clock, the reason and the people to page, mitigated issues kept open until the person who raised them confirms the fix held, and the decisions the leadership huddle needs today.",
+   "industries": [
+    "Healthcare",
+    "Hospitals & Health Systems"
+   ],
+   "personas": [
+    "Nurse Manager",
+    "Department Director",
+    "Chief Nursing Officer"
+   ],
+   "featured_tools": [
+    "Microsoft Copilot Studio",
+    "Microsoft Dataverse",
+    "Microsoft Teams",
+    "Power Apps"
+   ],
+   "customer_scenario": [
+    "Tiers, targets and paging lists lived in a paper binder.",
+    "Nurse managers could not see the board between patients.",
+    "Escalations lost their reason and clock on the way up.",
+    "Mitigated issues were closed before the fix had held."
+   ],
+   "outcomes": [
+    "Every huddle tier runs from one live board, from the unit to the Executive tier.",
+    "Unresolved issues move up a tier with their reason, a restarted clock and the right people paged, after one confirmation.",
+    "Issues close only when the person who raised them confirms the fix held, and leadership sees every decision with its reason and clock."
+   ],
+   "capabilities": [
+    "Whole board view",
+    "Escalation draft",
+    "Closure check",
+    "Leadership huddle decisions"
+   ],
+   "onepager": "71. Tiered Huddle Board Agent one-pager.pptx",
+   "demo_video": null,
+   "promise_coverage": 100,
+   "source": "AIBAST Agents Library \u2014 catalog template",
+   "advertised_display": "Tiered Huddle Board Agent",
+   "sharepoint_list_name": "Tiered Huddle Board Agent",
    "is_primary": true
   }
  ]
