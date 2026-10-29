@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-29T22:41:57.641214+00:00",
+  "generated_at": "2026-10-29T22:46:16.392349+00:00",
   "stats": {
     "total_agents": 92,
     "publishers": 1,
@@ -5112,6 +5112,7 @@
       "_stack": "grid_asset_maintenance",
       "_stack_vertical": "energy",
       "_synthetic_data": true,
+      "_added_at": "2026-10-29T15:46:07-07:00",
       "_solution": {
         "advertised_name": "Predictive Asset Maintenance Intelligence Agent",
         "sharepoint_list_name": "Predictive Asset Maintenance Intelligence Agent",

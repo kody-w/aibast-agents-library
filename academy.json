@@ -1,13 +1,13 @@
 {
   "schema": "aibast-academy/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-29T01:25:18.611312+00:00",
+  "generated_at": "2026-10-29T22:46:16.392349+00:00",
   "title": "Microsoft AI Academy",
   "description": "A hands-on catalog for exploring experimental AIBAST agents through scenario quests, guided builds, evidence reviews, and portable Microsoft implementation patterns.",
   "disclaimer": "Microsoft AI Academy is an experimental AIBAST learning experience. It is not an official Microsoft credential, certification, training program, or replacement for Microsoft Learn. Activities use synthetic data and self-reported milestones unless a course states otherwise.",
   "summary": {
-    "courses": 70,
-    "skills": 503,
+    "courses": 71,
+    "skills": 507,
     "paths": 6,
     "industries": 13,
     "points_per_course": 150
@@ -152,6 +152,7 @@
         "engineering-standards-advisor",
         "field-permit-to-work",
         "field-service-dispatch",
+        "grid-asset-maintenance",
         "inventory-rebalancing",
         "maintenance-scheduling",
         "order-entry-validation",
@@ -161,7 +162,7 @@
         "supplier-risk-monitoring",
         "warranty-registration"
       ],
-      "course_count": 15
+      "course_count": 16
     },
     {
       "id": "regulated-public-services",
@@ -2996,6 +2997,80 @@
       "primary_path": "regulated-public-services",
       "path_ids": [
         "regulated-public-services"
+      ]
+    },
+    {
+      "slug": "grid-asset-maintenance",
+      "agent": "@aibast-agents-library/grid-asset-maintenance",
+      "title": "Predictive Asset Maintenance Intelligence Agent",
+      "description": "Give reliability engineers, maintenance planners and asset managers one conversational view of grid asset health: transformers, switchgear, cables and overhead lines ranked by 30, 90 and 180-day failure risk, preventive work orders drafted with the parts and crew they need, field records checked before the asset register changes, and the replacement plan with its capital.",
+      "category": "energy",
+      "industry": "Energy",
+      "journey_stage": "Optimize",
+      "personas": [
+        "Asset Manager",
+        "Maintenance Planner",
+        "Reliability Engineer"
+      ],
+      "platforms": [
+        "Dynamics 365 Field Service",
+        "Microsoft Copilot Studio",
+        "Microsoft Dataverse",
+        "Power BI"
+      ],
+      "tags": [
+        "asset-management",
+        "energy",
+        "grid-assets",
+        "predictive-maintenance",
+        "reliability",
+        "utilities"
+      ],
+      "outcomes": [
+        "Built its replacement plan on condition data",
+        "Kept the asset register complete and current",
+        "Ordered long-lead parts in time for the work",
+        "Sent crews to the riskiest assets first"
+      ],
+      "quest_url": "solutions/grid-asset-maintenance/quest.html",
+      "field_guide_url": "solutions/grid-asset-maintenance/field-guide.html",
+      "manual_url": "solutions/grid-asset-maintenance/manual-tutorial.html",
+      "evidence_url": "solutions/grid-asset-maintenance/evidence-report.html",
+      "added_at": "2026-10-29T15:46:07-07:00",
+      "has_demo_video": false,
+      "has_onepager": true,
+      "demo_cases": 4,
+      "manual_steps": 18,
+      "skills": [
+        {
+          "name": "register-update",
+          "title": "Register update check",
+          "description": "Use when someone asks whether a completed maintenance job's field record is complete enough to update the asset register or fixed asset register.",
+          "path": "solutions/grid-asset-maintenance/manual/skills/aibast_register-update_03/SKILL.md"
+        },
+        {
+          "name": "replacement-plan",
+          "title": "Replacement plan",
+          "description": "Use when an asset manager or director asks about fleet health by asset class, the replacement pipeline, or capital needed by year.",
+          "path": "solutions/grid-asset-maintenance/manual/skills/aibast_replacement-plan_04/SKILL.md"
+        },
+        {
+          "name": "risk-ranking",
+          "title": "Risk ranking",
+          "description": "Use when a reliability engineer or planner asks which grid assets are most likely to fail in the next 30, 90 or 180 days, what is driving the risk, or what the maintenance backlog should be.",
+          "path": "solutions/grid-asset-maintenance/manual/skills/aibast_risk-ranking_01/SKILL.md"
+        },
+        {
+          "name": "work-order-draft",
+          "title": "Work order draft",
+          "description": "Use when a maintenance planner asks to prepare a preventive work order for an asset, with its history, materials, long-lead parts, crew or outage; returns a draft that is never raised.",
+          "path": "solutions/grid-asset-maintenance/manual/skills/aibast_work-order-draft_02/SKILL.md"
+        }
+      ],
+      "skill_count": 4,
+      "primary_path": "operations-supply-chain",
+      "path_ids": [
+        "operations-supply-chain"
       ]
     },
     {

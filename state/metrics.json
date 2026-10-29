@@ -1,6 +1,6 @@
 {
  "schema": "aibast-metrics/1.0",
- "generated_at": "2026-10-29T21:19:36Z",
+ "generated_at": "2026-10-29T22:46:18Z",
  "repo": {
   "stars": 8,
   "forks": 9,
@@ -11,7 +11,7 @@
   "pushed_at": "2026-10-29T06:56:32Z",
   "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
   "homepage": null,
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "carried_forward": false,
   "owner": "microsoft",
   "name": "aibast-agents-library",
@@ -38,13 +38,13 @@
   "days_tracked": 85,
   "tracking_since": "2026-07-26",
   "global_agent_distribution_fetch_events": 689,
-  "agents": 91,
-  "stacks": 71,
+  "agents": 92,
+  "stacks": 72,
   "verticals": 13,
   "publishers": 1,
   "categories": 13,
-  "total_lines": 49213,
-  "total_kb": 2476.9
+  "total_lines": 49699,
+  "total_kb": 2503.8
  },
  "daily": [
   {
@@ -736,7 +736,7 @@
   "clones_14d": 4777,
   "views_14d": 130,
   "live": true,
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "unavailable_reason": null,
   "carried_forward": false
  },
@@ -1028,7 +1028,7 @@
     "kind": "agent"
    }
   ],
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "carried_forward": false
  },
  "releases": {
@@ -2162,7 +2162,7 @@
     "assets": []
    }
   ],
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "carried_forward": false
  },
  "leaderboards": {
@@ -2855,6 +2855,26 @@
   ],
   "newest": [
    {
+    "name": "@aibast-agents-library/grid-asset-maintenance",
+    "display_name": "Predictive Asset Maintenance Intelligence Agent",
+    "publisher": "@aibast-agents-library",
+    "category": "energy",
+    "tier": "verified",
+    "downloads": 0,
+    "upvotes": null,
+    "acquisitions": null,
+    "upvote_discussion_url": null,
+    "acquisition_discussion_url": null,
+    "lines": 486,
+    "size_kb": 26.9,
+    "added_at": "2026-10-29T15:46:07-07:00",
+    "file": "agents/@aibast-agents-library/energy_stacks/grid_asset_maintenance_stack/grid_asset_maintenance_agent.py",
+    "description": "Rank a distribution company's grid assets (power transformers, switchgear, underground cables and overhead lines) by failure probability over 30, 90 and 180 days from a synthetic condition-monitoring snapshot, draft the preventive work order with asset history, materials, long-lead parts and crew pre-assignment, check a completed job's field record before the asset register and fixed asset register are updated, and summarize fleet health with the replacement pipeline and capital needed. The agent never raises a work order, orders parts, assigns a crew or changes a register; an authorized engineer approves every step through future authenticated tools.",
+    "stack": "grid_asset_maintenance",
+    "vertical": "energy",
+    "catalog_kind": "solution"
+   },
+   {
     "name": "@aibast-agents-library/tiered-huddle-board",
     "display_name": "Tiered Huddle Board Agent",
     "publisher": "@aibast-agents-library",
@@ -3133,26 +3153,6 @@
     "stack": "warranty_registration",
     "vertical": "manufacturing",
     "catalog_kind": "solution"
-   },
-   {
-    "name": "@aibast-agents-library/solution-design-review",
-    "display_name": "Solution Design Review Agent",
-    "publisher": "@aibast-agents-library",
-    "category": "professional_services",
-    "tier": "verified",
-    "downloads": 2,
-    "upvotes": null,
-    "acquisitions": null,
-    "upvote_discussion_url": null,
-    "acquisition_discussion_url": null,
-    "lines": 414,
-    "size_kb": 20.7,
-    "added_at": "2026-10-08T01:53:29-04:00",
-    "file": "agents/@aibast-agents-library/professional_services_stacks/solution_design_review_stack/solution_design_review_agent.py",
-    "description": "Help architects draft and self-check a solution design document before the architecture review board: intake of the template, discovery notes and initiative brief, an architecture vision, the current-state baseline, the non-functional requirements matrix with owners and gaps, the target design with its inventory changes, and a readiness check with a confidence score and severity-ranked gaps. The agent is read-only; it never submits to the review board, changes an inventory record, or approves a design.",
-    "stack": "solution_design_review",
-    "vertical": "professional_services",
-    "catalog_kind": "solution"
    }
   ],
   "stacks": [
@@ -3351,16 +3351,16 @@
     "lines": 8144
    },
    {
+    "name": "energy",
+    "agents": 8,
+    "downloads": 65,
+    "lines": 3538
+   },
+   {
     "name": "manufacturing",
     "agents": 8,
     "downloads": 47,
     "lines": 4444
-   },
-   {
-    "name": "energy",
-    "agents": 7,
-    "downloads": 65,
-    "lines": 3052
    },
    {
     "name": "general",
@@ -3431,16 +3431,16 @@
     "stacks": 13
    },
    {
+    "name": "energy",
+    "agents": 8,
+    "downloads": 65,
+    "stacks": 8
+   },
+   {
     "name": "manufacturing",
     "agents": 8,
     "downloads": 47,
     "stacks": 8
-   },
-   {
-    "name": "energy",
-    "agents": 7,
-    "downloads": 65,
-    "stacks": 7
    },
    {
     "name": "professional_services",
@@ -3498,7 +3498,7 @@
    }
   ],
   "tiers": {
-   "verified": 89,
+   "verified": 90,
    "pilot": 1
   }
  },
@@ -4034,6 +4034,19 @@
    "file": "agents/@aibast-agents-library/financial_services_stacks/regulatory_compliance_fs_stack/regulatory_compliance_fs_agent.py",
    "category": "financial_services",
    "stack": "regulatory_compliance_fs",
+   "catalog_kind": "solution"
+  },
+  {
+   "name": "@aibast-agents-library/grid-asset-maintenance",
+   "display_name": "Predictive Asset Maintenance Intelligence Agent",
+   "downloads": 0,
+   "upvotes": null,
+   "acquisitions": null,
+   "upvote_discussion_url": null,
+   "acquisition_discussion_url": null,
+   "file": "agents/@aibast-agents-library/energy_stacks/grid_asset_maintenance_stack/grid_asset_maintenance_agent.py",
+   "category": "energy",
+   "stack": "grid_asset_maintenance",
    "catalog_kind": "solution"
   },
   {
@@ -4689,7 +4702,7 @@
  ],
  "agent_discussion_coverage": {
   "status": "partial",
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "pages": 2,
   "discussions_scanned": 144,
   "diagnostics": {
@@ -4705,22 +4718,22 @@
    "upvote": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 19
+    "missing_discussions": 20
    },
    "acquisition": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 19
+    "missing_discussions": 20
    }
   }
  },
  "agent_upvote_coverage": {
   "status": "partial",
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 19,
+  "missing_discussions": 20,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -4733,11 +4746,11 @@
  },
  "agent_acquisition_coverage": {
   "status": "partial",
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 19,
+  "missing_discussions": 20,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -4751,26 +4764,26 @@
  "file_metrics": {
   "schema": "aibast-file-metrics/1.0",
   "source_status": "complete",
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "carried_forward": false,
   "totals": {
-   "files": 9792,
-   "observed_files": 9792,
+   "files": 9890,
+   "observed_files": 9890,
    "downloads": 263,
    "by_kind": {
     "agent": {
-     "files": 91,
-     "observed_files": 91,
+     "files": 92,
+     "observed_files": 92,
      "downloads": 134
     },
     "skill": {
-     "files": 509,
-     "observed_files": 509,
+     "files": 513,
+     "observed_files": 513,
      "downloads": 99
     },
     "workshop": {
-     "files": 8411,
-     "observed_files": 8411,
+     "files": 8502,
+     "observed_files": 8502,
      "downloads": 0
     },
     "source_bundle": {
@@ -4799,8 +4812,8 @@
      "downloads": 3
     },
     "asset": {
-     "files": 359,
-     "observed_files": 359,
+     "files": 361,
+     "observed_files": 361,
      "downloads": 0
     }
    }
@@ -5349,6 +5362,14 @@
     "workshop_slug": "field-service-dispatch",
     "downloads": 3,
     "status": "observed"
+   },
+   {
+    "path": "agents/@aibast-agents-library/energy_stacks/grid_asset_maintenance_stack/grid_asset_maintenance_agent.py",
+    "kind": "agent",
+    "agent_name": "@aibast-agents-library/grid-asset-maintenance",
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
    },
    {
     "path": "agents/@aibast-agents-library/energy_stacks/grid_outage_response_stack/grid_outage_response_agent.py",
@@ -39667,6 +39688,766 @@
     "kind": "workshop",
     "agent_name": null,
     "workshop_slug": "fs-regulatory-compliance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/EASY-MODE-COPILOT-CHAT.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/EASY-MODE-PERSONLESS.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/FIELD-GUIDE.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/agent.sync.yaml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/behaviors/aibast_register-update.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/behaviors/aibast_replacement-plan.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/behaviors/aibast_risk-ranking.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/behaviors/aibast_work-order-draft.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/capabilities/knowledge/files/aibast_grid-asset-maintenance-rules-and-guardrails.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/capabilities/knowledge/files/aibast_grid-asset-maintenance-rules-and-guardrails.md.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/capabilities/knowledge/files/aibast_grid-asset-maintenance-synthetic-records.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/capabilities/knowledge/files/aibast_grid-asset-maintenance-synthetic-records.md.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/copilot-studio/settings.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/deployment.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evals/copilot-studio-preview-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evals/dataverse-draft-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evals/manual-build-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evals/onepager-map.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evals/source-audit.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evals/transcripts.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evals/visual-checkpoints.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/evidence-report.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/export-manifest.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/exports/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/exports/grid-asset-maintenance-copilot-studio-solution.zip",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/exports/grid-asset-maintenance-deployment-settings.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/exports/grid-asset-maintenance-solution-export.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/field-guide.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual-tutorial.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual/GLOBAL-INSTRUCTIONS.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual/knowledge/aibast_grid-asset-maintenance-rules-and-guardrails.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual/knowledge/aibast_grid-asset-maintenance-synthetic-records.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual/skills/aibast_register-update_03/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual/skills/aibast_replacement-plan_04/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual/skills/aibast_risk-ranking_01/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/manual/skills/aibast_work-order-draft_02/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/quest.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/01-review-build.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/02-gam-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/03-gam-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/04-gam-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/05-gam-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/06-confirm-draft.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/annotated/01-review-build.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/annotated/02-gam-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/annotated/03-gam-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/annotated/04-gam-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/annotated/05-gam-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/annotated/06-confirm-draft.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/browserfilm.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/copilot-assisted-contact-sheet.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/assisted/copilot-assisted-walkthrough.gif",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/01-create-blank-agent.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/02-name-agent.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/03-enter-instructions.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/04-save-instructions.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/05-remove-web-search.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/06-add-aibast-grid-asset-maintenance-rules-and-guardrails.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/07-add-aibast-grid-asset-maintenance-synthetic-records.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/08-add-aibast-register-update-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/09-add-aibast-replacement-plan-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/10-add-aibast-risk-ranking-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/11-add-aibast-work-order-draft-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/12-review-inventory.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/13-open-preview.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/14-gam-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/15-gam-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/16-gam-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/17-gam-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/18-confirm-draft.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/01-create-blank-agent.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/02-name-agent.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/03-enter-instructions.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/04-save-instructions.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/05-remove-web-search.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/06-add-aibast-grid-asset-maintenance-rules-and-guardrails.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/07-add-aibast-grid-asset-maintenance-synthetic-records.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/08-add-aibast-register-update-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/09-add-aibast-replacement-plan-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/10-add-aibast-risk-ranking-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/11-add-aibast-work-order-draft-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/12-review-inventory.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/13-open-preview.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/14-gam-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/15-gam-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/16-gam-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/17-gam-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/annotated/18-confirm-draft.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/browserfilm.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/manual-build-contact-sheet.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/grid-asset-maintenance/screenshots/manual/manual-build-walkthrough.gif",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "grid-asset-maintenance",
     "downloads": 0,
     "status": "observed_zero"
    },
@@ -80943,6 +81724,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "state/architecture_level2_sources/grid-asset-maintenance.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "state/architecture_level2_sources/inventory-rebalancing.json",
     "kind": "asset",
     "agent_name": null,
@@ -81616,6 +82405,14 @@
    },
    {
     "path": "tests/demo_cases/fs-regulatory-compliance.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/demo_cases/grid-asset-maintenance.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -83154,7 +83951,7 @@
  },
  "workshops": {
   "totals": {
-   "workshops": 70,
+   "workshops": 71,
    "usage_events": 368,
    "views_14d": 4,
    "view_uniques_14d": 2,
@@ -83173,7 +83970,7 @@
   },
   "by_source": {
    "catalog": {
-    "solutions": 52,
+    "solutions": 53,
     "usage_events": 312,
     "file_downloads": 204,
     "bundle_downloads": 104
@@ -84498,6 +85295,25 @@
     "usage_events": 2
    },
    {
+    "catalog_key": "@aibast-agents-library/grid-asset-maintenance",
+    "agent_name": "@aibast-agents-library/grid-asset-maintenance",
+    "slug": "grid-asset-maintenance",
+    "display_name": "Predictive Asset Maintenance Intelligence Agent",
+    "quest_url": "solutions/grid-asset-maintenance/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 0,
+    "bundle_downloads": 0,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 0
+   },
+   {
     "catalog_key": "@aibast-agents-library/tiered-huddle-board",
     "agent_name": "@aibast-agents-library/tiered-huddle-board",
     "slug": "tiered-huddle-board",
@@ -84523,7 +85339,7 @@
    "mixed_windows": true,
    "views": {
     "status": "live popular-path response",
-    "as_of": "2026-10-29T21:19:36Z",
+    "as_of": "2026-10-29T22:46:18Z",
     "censored": true,
     "diagnostics": {
      "duplicate_rows": 0,
@@ -84537,7 +85353,7 @@
    },
    "downloads": {
     "status": "complete paginated jsDelivr file response",
-    "as_of": "2026-10-29T21:19:36Z",
+    "as_of": "2026-10-29T22:46:18Z",
     "pages": 1,
     "pagination": "complete",
     "diagnostics": {
@@ -84550,7 +85366,7 @@
    },
    "feedback": {
     "status": "workshop-feedback label + body marker union",
-    "as_of": "2026-10-29T21:19:36Z",
+    "as_of": "2026-10-29T22:46:18Z",
     "issues_scanned": 0,
     "pages": 3,
     "diagnostics": {
@@ -84562,7 +85378,7 @@
    },
    "agent_upvotes": {
     "status": "partial",
-    "as_of": "2026-10-29T21:19:36Z",
+    "as_of": "2026-10-29T22:46:18Z",
     "scope": "Native upvotes on each primary agent's canonical rating Discussion. This preference signal is separate from usage_events and acquisition Discussions."
    }
   },
@@ -84598,13 +85414,13 @@
     "url": "https://microsoft.github.io/aibast-agents-library/registry.json"
    }
   ],
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "carried_forward": false
  },
  "achievements": {
   "schema": "aibast-achievements/2.0",
   "status": "available",
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "carried_forward": false,
   "caveat": "Verified achievement points are server-scored from opt-in public GitHub progress claims. Each explicitly claimed achievement has a fixed value: started 5, local-proof 15, draft-builder 20, preview-proven 25, workshop-completed 35, and hard-mode-completed 50, for at most 150 points per workshop. Re-syncing unions achievement IDs without duplicating points. Profiles are public by explicit submission consent. GitHub verification confirms authenticated issue authorship and canonical claim format only; achievement completion remains self-reported and is not independently proven. Verified public achievements remain separate from local self-paced state, repository stars, agent upvotes, downloads, and workshop usage events.",
   "totals": {
@@ -85631,6 +86447,28 @@
     "achievement_completion_rate": 0.0
    },
    {
+    "slug": "grid-asset-maintenance",
+    "display_name": "Predictive Asset Maintenance Intelligence Agent",
+    "agent_name": "@aibast-agents-library/grid-asset-maintenance",
+    "participants": 0,
+    "points": 0,
+    "achievements": 0,
+    "starts": 0,
+    "workshop_completions": 0,
+    "hard_completions": 0,
+    "achievement_counts": {
+     "started": 0,
+     "local-proof": 0,
+     "draft-builder": 0,
+     "preview-proven": 0,
+     "workshop-completed": 0,
+     "hard-mode-completed": 0
+    },
+    "completion_rate": 0.0,
+    "hard_completion_rate": 0.0,
+    "achievement_completion_rate": 0.0
+   },
+   {
     "slug": "prior-authorization",
     "display_name": "Prior Authorization Agent",
     "agent_name": "@aibast-agents-library/prior-authorization",
@@ -86255,7 +87093,7 @@
  "workshop_certification": {
   "schema": "aibast-workshop-certification/1.0",
   "status": "available",
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "carried_forward": false,
   "totals": {
    "cohort_submissions": 0,
@@ -86720,6 +87558,16 @@
     "qualified_profiles": 0
    },
    {
+    "slug": "grid-asset-maintenance",
+    "display_name": "Predictive Asset Maintenance Intelligence Agent",
+    "agent_name": "@aibast-agents-library/grid-asset-maintenance",
+    "cohort_submissions": 0,
+    "verified_cohorts": 0,
+    "attendees_reported": 0,
+    "qualification_submissions": 0,
+    "qualified_profiles": 0
+   },
+   {
     "slug": "prior-authorization",
     "display_name": "Prior Authorization Agent",
     "agent_name": "@aibast-agents-library/prior-authorization",
@@ -86990,7 +87838,7 @@
  "ecosystem": {
   "schema": "aibast-ecosystem-metrics/1.0",
   "status": "available",
-  "as_of": "2026-10-29T21:19:36Z",
+  "as_of": "2026-10-29T22:46:18Z",
   "sources": {
    "aibast": {
     "status": "available",
@@ -87004,8 +87852,8 @@
   "totals": {
    "aibast_direct_agent_fetches": 689,
    "combined_agent_distribution_fetch_events": 689,
-   "distribution_entries": 91,
-   "logical_agents": 91,
+   "distribution_entries": 92,
+   "logical_agents": 92,
    "overlap_agents": 0
   },
   "agents": [
@@ -87908,6 +88756,16 @@
     ],
     "aibast_direct_agent_fetches": 1,
     "combined_distribution_fetch_events": 1
+   },
+   {
+    "logical_name": "@aibast-agents-library/grid-asset-maintenance",
+    "display_name": "Predictive Asset Maintenance Intelligence Agent",
+    "publisher": "@aibast-agents-library",
+    "channels": [
+     "aibast"
+    ],
+    "aibast_direct_agent_fetches": 0,
+    "combined_distribution_fetch_events": 0
    },
    {
     "logical_name": "@aibast-agents-library/tiered-huddle-board",
