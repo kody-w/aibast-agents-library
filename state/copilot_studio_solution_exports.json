@@ -1,6 +1,6 @@
 {
   "schema": "aibast-copilot-studio-solution-exports/1.0",
-  "generated_at": "2026-10-29T01:20:49.270093+00:00",
+  "generated_at": "2026-10-29T22:41:49.072274+00:00",
   "environment": {
     "name": "kodyv8",
     "url": "https://org7dfbd855.crm.dynamics.com/"
@@ -8,11 +8,11 @@
   "managed": false,
   "published": false,
   "summary": {
-    "total": 70,
-    "exported": 70,
+    "total": 71,
+    "exported": 71,
     "missing": 0,
-    "with_deployment_settings": 70,
-    "unpublished": 70
+    "with_deployment_settings": 71,
+    "unpublished": 71
   },
   "solutions": [
     {
@@ -728,6 +728,30 @@
       "bot_schema_name": "aibast_RegulatoryCompliancePilot",
       "source_environment": "kodyv8",
       "exported_at": "2026-10-08T08:04:36.026204+00:00",
+      "import_caveats": [
+        "Import as an unmanaged solution for manual review.",
+        "Map connection references and environment variables before enabling integrations.",
+        "The exported agent remains unpublished unless the target administrator explicitly publishes it."
+      ],
+      "settings_error": null
+    },
+    {
+      "slug": "grid-asset-maintenance",
+      "solution_unique_name": "aibast_PredictiveAssetManualBuild",
+      "status": "exported",
+      "zip": "solutions/grid-asset-maintenance/exports/grid-asset-maintenance-copilot-studio-solution.zip",
+      "deployment_settings": "solutions/grid-asset-maintenance/exports/grid-asset-maintenance-deployment-settings.json",
+      "metadata": "solutions/grid-asset-maintenance/exports/grid-asset-maintenance-solution-export.json",
+      "published": false,
+      "managed": false,
+      "error": null,
+      "sha256": "2cb8d3160f27015e7407b8aff09381e207d95e178d8bed2a367fa04631fe0c8a",
+      "bytes": 50642,
+      "agent_display_name": "Predictive Asset Manual",
+      "agent_id": null,
+      "bot_schema_name": "cr2bf_predictiveassetmanual_4Mnun7",
+      "source_environment": "kodyv8",
+      "exported_at": "2026-10-29T22:41:49.072274+00:00",
       "import_caveats": [
         "Import as an unmanaged solution for manual review.",
         "Map connection references and environment variables before enabling integrations.",

@@ -37,7 +37,7 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parent.parent
 SOLUTION_BUNDLE_RELEASE_TAG = "solution-bundles"
 SCHEMA = "aibast-workshop-course-rollout-audit/1.0"
-EXPECTED_WORKSHOPS = 70
+EXPECTED_WORKSHOPS = 71
 VISUAL_SCHEMA = "aibast-visual-checkpoints/1.0"
 BROWSERFILM_SCHEMA = "rapp-browserfilm/1.0"
 RAW_SUFFIXES = {".md", ".json", ".py"}

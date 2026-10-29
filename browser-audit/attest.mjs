@@ -213,8 +213,8 @@ const repositoryHeadMode = currentHeadIsAuditedCommit
 
 const assertions = {
   audit_schema: auditReport.schema === "aibast-browser-visual-audit/4.8",
-  audit_complete: auditReport.total === 70
-    && auditReport.passed === 70
+  audit_complete: auditReport.total === 71
+    && auditReport.passed === 71
     && auditReport.failed === 0,
   immutable_inputs: auditReport.immutable_snapshot_complete === true
     && auditReport.audited_inputs_unchanged === true
