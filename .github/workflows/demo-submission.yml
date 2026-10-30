@@ -59,6 +59,7 @@ jobs:
           python-version: '3.11'
 
       - name: Check the submission
+        id: check
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
           NUMBER: ${{ github.event.issue.number }}
@@ -70,12 +71,21 @@ jobs:
             --result "$RUNNER_TEMP/result.json" \
             --comment "$RUNNER_TEMP/comment.md"
 
+      # Runs even when the check step crashed, so the submitter always gets a
+      # reply and a label. A crash leaves no comment or result file behind, so
+      # the step writes a short comment of its own and asks for changes; the
+      # job still fails, so a maintainer sees the run.
       - name: Comment and label
+        if: ${{ !cancelled() && steps.check.outcome != 'skipped' }}
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.issue.number }}
         run: |
+          if [ ! -s "$RUNNER_TEMP/comment.md" ] || [ ! -s "$RUNNER_TEMP/result.json" ]; then
+            printf '%s\n' "Thank you. The automatic checks could not finish on this submission. A library maintainer will look at the workflow run. You can also edit the issue to run the checks again." > "$RUNNER_TEMP/comment.md"
+            printf '%s\n' '{"ok": false, "problems": ["The automatic checks could not finish."]}' > "$RUNNER_TEMP/result.json"
+          fi
           gh issue comment "$NUMBER" --body-file "$RUNNER_TEMP/comment.md"
           if python -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))["ok"] else 1)' "$RUNNER_TEMP/result.json"; then
             gh issue edit "$NUMBER" --add-label "demo: ready for review" --remove-label "demo: needs changes"

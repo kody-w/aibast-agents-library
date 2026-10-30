@@ -154,7 +154,7 @@ OTHER_AI_PRODUCT_TERMS = (
     # "perplexity" alone is an everyday word.
     "perplexity ai",
     "deep seek",
-    "midjourney",
+    "mid journey",
     "qwen",
     # Other vendors' agent and AI platforms.
     "agent force",
@@ -167,7 +167,7 @@ OTHER_AI_PRODUCT_TERMS = (
     "amazon q",
     "sage maker",
     "vertex ai",
-    "agentspace",
+    "agent space",
     "dialog flow",
     "duet ai",
     "watson x",
@@ -177,7 +177,7 @@ OTHER_AI_PRODUCT_TERMS = (
 # everyday words. Written with a space between the parts, they match only when
 # every part starts with a capital ("Open AI", "Dialog Flow"), so prose such as
 # "the dialog flow of the agent" passes. Joined forms ("openai", "open-ai",
-# "open_ai", "DialogFlow.pdf") still match in any case (rule 8).
+# "open_ai", "DialogFlow.pdf") still match in any case (GAP_NEEDS_CAPITALS).
 SPACED_NAMES_NEED_CAPITALS = frozenset({
     "open ai",
     "deep seek",
@@ -185,6 +185,8 @@ SPACED_NAMES_NEED_CAPITALS = frozenset({
     "sage maker",
     "dialog flow",
     "watson x",
+    "agent space",
+    "mid journey",
 })
 OTHER_AI_PRODUCTS_PROBLEM = "Remove the names of AI products from other companies."
 
@@ -325,33 +327,45 @@ def is_sign_in_only_host(host: str) -> bool:
 # One set of rules for every field, so a fix for one case cannot quietly
 # break another. tests/test_community_term_corpus.py holds every case.
 #
-# The text is read as a list of words (runs of letters and digits). Each word
-# is either joined to the one before it or starts after a break. A listed
-# name is found when its letters are spelled by consecutive joined words.
+# The text is read as a list of words (runs of letters and digits). The gap
+# before each word is sorted once into one of four kinds:
 #
-# 1. Fold the text (NFKC, drop invisible characters, casefold).
-# 2. Two words are joined by nothing but spaces or underscores, or by one
-#    joining mark that sits between two word characters ("RAPP/Factory",
-#    "Vertex.AI", "Salesforce·Einstein", "Amazon-Q"). A possessive joins too
-#    ("Google's Bard").
-# 3. Anything else is a break: a mark followed or preceded by a space
-#    ("Amazon. Q4", "Amazon, Q3"), an opening bracket or a quote
-#    ("perplexity (AI"), and a dash used as punctuation ("perplexity—AI").
-# 4. A name may be spelled in one word or in several, but every place where
+#   tight - nothing, underscores, or one joining mark that sits between two
+#           word characters ("RAPP/Factory", "Vertex.AI", "Amazon-Q",
+#           "Salesforce·Einstein"). A possessive is tight too ("Google's Bard").
+#   space - whitespace only ("Open AI").
+#   dash  - one en or em dash with no space around it ("Vertex—AI").
+#   break - anything else: a mark with a space before or after it ("Amazon.
+#           Q4", "Amazon, Q3", "Amazon - Q4"), an opening bracket or a quote
+#           ("perplexity (AI"), or more than one mark.
+#
+# A listed name is found when consecutive words, joined by gaps that are not
+# breaks, spell it. GAP_NEEDS_CAPITALS says when a gap joins only words that
+# all start with a capital:
+#
+#   tight - never; a tight join always reads as one name ("open-ai").
+#   space - only for names in SPACED_NAMES_NEED_CAPITALS, whose parts are
+#           everyday words: "Open AI" flags, "an open AI standard" passes.
+#   dash  - for every name, because a bare dash is also sentence punctuation:
+#           "Vertex—AI" and "Open–AI" flag, "perplexity—AI helps" passes.
+#
+# Further rules:
+#
+# 1. The text is folded first (NFKC, invisible characters dropped, casefold).
+# 2. A name may be spelled in one word or in several, but every place where
 #    the text's words divide must be a place where the name's words divide:
 #    "vertexai", "Vertex AI" and "open-ai" are names; "Ope nAI" is not.
 #    Each name is listed once, with spaces between its words ("open ai").
-# 5. A name starts at the start of a word and ends at the end of one. A
+# 3. A name starts at the start of a word and ends at the end of one. A
 #    version number may follow it (GPT4, Claude3, GPT-4o), unless its last
 #    word is one letter, so "Amazon Q4" stays a sales quarter.
-# 6. Each word is read whole and also split at capitals and digits
-#    ("AzureOpenAI" -> "Azure Open AI"). One-pager links do not split opaque
-#    ids, which have a digit followed by a letter ("AbNDA9xQ").
-# 7. A lower-case word built only from listed names ("azureopenai") counts as
-#    those names.
-# 8. A name in SPACED_NAMES_NEED_CAPITALS that the text spells across words
-#    divided only by whitespace matches only when every one of those words
-#    starts with a capital ("Open AI", not "an open AI standard").
+# 4. Each word is read whole and also split at capitals and digits
+#    ("AzureOpenAI" -> "Azure Open AI"); the pieces of one word are tight.
+#    One-pager links do not split opaque ids, which have a digit followed by
+#    a letter ("AbNDA9xQ").
+# 5. A lower-case word built only from listed names ("azureopenai") counts as
+#    those names. The word is decomposed with a loop, never recursion, so a
+#    word of any length is checked.
 
 # Spaces out joined words: "AzureOpenAI" -> "Azure Open AI", "GPT4o" -> "GPT 4o".
 _JOIN_RE = re.compile(
@@ -359,22 +373,39 @@ _JOIN_RE = re.compile(
 )
 _WORD_RE = re.compile(r"[^\W_]+")
 _POSSESSIVE_RE = re.compile(r"(?<=[^\W_])['’]s(?![^\W_])")
-# Marks that join two words when they sit between two word characters
-# (rule 2). The en and em dashes are not here: they are punctuation.
+# Marks that join two words when they sit between two word characters.
 _JOINING_MARKS = frozenset("-‐‑/\\.·∙•+:~|")
+# Dashes that are also sentence punctuation: they join only capitalised words.
+_DASHES = frozenset("–—")
 # A run of letters and digits with a digit followed by a letter is an opaque
 # id ("AbNDA9xQ", "1aGPT3kz"), so a link never splits it at capitals.
 _OPAQUE_RE = re.compile(r"[0-9][A-Za-z]")
 
-# A stream is a list of (word, joined to the word before, divided from the
-# word before by whitespace only, starts with a capital).
-_Stream = list[tuple[str, bool, bool, bool]]
+TIGHT, SPACE, DASH, BREAK = "tight", "space", "dash", "break"
+# For each gap that joins words: the names it joins only when every word of
+# the name starts with a capital. "all" means every name.
+GAP_NEEDS_CAPITALS = {TIGHT: frozenset(), SPACE: SPACED_NAMES_NEED_CAPITALS, DASH: "all"}
+
+# A stream is a list of (word, gap before it, starts with a capital).
+_Stream = list[tuple[str, str, bool]]
 
 
-def _is_join(separator: str) -> bool:
+def _gap(separator: str) -> str:
+    """The kind of gap a separator between two words makes."""
     if not separator.strip(" \t\n\r\f\v_"):
-        return True
-    return len(separator) == 1 and separator in _JOINING_MARKS
+        if separator and separator.isspace():
+            return SPACE
+        return TIGHT
+    if len(separator) == 1 and separator in _JOINING_MARKS:
+        return TIGHT
+    if len(separator) == 1 and separator in _DASHES:
+        return DASH
+    return BREAK
+
+
+def _needs_capitals(gap: str, term: str) -> bool:
+    rule = GAP_NEEDS_CAPITALS[gap]
+    return rule == "all" or term in rule
 
 
 def _streams(text: str, keep_ids: bool) -> tuple[_Stream, _Stream]:
@@ -384,70 +415,90 @@ def _streams(text: str, keep_ids: bool) -> tuple[_Stream, _Stream]:
     split: _Stream = []
     end = None
     for match in _WORD_RE.finditer(plain):
-        separator = plain[end:match.start()] if end is not None else ""
-        joined = end is not None and _is_join(separator)
-        spaced = joined and separator.isspace()
+        gap = BREAK if end is None else _gap(plain[end:match.start()])
         end = match.end()
         word = match.group(0)
-        whole.append((word.casefold(), joined, spaced, word[0].isupper()))
+        whole.append((word.casefold(), gap, word[0].isupper()))
         pieces = [word] if keep_ids and _OPAQUE_RE.search(word) else _JOIN_RE.sub(" ", word).split()
         split.extend(
-            (p.casefold(), joined if k == 0 else True, spaced if k == 0 else False, p[0].isupper())
-            for k, p in enumerate(pieces)
+            (piece.casefold(), gap if k == 0 else TIGHT, piece[0].isupper())
+            for k, piece in enumerate(pieces)
         )
     return whole, split
 
 
 def _spelled_at(stream: _Stream, start: int, term: str) -> bool:
-    """True when the words from stream[start] on spell the term (rules 4, 5, 8)."""
+    """True when the words from stream[start] on spell the term (rules 2, 3
+    and GAP_NEEDS_CAPITALS)."""
     words = term.split()
     key = "".join(words)
     divisions = set(itertools.accumulate(len(w) for w in words[:-1]))
     one_letter = len(words[-1]) == 1
-    needs_capitals = term in SPACED_NAMES_NEED_CAPITALS
-    spaced_any = False
+    capitals_needed = False
     capitals_all = True
     pos = 0
     for i in range(start, len(stream)):
-        word, joined, spaced, capital = stream[i]
-        if i > start and not joined:
-            return False
-        if i > start and spaced:
-            spaced_any = True
+        word, gap, capital = stream[i]
+        if i > start:
+            if gap == BREAK:
+                return False
+            capitals_needed = capitals_needed or _needs_capitals(gap, term)
         capitals_all = capitals_all and capital
-        rule8_ok = not (needs_capitals and spaced_any and not capitals_all)
         rest = key[pos:]
         if word == rest:
             following = stream[i + 1] if i + 1 < len(stream) else None
-            digit_next = bool(following and following[1] and following[0][0].isdigit())
-            return not (one_letter and digit_next) and rule8_ok
-        if word.startswith(rest):
-            return word[len(rest)].isdigit() and not one_letter and rule8_ok
-        if rest.startswith(word) and pos + len(word) in divisions:
+            digit_next = bool(following and following[1] != BREAK and following[0][0].isdigit())
+            ok = not (one_letter and digit_next)
+        elif word.startswith(rest):
+            ok = word[len(rest)].isdigit() and not one_letter
+        elif rest.startswith(word) and pos + len(word) in divisions:
             pos += len(word)
             continue
-        return False
+        else:
+            return False
+        return ok and (capitals_all or not capitals_needed)
     return False
 
 
 def _compound_terms(word: str, terms: list[str]) -> set[str]:
     """Terms that make up a lower-case word built only from terms, such as
-    "azureopenai". A version tail ("chatgpt4o") may follow (rule 7)."""
-    keys = {"".join(t.split()): t for t in terms}
+    "azureopenai". A version tail ("chatgpt4o") may follow (rule 5).
 
-    def walk(i: int, last: str | None) -> set[str] | None:
-        if i == len(word):
-            return set()
-        if last is not None and word[i].isdigit():
-            return None if len(last.split()[-1]) == 1 else set()
-        for key in sorted(keys, key=len, reverse=True):
-            if word.startswith(key, i):
-                rest = walk(i + len(key), keys[key])
-                if rest is not None:
-                    return rest | {keys[key]}
-        return None
-
-    return walk(0, None) or set()
+    Dynamic programming from the end of the word, so a word of any length
+    is checked without recursion. Among the ways to read the word, the one
+    that takes the longest term first at each step is reported.
+    """
+    keys = sorted({"".join(t.split()): t for t in terms}.items(),
+                  key=lambda kv: len(kv[0]), reverse=True)
+    n = len(word)
+    # done[i][state]: word[i:] can be read, where state says what came before:
+    # 0 nothing yet, 1 a term whose last word is longer than one letter,
+    # 2 a term whose last word is one letter (so no version tail may follow).
+    done = [[False] * 3 for _ in range(n + 1)]
+    done[n] = [True, True, True]
+    choice: list[list[tuple[str, str] | None]] = [[None] * 3 for _ in range(n + 1)]
+    for i in range(n - 1, -1, -1):
+        for state in range(3):
+            if state and word[i].isdigit():
+                done[i][state] = state == 1
+                continue
+            for key, term in keys:
+                if word.startswith(key, i):
+                    after = 2 if len(term.split()[-1]) == 1 else 1
+                    if done[i + len(key)][after]:
+                        done[i][state] = True
+                        choice[i][state] = (key, term)
+                        break
+    if not n or not done[0][0]:
+        return set()
+    found: set[str] = set()
+    i, state = 0, 0
+    while i < n and choice[i][state] is not None:
+        key, term = choice[i][state]
+        found.add(term)
+        i += len(key)
+        state = 2 if len(term.split()[-1]) == 1 else 1
+    return found
 
 
 def forbidden_terms_in(
