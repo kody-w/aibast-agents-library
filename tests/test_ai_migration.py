@@ -516,6 +516,58 @@ def test_redaction_leaves_ordinary_words_alone():
         assert "[REDACTED]" in MODULE.redact_text(secret), secret
 
 
+
+# Joined and camel-case setting names still hide their values, even letters-only
+# ones. Every value here is a fake placeholder; a failure names the setting only.
+JOINED_SECRET_SETTINGS = [
+    "DBPASSWORD=placeholderpass", "APIKEY=Fakefakefake", "OPENAI_APIKEY: placeholderkey",
+    "accesstoken: fakeaccessvalue", "MYAPP_AUTH=fakeauthvalue", "auth: fakeauthvalue",
+    "dbPassword: placeholderpass", "accessToken=fakeaccessvalue", "apiKey: fakeplaceholder",
+    "clientSecret=fakesecretvalue", "SMTP_PASSWD=fakepassword", "db_pwd: fakepassword",
+    "AWS_ACCESSKEY=fakeaccessvalue", "privatekey: fakeprivatevalue", "github_token=placeholdervalue",
+    "ConnectionString=fakeconnectionvalue", "connection_string: fakeconnectionvalue",
+    "authToken = 'fakeauthvalue'", "SIGNINGKEY=fakesigningvalue",
+]
+
+
+def test_redaction_hides_joined_and_camel_case_setting_names():
+    for setting in JOINED_SECRET_SETTINGS:
+        value = setting.replace("'", "").split("=" if "=" in setting else ":", 1)[1].strip()
+        redacted = MODULE.redact_text(setting)
+        assert value not in redacted and "[REDACTED]" in redacted, setting.split("=")[0].split(":")[0]
+
+
+def test_redaction_keeps_ordinary_words_and_names():
+    text = ("Author: Jane Smith\nPrimary key: customer_id\nprimaryKey: customer_id\n"
+            "Authorization flow: read the docs\nkeyboard: qwerty\nauthoring: drafts first")
+    assert MODULE.redact_text(text) == text
+    check = MODULE._is_secret_name
+    for innocent in ("auth-helper", "token-budget.md", "session-notes", "design-tokens", "authoring"):
+        assert not check(innocent), innocent
+
+
+def test_apply_does_not_copy_joined_setting_values(tmp_path, monkeypatch):
+    home = tmp_path / "home"
+    skill = home / ".claude" / "skills" / "db-setup"
+    skill.mkdir(parents=True)
+    (skill / "SKILL.md").write_text(
+        "Connect with DBPASSWORD=placeholderpass and OPENAI_APIKEY: placeholderkey\naccesstoken: fakeaccessvalue\n",
+        encoding="utf-8")
+    imports = tmp_path / "imports"
+    agents = tmp_path / "agents"
+    agents.mkdir()
+    monkeypatch.setenv("AI_MIGRATION_IMPORTS_DIR", str(imports))
+    monkeypatch.setenv("AGENTS_PATH", str(agents))
+    MODULE.AIMigrationAgent().perform(action="apply", home_path=str(home), project_path=str(tmp_path / "none"),
+                                      export_path=str(tmp_path / "none"), dry_run=False)
+    written = [f for f in imports.rglob("*") if f.is_file()]
+    assert written
+    for f in written:
+        body = f.read_text(encoding="utf-8", errors="ignore")
+        for fake in ("placeholderpass", "placeholderkey", "fakeaccessvalue"):
+            assert fake not in body, f.name
+
+
 # ── Generated agents compile for every name and on every OS ──
 TRICKY_NAMES = ["update-docs", "xlsx", "Notes", "1st-pass", "42", "név-ünnep", "日本語", "a b\tc", 'say "hi"',
                 "back\\slash", "N", "u1234", "class", "def", "__init__", "-", "x" * 200, "..", "Ünïcode Ñame"]
