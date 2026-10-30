@@ -252,7 +252,8 @@ def _words(text):
 
     Numbers are not words: a number only tells assets apart through _qualifiers (a voltage, or a panel, feeder,
     joint, RMU or transformer number), so '1.2 km' in a cable's name never meets a '1' or '2' in the request, and
-    'one' is a pronoun ('the Millbrook one'), not a number, unless it follows a designator.
+    'one' is a pronoun ('the Millbrook one'), not a number, unless it follows a designator. A unit ('kV', 'MVA',
+    'km') is not a word either: it is read with its number, so '15000 kVA' and '15 MVA' say the same thing.
     """
     words = set()
     for word in re.findall(r"[a-z0-9]+(?:[-.][a-z0-9]+)*", str(text).lower()):
@@ -260,7 +261,7 @@ def _words(text):
             continue
         if len(word) > 3 and word.endswith("s") and not word.endswith("ss"):
             word = word[:-1]
-        if word not in _STOPWORDS:
+        if word not in _STOPWORDS and word not in _UNIT_SCALE:
             words.add(word)
     return words
 
@@ -320,26 +321,32 @@ def _digits(text):
         lambda m: m.group(0)[:m.start(3) - m.start(0)] + _spelled(m.group(3)), text)
 
 
-# A measure is a number with its unit: a voltage ('11 kV', '33/11 kV'), a rating ('20 MVA', '500 kVA') or a length
-# ('1.2 km'). Every unit works the same way: a measure the request states rules out a record that states a
-# different one of the same unit, so '15 MVA transformer' never drafts the 20 MVA unit and '11 kV line' never picks
-# the 33 kV line.
-_UNIT_WORDS = ("kv", "kva", "mva", "km")
+# A measure is a number with its unit: a voltage ('11 kV', '33/11 kV', '11000 V'), a rating ('20 MVA', '500 kVA')
+# or a length ('1.2 km', '1200 m'). A measure is read into its dimension and one base unit before anything is
+# compared, so '15000 kVA' is the 15 MVA rating and '1200 m' is the 1.2 km length. Every dimension works the same
+# way: a measure the request states rules out a record that states a different one in the same dimension, so
+# '15 MVA transformer' (or '15000 kVA transformer') never drafts the 20 MVA unit and '11 kV line' never picks the
+# 33 kV line.
+_UNIT_SCALE = {"v": ("voltage", 1), "kv": ("voltage", 1000), "kva": ("rating", 1), "mva": ("rating", 1000),
+               "m": ("length", 1), "km": ("length", 1000)}
+_DIMENSIONS = {dimension for dimension, _ in _UNIT_SCALE.values()}
+_UNIT_WORDS = tuple(sorted(_UNIT_SCALE, key=len, reverse=True))
 _MEASURE = re.compile(r"\b(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?\s*(" + "|".join(_UNIT_WORDS) + r")\b")
 # 'transformer 1' and 'transformer number 1' are transformer T1. A number followed by a unit, a slash or a decimal
 # point is a measure, not a designator: 'transformer 33/11 kV', 'transformer 33 kV' and 'transformer 20 MVA' name
 # a voltage or a rating, never transformer number 33 or 20.
 _DESIGNATOR = re.compile(r"\b" + _KINDS + _NUMBER_WORD + r"[\s-]?(\d+)\b"
-                         r"(?!\s*(?:[/.]\d|kv\b|kva\b|mva\b|km\b|mm\b|m\b|%))")
+                         r"(?!\s*(?:[/.]\d|v\b|kv\b|kva\b|mva\b|km\b|mm\b|m\b|%))")
 
 
 def _qualifiers(text):
-    """Numbers that tell assets apart: {'kv': {'11', '33'}, 'mva': {'20'}, 'km': {'1.2'}, 'panel': {'4'}, 't': {'2'},
-    ...}."""
+    """Numbers that tell assets apart, measures in their base unit: {'voltage': {'11000.0', '33000.0'}, 'rating':
+    {'20000.0'} (kVA), 'length': {'1200.0'} (m), 'panel': {'4'}, 't': {'2'}, ...}."""
     found = {}
     text = _digits(text)
     for first, second, unit in _MEASURE.findall(text):
-        found.setdefault(unit, set()).update(str(float(v)) for v in (first, second) if v)
+        dimension, scale = _UNIT_SCALE[unit]
+        found.setdefault(dimension, set()).update(repr(round(float(v) * scale, 6)) for v in (first, second) if v)
     for kind, number in _DESIGNATOR.findall(text):
         found.setdefault("t" if kind == "transformer" else kind, set()).add(str(int(number)))
     return found
@@ -382,11 +389,15 @@ def _resolve(value, default, items, key):
     # line' never picks the 33 kV line and '15 MVA transformer' never picks the 20 MVA one.
     wanted = _qualifiers(q)
     ruled_out = [item for item in items if _conflicts(wanted, _record_qualifiers(item, key))]
+    # The kinds of number that ruled a record out ('length' for '2 km cable' against the 1.2 km section).
+    ruling = {kind for item in ruled_out for kind, numbers in _record_qualifiers(item, key).items()
+              if kind in wanted and not (wanted[kind] & numbers)}
     items = [item for item in items if item not in ruled_out]
     vocab = [(item, *_record_words(item, key)) for item in items]
     # A designator the request names ('RMU 22', 'RMU22', 'panel 4') counts as a naming word for every record that
-    # carries it, however the record spells it (SG-1140's keyword is 'rmu-22').
-    designators = {(kind, n) for kind, numbers in wanted.items() if kind not in _UNIT_WORDS for n in numbers}
+    # carries it, however the record spells it (SG-1140's keyword is 'rmu-22'). A measure counts the same way, as a
+    # describing word, in whatever unit it was written ('1.2 km' and '1200 m' both describe the feeder 7 section).
+    designators = {(kind, n) for kind, numbers in wanted.items() for n in numbers}
     carried = {id(item): {(kind, n) for kind, numbers in _record_qualifiers(item, key).items() for n in numbers}
                for item in items}
     scores = []
@@ -396,7 +407,8 @@ def _resolve(value, default, items, key):
             shared = sum(1 for _, p, s in vocab if word in p or word in s)
             score += (1.0 if word in primary else 0.5) / shared
         for designator in designators & carried[id(item)]:
-            score += 1.0 / sum(1 for other in items if designator in carried[id(other)])
+            weight = 0.5 if designator[0] in _DIMENSIONS else 1.0
+            score += weight / sum(1 for other in items if designator in carried[id(other)])
         if score:
             scores.append((score, item))
     if not scores:
@@ -411,6 +423,13 @@ def _resolve(value, default, items, key):
         named_elsewhere = set().union(*(_record_words(item, key)[0] for item in ruled_out))
         if (asked & named_elsewhere) - winner:
             return None
+        # The stated measure or number ruled out the only records that carry one of its kind, and the winner does
+        # not carry it either: it matches only on words it shares with a ruled-out record (the class word 'cable'
+        # in 'the 2 km cable'), so the request describes an asset that is not monitored.
+        if ruling - set(_record_qualifiers(tied[0], key)):
+            described_elsewhere = set().union(*(set().union(*_record_words(item, key)) for item in ruled_out))
+            if not (asked & winner) - described_elsewhere:
+                return None
     return tied[0] if len(tied) == 1 else tied
 
 

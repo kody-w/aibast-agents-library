@@ -112,22 +112,28 @@ RFQS = [
      # subject and must not turn a question the pack answers into a new clarification.
      #
      # A pair is a weak reading: its words are everyday English. A pack topic's "anchors" are the words that make a
-     # question about how a bid is assessed (its score, weights, marks, certificates, quality). When the question
-     # names an anchor, the everyday reading wins over a pair: 'a risk of a lower score', 'how much weight do you
-     # pay', 'the panel access our certificate through the portal', 'marks lost until the certificate arrives'.
-     # A subject's own keyword is a strong reading and always wins ('Is the warranty scored?' is about warranty).
+     # clause about how a bid is assessed (its score, weights, marks, certificates, quality). When a clause names an
+     # anchor, the everyday reading wins over a pair in that clause: 'a risk of a lower score', 'how much weight do
+     # you pay', 'the panel access our certificate through the portal', 'marks lost until the certificate
+     # arrives'. An anchor frames only its own clause: 'Who bears the risk during delivery? Also, what are the
+     # evaluation criteria?' still asks about risk. A clause that opens by asking the subject (a pair's "asks"
+     # opener: 'where can I download', 'how do I access', 'who bears the risk') asks it directly, and an anchor later
+     # in the clause does not overrule it. A subject's own keyword is a strong reading and always wins ('Is the
+     # warranty scored?' is about warranty).
     "not_covered": [
         {"subject": "payment terms",
          "keywords": ["payment", "invoice", "invoicing", "retention", "deposit", "upfront", "pay us", "paid us",
                       "pay the supplier", "be paid", "get paid"],
          "pairs": [[["pay", "paid"],
                     ["us", "supplier", "suppliers", "when", "soon", "after", "within", "before", "advance",
-                     "upfront", "on delivery", "on receipt", "day", "week", "month", "net", "terms"]]]},
+                     "upfront", "on delivery", "on receipt", "day", "week", "month", "net", "terms"]]],
+         "asks": ["when", "how soon"]},
         {"subject": "access to the tender documents",
          "keywords": ["portal access", "portal login", "log in", "login", "password", "download link"],
          "pairs": [[["download", "access"],
                     ["where", "how do i", "how can i", "cannot", "can't", "unable", "link", "portal",
-                     "tender documents", "rfq documents", "tender pack", "rfq pack"]]]},
+                     "tender documents", "rfq documents", "tender pack", "rfq pack"]]],
+         "asks": ["where", "how do i", "how can i", "i cannot", "i can't", "we cannot", "we can't"]},
         {"subject": "risk, insurance and liability",
          "keywords": ["insurance", "insured", "insure", "liability", "liable", "incoterm", "in transit",
                       "transit risk", "title transfer", "transfer of title", "passing of title"],
@@ -135,7 +141,8 @@ RFQS = [
                     ["bear", "bore", "borne", "carry", "hold", "pass", "transfer", "responsible",
                      "who pays", "who covers", "covered", "until", "during delivery", "on delivery",
                      "after delivery", "before delivery", "transit", "ship", "shipped", "shipping", "shipment",
-                     "arrive", "arrival", "unloading"]]]},
+                     "arrive", "arrival", "unloading"]]],
+         "asks": ["who"]},
          {"subject": "splitting the award between suppliers", "keywords": [
              "two suppliers", "multiple suppliers", "several suppliers", "more than one supplier",
              "between suppliers", "split award", "dual award", "joint bid", "consortium", "subcontract"]},
@@ -289,20 +296,37 @@ def _keyword_hit(keyword, text):
     return re.search(_keyword_pattern(keyword), text) is not None
 
 
-def _raises(subject, text, anchored=False):
-    """True when the question raises an off-pack subject: one of its own keywords anywhere, or a subject word and a
-    framing word of one of its pairs in the same sentence ('who bears risk during delivery', 'risk passes on
-    delivery', 'where can I download'), never a common word on its own ('the risk of half marks').
+# Where one clause of a question ends and the next begins: a sentence end, a semicolon, or a comma or 'also' that
+# joins a second question ('How is quality evaluated, and who bears the risk?').
+_CLAUSE_BREAK = re.compile(r"[.?!;]+|,\s*(?:and|but|or|also|plus)\b|\balso\b|,\s*(?=(?:who|where|when|how|what|which)\b)")
 
-    anchored: the question names a pack anchor (it is about how a bid is assessed), so a pair, the weak everyday
-    reading, does not raise the subject; only the subject's own keywords do."""
+
+def _clauses(text):
+    return [c.strip(" ,") for c in _CLAUSE_BREAK.split(text) if c.strip(" ,")]
+
+
+def _opens_with(clause, openers):
+    return any(re.match(_keyword_pattern(k), clause) for k in openers)
+
+
+def _raises(subject, text, anchors=()):
+    """True when the question raises an off-pack subject.
+
+    Strong reading: one of the subject's own keywords anywhere in the question.
+    Weak reading: a subject word and a framing word of one of its pairs in the same clause ('who bears risk during
+    delivery', 'risk passes on delivery', 'where can I download'), never a common word on its own ('the risk of
+    half marks'). A pack anchor in that same clause (it is about how a bid is assessed) cancels the weak reading
+    for that clause only, unless the clause opens by asking the subject ('where can I download ... the evaluation
+    criteria'). An anchor in another clause or sentence never cancels it.
+    """
     if any(_keyword_hit(k, text) for k in subject.get("keywords", [])):
         return True
-    if anchored:
-        return False
-    for sentence in re.split(r"[.?!;]+", text):
+    for clause in _clauses(text):
+        anchored = any(_keyword_hit(k, clause) for k in anchors)
+        if anchored and not _opens_with(clause, subject.get("asks", [])):
+            continue
         for topic, frame in subject.get("pairs", []):
-            if any(_keyword_hit(k, sentence) for k in topic) and any(_keyword_hit(k, sentence) for k in frame):
+            if any(_keyword_hit(k, clause) for k in topic) and any(_keyword_hit(k, clause) for k in frame):
                 return True
     return False
 
@@ -490,8 +514,8 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         # One incidental pack word does not answer a question about a subject the pack is silent on: the whole
         # question goes to every bidder as a new clarification; related pack text is shown only as context (the
         # published clarifications are listed below in any case).
-        anchored = any(_keyword_hit(k, q) for p in rfq["pack"] for k in p.get("anchors", []))
-        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", []) if _raises(u, q, anchored)]
+        anchors = [k for p in rfq["pack"] for k in p.get("anchors", [])]
+        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", []) if _raises(u, q, anchors)]
         lines = [f"# Supplier Question - {rfq['id']}", "",
                  f"**RFQ:** {rfq['id']} ({rfq['route']}), closes {_date(rfq['closes_in_days'])} "
                  f"(in {rfq['closes_in_days']} days)",
