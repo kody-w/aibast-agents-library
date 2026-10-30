@@ -305,7 +305,7 @@ html[data-theme="dark"] {
     <h2 id="related-heading">Related resources</h2>
     <p>Official Microsoft references and independent community projects. Credit stays with each owner.</p>
     <div class="community-grid" id="community-grid"><p>Loading related resources...</p></div>
-    <p class="small-print" id="community-note"></p>
+    <p class="small-print" id="community-note">This is a curated, non-exhaustive list. Descriptions are paraphrased from each owner's listing. Inclusion is not an endorsement, partnership or verified benchmark.</p>
   </section>
 </main>
 <div class="footer">
@@ -400,13 +400,16 @@ function demoCard(demo) {
       </article>`;
 }
 
+// The manifest's own "note" documents the file for maintainers; visitors see this.
+const PUBLIC_NOTE = "This is a curated, non-exhaustive list. Descriptions are paraphrased from each owner's listing. Inclusion is not an endorsement, partnership or verified benchmark.";
+
 async function renderCommunityTools() {
   $("submit-demo").href = SUBMIT_URL;
+  $("community-note").textContent = PUBLIC_NOTE;
   try {
     const doc = await getCommunityTools();
     const demos = doc.tools.filter(entry => kindOf(entry) === "demo");
     const tools = doc.tools.filter(entry => kindOf(entry) === "tool");
-    $("community-note").textContent = doc.note;
     $("demo-grid").innerHTML = demos.length
       ? demos.map(demoCard).join("")
       : '<p class="empty">No demos yet. Be the first to submit one.</p>';

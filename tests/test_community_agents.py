@@ -29,8 +29,9 @@ SAMPLE_DEMO = {
     "industry": "Healthcare",
     "products": ["Copilot Studio"],
     "submission_issue": 1,
-    "thumbnail": "https://i.ytimg.com/vi/abc123/hqdefault.jpg",
+    "thumbnail": "https://i.ytimg.com/vi/abc123/mqdefault.jpg",
 }
+DEMO_LABELS = ("demo: submitted", "demo: ready for review", "demo: needs changes", "demo: approved")
 
 
 def filled_body(**overrides):
@@ -121,7 +122,7 @@ def test_unticked_confirmation_is_rejected():
 
 @pytest.mark.parametrize("url, message", [
     ("http://www.youtube.com/watch?v=x", "https"),
-    ("https://example.com/video", "YouTube or Microsoft Stream"),
+    ("https://example.com/video", "public YouTube link"),
     ("https://user:pw@youtube.com/watch?v=x", "plain public"),
     ("not a url", "https"),
 ])
@@ -132,7 +133,19 @@ def test_bad_video_links_are_rejected(url, message):
 
 def test_allowed_video_hosts():
     assert ds.classify_video_url("https://youtu.be/9A8k0z77NFo") == "youtube"
-    assert ds.classify_video_url("https://web.microsoftstream.com/video/abc") == "stream"
+
+
+@pytest.mark.parametrize("url", [
+    "https://contoso.sharepoint.com/:v:/s/team/EabcXYZ",
+    "https://web.microsoftstream.com/video/abc",
+])
+def test_stream_links_get_a_clear_youtube_only_answer(url):
+    """Stream videos need a sign-in, so the form and checker accept YouTube only."""
+    with pytest.raises(ds.SubmissionError, match="need a sign-in"):
+        ds.classify_video_url(url)
+    form = FORM.read_text(encoding="utf-8")
+    assert "public Microsoft Stream link" not in form
+    assert "Microsoft Stream videos need a sign-in" in form
 
 
 @pytest.mark.parametrize("field, text", [
@@ -161,7 +174,8 @@ def test_youtube_resolution_uses_oembed_and_keeps_https_thumbnail():
 
     facts = ds.resolve_video("https://www.youtube.com/watch?v=x", "youtube", fetch=fetch)
     assert seen[0].startswith("https://www.youtube.com/oembed?")
-    assert facts["thumbnail"] == "https://i.ytimg.com/vi/x/hqdefault.jpg"
+    # hqdefault is 4:3 with black bars baked in; mqdefault is 16:9 without them.
+    assert facts["thumbnail"] == "https://i.ytimg.com/vi/x/mqdefault.jpg"
 
     def missing(url):
         raise ValueError("404")
@@ -183,6 +197,76 @@ def test_apply_adds_then_replaces_the_demo_and_keeps_tools():
     assert manifest["count"] == len(manifest["tools"])
     assert manifest["snapshot_date"] == "2026-10-29"
     assert len([t for t in manifest["tools"] if t.get("kind", "tool") == "tool"]) == tool_count
+
+
+def test_saved_demo_thumbnails_have_no_letterbox_bars():
+    for demo in DEMOS:
+        if "i.ytimg.com" in demo.get("thumbnail", ""):
+            assert not demo["thumbnail"].endswith("/hqdefault.jpg"), demo["id"]
+
+
+def _two_team_manifest():
+    manifest = json.loads(json.dumps(MANIFEST))
+    original = {**SAMPLE_DEMO, "submission_issue": 335, "graduated_to": "tiered-huddle-board"}
+    manifest["tools"].append(original)
+    manifest["count"] = len(manifest["tools"])
+    return manifest, original
+
+
+def test_a_new_submission_cannot_replace_another_teams_demo():
+    manifest, original = _two_team_manifest()
+    takeover = {**SAMPLE_DEMO, "author": "Another Team", "url": "https://youtu.be/zzz"}
+    takeover.pop("submission_issue")
+    with pytest.raises(ds.SubmissionError, match="already used by another demo"):
+        ds.apply_entry(manifest, takeover, 999, "2026-10-30")
+    demos = [t for t in manifest["tools"] if t.get("id") == SAMPLE_DEMO["id"]]
+    assert demos == [original]
+
+
+def test_the_same_issue_can_update_its_demo_and_keeps_its_graduation():
+    manifest, _ = _two_team_manifest()
+    update = {**SAMPLE_DEMO, "description": "New words. Still two sentences."}
+    ds.apply_entry(manifest, update, 335, "2026-10-30")
+    demos = [t for t in manifest["tools"] if t.get("id") == SAMPLE_DEMO["id"]]
+    assert len(demos) == 1
+    assert demos[0]["description"] == "New words. Still two sentences."
+    assert demos[0]["graduated_to"] == "tiered-huddle-board"
+
+
+def test_the_check_reports_a_title_another_demo_already_uses(tmp_path):
+    manifest, _ = _two_team_manifest()
+    body = filled_body(title=SAMPLE_DEMO["name"])
+    _, problems = ds.run_check(body, offline=True, manifest=manifest, issue=999)
+    assert any("already used by another demo" in p for p in problems), problems
+    _, problems = ds.run_check(body, offline=True, manifest=manifest, issue=335)
+    assert problems == []
+
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    (tmp_path / "body.md").write_text(body, encoding="utf-8")
+    result, comment = tmp_path / "r.json", tmp_path / "c.md"
+    subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "demo_submission.py"), "check", "--offline",
+         "--issue", "999", "--manifest", str(path), "--body-file", str(tmp_path / "body.md"),
+         "--result", str(result), "--comment", str(comment)],
+        check=True, capture_output=True,
+    )
+    assert json.loads(result.read_text())["ok"] is False
+    assert "already used by another demo" in comment.read_text()
+
+
+def test_the_check_reports_a_title_used_by_a_related_resource():
+    manifest = json.loads(json.dumps(MANIFEST))
+    resource = next(t for t in manifest["tools"] if t.get("kind", "tool") == "tool")
+    _, problems = ds.run_check(
+        filled_body(title=resource["name"]), offline=True, manifest=manifest, issue=5
+    )
+    assert any("related resource" in p for p in problems), problems
+
+
+def test_a_title_with_no_letters_or_numbers_fails_at_check_time():
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(title="\u65e5\u672c\u8a9e\u30c7\u30e2")))
+    assert any("English letter or number" in p for p in problems), problems
 
 
 def test_apply_never_overwrites_a_related_resource():
@@ -226,6 +310,24 @@ def test_workflow_is_least_privilege_pinned_and_injection_safe():
     assert "Closes #" in text
 
 
+def test_workflow_creates_its_own_labels_first():
+    """GitHub drops form labels a repository does not have, so the workflow
+    must create every label it uses, and promotion must name them."""
+    yaml = pytest.importorskip("yaml")
+    text = WORKFLOW.read_text(encoding="utf-8")
+    flow = yaml.safe_load(text)
+    used = set(re.findall(r"demo: [a-z ]+[a-z]", text)) | {"demo: submitted"}
+    assert used == set(DEMO_LABELS)
+    for name, job in flow["jobs"].items():
+        first = job["steps"][0].get("run", "")
+        for label in DEMO_LABELS:
+            assert f'gh label create "{label}"' in first and "--force" in first, (name, label)
+    for path in (ROOT / "docs" / "RELEASE-PROCESS.md", ROOT / "tools" / "promotion_check.sh"):
+        doc = path.read_text(encoding="utf-8")
+        for label in DEMO_LABELS:
+            assert label in doc, (path.name, label)
+
+
 # ----------------------------------------------------------------- the page
 def test_page_has_shelf_submit_button_and_related_resources():
     page = BeautifulSoup((ROOT / "community-agents.html").read_text(encoding="utf-8"), "html.parser")
@@ -240,6 +342,22 @@ def test_page_has_shelf_submit_button_and_related_resources():
     assert "kody-w" not in str(page)
     assert 'data-clarity-project' in str(page)
     assert "aibast-design:start" in str(page)
+
+
+def test_small_print_is_written_for_visitors_not_the_manifest_schema():
+    result = run_community_tools_node(
+        "globalThis.fetch = async () => ({ok: true, json: async () => community});",
+        """
+await renderCommunityTools();
+console.log(JSON.stringify({note: $("community-note").textContent, errors}));
+""",
+    )
+    assert result["errors"] == []
+    note = result["note"]
+    assert note != MANIFEST["note"]
+    assert "not an endorsement" in note
+    for word in ("kind", "Entries", "Backs the", "manifest"):
+        assert word not in note, word
 
 
 def test_old_page_redirects_and_keeps_hash_and_query():
@@ -327,16 +445,36 @@ def _library_surfaces():
     return [p for p in paths if p.exists()]
 
 
-@pytest.mark.parametrize("demo", DEMOS or [SAMPLE_DEMO], ids=lambda d: d["id"])
+def _demo_leaks(demo, paths):
+    """Library files that mention the demo's own id or name.
+
+    A graduated demo lives in the library under its template slug
+    (graduated_to), so only the demo's own id and name are leaks.
+    """
+    leaks = []
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        if f'"{demo["id"]}"' in text or demo["name"] in text:
+            leaks.append(path.name)
+    return leaks
+
+
+@pytest.mark.parametrize("demo", DEMOS + [SAMPLE_DEMO], ids=lambda d: d["id"])
 def test_no_demo_appears_in_library_catalogs_academy_or_metrics(demo):
     registry = json.loads((ROOT / "registry.json").read_text(encoding="utf-8"))
     assert demo["id"] not in {t.get("id") for t in registry.get("community_tools", [])}
     assert all(t.get("kind", "tool") == "tool" for t in registry.get("community_tools", []))
-    if demo.get("graduated_to"):
-        return  # graduated demos live in the library under their template slug
-    for path in _library_surfaces():
-        text = path.read_text(encoding="utf-8")
-        assert f'"{demo["id"]}"' not in text, path.relative_to(ROOT)
+    assert _demo_leaks(demo, _library_surfaces()) == []
+
+
+def test_leak_check_catches_a_graduated_demo_copied_into_the_academy(tmp_path):
+    demo = {**SAMPLE_DEMO, "graduated_to": "tiered-huddle-board"}
+    academy = tmp_path / "academy.json"
+    academy.write_text(json.dumps({"courses": [{"id": demo["id"], "name": demo["name"]}]}))
+    assert _demo_leaks(demo, [academy]) == ["academy.json"]
+    named = tmp_path / "state.json"
+    named.write_text(json.dumps({"title": demo["name"]}))
+    assert _demo_leaks(demo, [named]) == ["state.json"]
 
 
 @pytest.mark.parametrize("demo", [d for d in DEMOS if d.get("graduated_to")] or [None], ids=lambda d: d["id"] if d else "none")

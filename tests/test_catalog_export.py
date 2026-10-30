@@ -123,7 +123,7 @@ console.log(JSON.stringify({
     assert result["html"].count('class="community-card"') == len(LIBRARY_COMMUNITY_TOOLS)
     assert "<img" not in result["html"]
     assert "&lt;img" in result["html"]
-    assert result["note"] == COMMUNITY["note"]
+    assert "not an endorsement" in result["note"]
     assert result["errors"] == []
     for tool in LIBRARY_COMMUNITY_TOOLS:
         assert tool["url"] in result["html"]
