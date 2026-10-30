@@ -6,8 +6,8 @@
     "solutions/*/evals/transcripts.json"
   ],
   "summary": {
-    "scenarios": 391,
-    "recorded": 381,
+    "scenarios": 394,
+    "recorded": 384,
     "not_recorded": 10
   },
   "agents": {
@@ -459,7 +459,10 @@
         "payments-operations-release-risk-review",
         "payments-operations-reconcile-settlement",
         "payments-operations-payment-status",
-        "payments-operations-daily-kpi-brief"
+        "payments-operations-daily-kpi-brief",
+        "payments-operations-sanctions-review-queue",
+        "payments-operations-correspondent-limits",
+        "payments-operations-customer-verification"
       ]
     },
     "@aibast-agents-library/permit-license-management": {
@@ -2555,6 +2558,22 @@
       "case_id": "PI-08",
       "recorded": true
     },
+    "payments-operations-correspondent-limits": {
+      "agent_id": "@aibast-agents-library/payments-operations",
+      "title": "Treasury Analyst: Correspondent limits and nostro funding",
+      "prompt": "Are we close to any correspondent limits today, and do any nostro accounts need funding?",
+      "folder": "payments-operations",
+      "case_id": "PO-09",
+      "recorded": true
+    },
+    "payments-operations-customer-verification": {
+      "agent_id": "@aibast-agents-library/payments-operations",
+      "title": "Payments Analyst: Customer verification draft",
+      "prompt": "PAY-3130 to Coho Winery was flagged. How should we verify it with the customer?",
+      "folder": "payments-operations",
+      "case_id": "PO-10",
+      "recorded": true
+    },
     "payments-operations-daily-kpi-brief": {
       "agent_id": "@aibast-agents-library/payments-operations",
       "title": "Head of Payments Operations: Daily payments KPI brief",
@@ -2601,6 +2620,14 @@
       "prompt": "What's the repair plan for PAY-3105? Don't change anything yet.",
       "folder": "payments-operations",
       "case_id": "PO-03",
+      "recorded": true
+    },
+    "payments-operations-sanctions-review-queue": {
+      "agent_id": "@aibast-agents-library/payments-operations",
+      "title": "Compliance Analyst: Sanctions review queue",
+      "prompt": "Which sanctions alerts should I review first, and what do I compare?",
+      "folder": "payments-operations",
+      "case_id": "PO-08",
       "recorded": true
     },
     "payments-operations-validate-payment": {

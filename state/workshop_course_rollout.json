@@ -1,6 +1,6 @@
 {
   "schema": "aibast-workshop-course-rollout-audit/1.0",
-  "generated_at": "2026-10-30T09:34:28Z",
+  "generated_at": "2026-10-30T13:18:00Z",
   "total": 72,
   "passed": 72,
   "failed": 0,
@@ -986,22 +986,22 @@
       "passed": true,
       "failures": [],
       "metrics": {
-        "locked_cases": 7,
+        "locked_cases": 10,
         "inline_scripts": 10,
-        "assisted_frames": 9,
-        "quest_hard_steps": 26,
-        "quest_report_buttons": 41,
-        "quest_preview_prompts": 7,
-        "manual_steps": 26,
-        "manual_frames": 26,
-        "manual_report_buttons": 26,
-        "manual_source_downloads": 26,
-        "visual_captures": 35,
-        "visual_reusable": 35,
+        "assisted_frames": 12,
+        "quest_hard_steps": 32,
+        "quest_report_buttons": 50,
+        "quest_preview_prompts": 10,
+        "manual_steps": 32,
+        "manual_frames": 32,
+        "manual_report_buttons": 32,
+        "manual_source_downloads": 32,
+        "visual_captures": 44,
+        "visual_reusable": 44,
         "visual_reshoot_required": 0,
         "visual_reference_only_displayed": 0,
-        "manifest_items": 128,
-        "zip_entries": 130
+        "manifest_items": 152,
+        "zip_entries": 154
       }
     },
     {

@@ -2730,7 +2730,9 @@
     "Payments Analyst",
     "Payments Repair Analyst",
     "Reconciliation Analyst",
-    "Head of Payments Operations"
+    "Head of Payments Operations",
+    "Compliance Analyst",
+    "Treasury Analyst"
    ],
    "featured_tools": [
     "Microsoft Copilot Studio",
@@ -2756,7 +2758,10 @@
     "Pre-release risk review",
     "Settlement reconciliation",
     "Payment status answer",
-    "Daily payments KPI brief"
+    "Daily payments KPI brief",
+    "Orders sanctions alerts against the review SLA and lists the evidence the analyst compares",
+    "Tracks correspondent limit use and projected nostro balances and drafts any funding request",
+    "Drafts the customer verification call for a flagged payment through the contact on file"
    ],
    "onepager": "61. Payments Operations Agent one-pager.pptx",
    "demo_video": "61-Payments Operations Agent.mp4",

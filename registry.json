@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-30T09:29:17.208252+00:00",
+  "generated_at": "2026-10-30T13:14:22.589951+00:00",
   "stats": {
     "total_agents": 93,
     "publishers": 1,
@@ -16,8 +16,8 @@
     "curated_copy_solutions": 72,
     "solution_onepagers": 72,
     "solution_demo_videos": 64,
-    "total_lines": 50556,
-    "total_kb": 2554.3,
+    "total_lines": 50705,
+    "total_kb": 2564.9,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -8142,9 +8142,9 @@
     {
       "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/payments-operations",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "display_name": "Payments Operations Agent",
-      "description": "Help payments operations teams clear the daily release queue faster by validating payments against scheme rules, planning exception repairs, reviewing pre-release risk, reconciling settlement accounts, and answering status questions with evidence, while every release decision stays with an authorized analyst.",
+      "description": "Help payments operations teams clear the daily release queue faster by validating payments against scheme rules, planning exception repairs, reviewing pre-release risk, reconciling settlement accounts, ordering the sanctions-alert review queue, watching correspondent limits and nostro funding, drafting customer verification for flagged payments, and answering status questions with evidence, while every release, screening and fraud decision stays with an authorized analyst.",
       "author": "AIBAST",
       "tags": [
         "payments",
@@ -8160,11 +8160,11 @@
         "@rapp/basic-agent"
       ],
       "_file": "agents/@aibast-agents-library/financial_services_stacks/payments_operations_stack/payments_operations_agent.py",
-      "_size_kb": 26.5,
-      "_lines": 479,
-      "_sha256": "7ea4116d83dcf96604ec23a0d3f02d08ff59e1b5a1a1a308cb0b34f4cc919a8d",
+      "_size_kb": 37.1,
+      "_lines": 628,
+      "_sha256": "639a553f7d695ff2763155e176853187a3e98aba03dd025465837f99fe44b217",
       "_install_prefix": "payments_operations__",
-      "_install_filename": "payments_operations__7ea4116d83dc_agent.py",
+      "_install_filename": "payments_operations__639a553f7d69_agent.py",
       "_stack": "payments_operations",
       "_stack_vertical": "financial_services",
       "_synthetic_data": true,
@@ -8183,7 +8183,9 @@
           "Payments Analyst",
           "Payments Repair Analyst",
           "Reconciliation Analyst",
-          "Head of Payments Operations"
+          "Head of Payments Operations",
+          "Compliance Analyst",
+          "Treasury Analyst"
         ],
         "featured_tools": [
           "Microsoft Teams",
@@ -8195,23 +8197,23 @@
         ],
         "capabilities": [
           "Validates payments against scheme rules and plans repairs",
-          "Reviews screening and risk drivers for held payments",
-          "Reconciles settlement accounts and ranks open breaks by value",
+          "Prepares sanctions alerts and verification calls",
+          "Reconciles settlements and tracks nostro funding",
           "Answers payment status inquiries and builds the daily KPI brief by rail"
         ],
         "outcomes": [
           "Faster triage: failed payments arrive with a repair plan",
-          "Better releases: screening, risk and drivers in one view",
+          "Better releases: flags and evidence in one view",
           "Earlier break resolution: breaks are ranked by value before the cutoff"
         ],
         "customer_scenario": [
           "Exception repairs are researched by hand while failed payments wait",
-          "Held payments wait while analysts gather screening data",
+          "Held payments and sanctions alerts wait for evidence",
           "Settlement breaks surface late with no ranking by value",
           "Relationship managers chase status by email"
         ],
         "slide_title": "Payments Operations Agent",
-        "slide_summary": "Helps payments teams clear the daily release queue faster with rule checks, repairs and reconciliation, while analysts keep every release decision.",
+        "slide_summary": "Helps payments teams clear the daily release queue faster with rule checks, repairs, reconciliation and sanctions review, while analysts keep every release decision.",
         "scenario_name": "A regional bank",
         "challenge_intro": "A bank's payments desk must clear a growing queue before cutoffs:",
         "actions_intro": "The Payments Operations Agent gives the release desk one conversational view:",
@@ -8236,6 +8238,7 @@
           "Surfaces the largest settlement breaks before the cutoff."
         ],
         "search_terms": [
+          "Compliance Analyst",
           "Head of Payments Operations",
           "Microsoft Copilot Studio",
           "Microsoft Dataverse",
@@ -8246,6 +8249,9 @@
           "Payments Repair Analyst",
           "Power Automate",
           "Reconciliation Analyst",
+          "Treasury Analyst",
+          "correspondent_limits",
+          "customer_verification",
           "daily_kpi_brief",
           "exception repair",
           "payment_status",
@@ -8255,6 +8261,7 @@
           "release queue",
           "release_risk_review",
           "repair_plan",
+          "sanctions_review_queue",
           "settlement reconciliation",
           "straight-through processing",
           "validate_payment"
@@ -8296,6 +8303,21 @@
             "label": "Head of Payments Operations: Daily payments KPI brief",
             "prompt": "Give me yesterday's payments KPI brief by rail.",
             "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-daily-kpi-brief"
+          },
+          {
+            "label": "Compliance Analyst: Sanctions review queue",
+            "prompt": "Which sanctions alerts should I review first, and what do I compare?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-sanctions-review-queue"
+          },
+          {
+            "label": "Treasury Analyst: Correspondent limits and nostro funding",
+            "prompt": "Are we close to any correspondent limits today, and do any nostro accounts need funding?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-correspondent-limits"
+          },
+          {
+            "label": "Payments Analyst: Customer verification draft",
+            "prompt": "PAY-3130 to Coho Winery was flagged. How should we verify it with the customer?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-customer-verification"
           }
         ],
         "architecture": {
@@ -8342,6 +8364,21 @@
               "operation": "daily_kpi_brief",
               "name": "Daily payments KPI brief",
               "purpose": "Use when leadership asks for volume, exceptions, and straight-through rate by rail plus today's open items."
+            },
+            {
+              "operation": "sanctions_review_queue",
+              "name": "Sanctions review queue",
+              "purpose": "Use when a compliance analyst asks which sanctions alerts to review first and what to compare; flags come from the screening service and the analyst decides."
+            },
+            {
+              "operation": "correspondent_limits",
+              "name": "Correspondent limits and nostro funding",
+              "purpose": "Use when someone asks about correspondent limit use, projected nostro balances, or a funding request for treasury."
+            },
+            {
+              "operation": "customer_verification",
+              "name": "Customer verification draft",
+              "purpose": "Use when someone asks how to verify a flagged payment with the customer through the contact on file; the analyst decides release or hold."
             }
           ],
           "easy_mode": [
@@ -8352,7 +8389,7 @@
             "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
           ],
           "local_install_prompt": "Install Payments Operations Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/payments-operations/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect customer systems or execute external actions.",
-          "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Payments Operations Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/payments-operations/deployment.json. Upload the two synthetic knowledge files and 7 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+          "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Payments Operations Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/payments-operations/deployment.json. Upload the two synthetic knowledge files and 10 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
           "required_connections": [
             "Use only approved, least-privilege production connections; the packaged demonstration uses synthetic knowledge files.",
             "Approved payments hub (read-only)",
@@ -8401,13 +8438,15 @@
       },
       "_demo": {
         "slug": "payments-operations",
-        "case_count": 7,
+        "case_count": 10,
         "personas": [
+          "Compliance Analyst",
           "Head of Payments Operations",
           "Payments Analyst",
           "Payments Operations Lead",
           "Payments Repair Analyst",
-          "Reconciliation Analyst"
+          "Reconciliation Analyst",
+          "Treasury Analyst"
         ],
         "prompts": [
           "What's in this morning's payment release queue, and which payments need attention?",

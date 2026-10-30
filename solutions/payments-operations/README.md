@@ -17,7 +17,7 @@ Help payments operations teams clear the daily release queue faster by validatin
 
 Hero scenario: A regional bank's payments operations desk at the fictional Woodgrove Bank.
 
-Implemented operations: `queue_overview`, `validate_payment`, `repair_plan`, `release_risk_review`, `reconcile_settlement`, `payment_status`, `daily_kpi_brief`. The package contains one locked persona-language case and one uploadable skill for every exposed operation.
+Implemented operations: `queue_overview`, `validate_payment`, `repair_plan`, `release_risk_review`, `reconcile_settlement`, `payment_status`, `daily_kpi_brief`, `sanctions_review_queue`, `correspondent_limits`, `customer_verification`. The package contains one locked persona-language case and one uploadable skill for every exposed operation.
 
 ## Approval boundary
 
@@ -25,7 +25,7 @@ This package is synthetic and read-only. It does not connect to customer systems
 
 ## Manual Copilot Studio preparation
 
-Upload both Markdown files in `manual/knowledge/`, then upload the 7 `SKILL.md` files in `manual/skills/`. Bind only approved production connections after security and business-owner review. Keep the agent in Draft and stop before publish until an authorized reviewer validates every operation and guardrail.
+Upload both Markdown files in `manual/knowledge/`, then upload the 10 `SKILL.md` files in `manual/skills/`. Bind only approved production connections after security and business-owner review. Keep the agent in Draft and stop before publish until an authorized reviewer validates every operation and guardrail.
 
 <!-- scaffold-solution-journey:start -->
 ## Customer journey package map
@@ -48,7 +48,7 @@ Upload both Markdown files in `manual/knowledge/`, then upload the 7 `SKILL.md` 
 | Copilot Studio deployment settings | `solutions/payments-operations/exports/payments-operations-deployment-settings.json` |
 | Copilot Studio export metadata | `solutions/payments-operations/exports/payments-operations-solution-export.json` |
 
-**Scaffold status:** 126 resources ready; 0 pending. Manual evidence and referenced screenshots passed scaffold validation.
+**Scaffold status:** 150 resources ready; 0 pending. Manual evidence and referenced screenshots passed scaffold validation.
 
 The journey uses synthetic inputs and qualitative proof. It is not a customer
 KPI, live-system result, production-readiness claim, or publication approval.
