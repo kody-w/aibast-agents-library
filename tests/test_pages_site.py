@@ -986,6 +986,7 @@ class PagesWorkflowTests(unittest.TestCase):
             "/scripts/build_pages_site.py",
             "/tests/test_pages_site.py",
             "/.github/workflows/pages.yml",
+            "/tools/clarity_tag.py",  # the feedback-block test reads its consent key
             "/solutions/",
             "/academy/",
             "/skills/",
