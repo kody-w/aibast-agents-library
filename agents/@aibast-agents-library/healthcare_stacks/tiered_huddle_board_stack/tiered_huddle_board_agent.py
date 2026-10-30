@@ -256,6 +256,42 @@ def _resolve_issue(value, default):
     return tied[0] if len(tied) == 1 else tied
 
 
+def _people():
+    """Every person on the board or the paging roster, by full name."""
+    names = {name for lanes in _roster().values() for people in lanes.values() for name, _ in people}
+    names |= {i["owner"] for i in _issues()} | {i["originator"] for i in _issues()}
+    return sorted(n for n in names if n)
+
+
+def _resolve_viewer(value):
+    """The person asking: a full name, a first or last name, or a name with a title ('Elena', 'Brooks',
+    'Elena Brooks, Nurse Manager'). Returns a name, a list of names on a tie, or None when nobody matches.
+
+    A waiting-on value that is not a person (Case management, Leadership huddle) still matches when it is named in
+    full.
+    """
+    text = str(value).strip()
+    low = text.lower()
+    for issue in _issues():
+        if issue["waiting_on"] and issue["waiting_on"].lower() == low:
+            return issue["waiting_on"]
+    for name in _people():
+        if name.lower() == low:
+            return name
+    asked = set(re.findall(r"[a-z]+", low))
+    scores = []
+    for name in _people():
+        parts = set(re.findall(r"[a-z]+", name.lower()))
+        hit = len(parts & asked)
+        if hit:
+            scores.append((hit, name))
+    if not scores:
+        return None
+    best = max(hit for hit, _ in scores)
+    tied = [name for hit, name in scores if hit == best]
+    return tied[0] if len(tied) == 1 else tied
+
+
 def _open(issues):
     return [i for i in issues if not _is_closed(i)]
 
@@ -308,7 +344,8 @@ class TieredHuddleBoardAgent(BasicAgent):
                     },
                     "viewer": {
                         "type": "string",
-                        "description": "Person asking, for 'waiting on me'. Optional; defaults to Elena Brooks, "
+                        "description": "Person asking, for 'waiting on me': a full name, first or last name, "
+                                       "with or without a title. Optional; defaults to Elena Brooks, "
                                        "Nurse Manager of 4 West.",
                     },
                 },
@@ -332,16 +369,20 @@ class TieredHuddleBoardAgent(BasicAgent):
 
     # -- board_view ---------------------------------------------------------
     def _board_view(self, **kwargs) -> str:
-        viewer = (kwargs.get("viewer") or DEFAULT_VIEWER).strip()
+        asked = (kwargs.get("viewer") or DEFAULT_VIEWER).strip()
+        resolved = _resolve_viewer(asked)
+        viewer = resolved if isinstance(resolved, str) else asked
         now = _now()
         live = _open(_issues())
         past = sorted([i for i in live if _past_target(i)], key=_remaining)
-        mine = [i for i in live if i["waiting_on"].lower() == viewer.lower()]
+        mine = [i for i in live if isinstance(resolved, str) and i["waiting_on"] == resolved]
+        waiting = f"**Waiting on {viewer}:** {len(mine)}" if isinstance(resolved, str) else \
+            f"**Waiting on {viewer}:** not shown (see below)"
         lines = [
             f"# Huddle Board - {HOSPITAL}",
             "",
             f"**As of:** {now:%A %d %B, %H:%M} | **Open items:** {len(live)} | "
-            f"**Past target:** {len(past)} | **Waiting on {viewer}:** {len(mine)}",
+            f"**Past target:** {len(past)} | {waiting}",
             "",
         ]
         if past:
@@ -357,7 +398,13 @@ class TieredHuddleBoardAgent(BasicAgent):
                     lines.append(f"| {tier['name']} ({tier['target_hours']} h) | {i['id']} | {i['unit']} | "
                                  f"{i['title']} | {_clock(i)} | {i['status']} | {i['waiting_on']} |")
         lines += ["", f"## Waiting on {viewer}"]
-        if mine:
+        if resolved is None:
+            lines.append(f"- `{asked}` is not a name on this board or its paging roster, so this view cannot say "
+                         "what is waiting on them. Ask again with the full name as it appears on the board.")
+        elif isinstance(resolved, list):
+            lines.append(f"- `{asked}` matches more than one person: {', '.join(resolved)}. Ask again with the "
+                         "full name.")
+        elif mine:
             lines += [f"- {i['id']}: {i['title']} ({_clock(i)})" for i in mine]
         else:
             lines.append(f"- Nothing on the board is waiting on {viewer}.")
@@ -376,6 +423,16 @@ class TieredHuddleBoardAgent(BasicAgent):
         if _is_closed(issue):
             return (f"# Escalation Draft - {issue['id']}\n\n{issue['id']} is closed; there is nothing to escalate."
                     f"\n\n{BOUNDARY}")
+        if _is_mitigated(issue):
+            done, required = issue["hold_hours_done"], issue["hold_hours_required"]
+            hold = (f"its {required}-hour hold is complete" if done >= required
+                    else f"it is {done} of {required} hours into its hold period")
+            return (f"# Escalation Draft - {issue['id']}\n\n{issue['id']} is mitigated and {hold}, so it is not "
+                    f"escalated: a mitigated item runs a hold period instead of its tier clock. Mitigation: "
+                    f"{issue['mitigation']}\n\nIt closes when {issue['originator']} (who raised it) confirms the "
+                    f"fix held; run a closure check for that. If the fix fails, it goes back on its "
+                    f"{current['name']} clock and can be escalated then. No escalation was drafted and no one was "
+                    f"paged.\n\n{BOUNDARY}")
         if target is None:
             return (f"# Escalation Draft - {issue['id']}\n\n{issue['id']} is already at the {current['name']} tier, "
                     f"the top of the board. It stays on the {current['huddle']} leadership huddle until decided."

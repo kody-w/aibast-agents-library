@@ -273,6 +273,33 @@ def _id_named(item_id, text):
     return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
 
 
+_VOLTAGE = re.compile(r"\b(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?\s*kv\b")
+_DESIGNATOR = re.compile(r"\b(panel|feeder|joint|t|rmu)[\s-]?(\d+)\b")
+
+
+def _qualifiers(text):
+    """Numbers that tell assets apart: {'kv': {'11', '33'}, 'panel': {'4'}, 't': {'2'}, ...}."""
+    found = {}
+    text = str(text).lower()
+    for match in _VOLTAGE.finditer(text):
+        found.setdefault("kv", set()).update(v for v in match.groups() if v)
+    for kind, number in _DESIGNATOR.findall(text):
+        found.setdefault(kind, set()).add(str(int(number)))
+    return found
+
+
+def _record_qualifiers(item, key):
+    fields = [item[key], item.get("name", ""), item.get("site", ""), item.get("asset", ""),
+              item.get("asset_name", "")] + list(item.get("keywords", []))
+    return _qualifiers(" ".join(fields))
+
+
+def _conflicts(asked, carried):
+    """True when the request names a number of a kind the record also has, and the record's number differs:
+    'panel 2' against panel 4, '11 kV' against a 33 kV line, 'T1' against transformer T2."""
+    return any(kind in carried and not (numbers & carried[kind]) for kind, numbers in asked.items())
+
+
 def _resolve(value, default, items, key):
     """Id or words from the record; empty -> the default; no match -> None; a tie -> the tied records (a list).
 
@@ -292,6 +319,12 @@ def _resolve(value, default, items, key):
     if named:
         return named[0] if len(named) == 1 else named
     asked = _words(q)
+    # A voltage or a panel, feeder, joint or transformer number in the request rules out every record that carries a
+    # different one, so 'Ashby Road panel 2' never drafts panel 4's work order and '11 kV line' never picks the
+    # 33 kV line.
+    wanted = _qualifiers(q)
+    ruled_out = [item for item in items if _conflicts(wanted, _record_qualifiers(item, key))]
+    items = [item for item in items if item not in ruled_out]
     vocab = [(item, *_record_words(item, key)) for item in items]
     scores = []
     for item, primary, secondary in vocab:
@@ -306,6 +339,13 @@ def _resolve(value, default, items, key):
     scores.sort(key=lambda pair: -pair[0])
     best = scores[0][0]
     tied = [item for score, item in scores if abs(score - best) < 1e-9]
+    if len(tied) == 1 and ruled_out:
+        # A word that names only a ruled-out record ('Millbrook' in 'T1 at Millbrook', where the Millbrook
+        # transformer is T2) means the request describes an asset that is not monitored; no substitute is offered.
+        winner = set().union(*_record_words(tied[0], key))
+        named_elsewhere = set().union(*(_record_words(item, key)[0] for item in ruled_out))
+        if (asked & named_elsewhere) - winner:
+            return None
     return tied[0] if len(tied) == 1 else tied
 
 
