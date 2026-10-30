@@ -21,6 +21,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -76,9 +77,45 @@ REQUIRED_CONFIRMATIONS = (
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}
 # Microsoft Stream videos live on SharePoint and need a sign-in, so they cannot
 # play on a public page. Only public YouTube links are accepted.
+# A YouTube video id: 11 letters, digits, hyphens or underscores.
+YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
+# youtube.com paths that name one video in their second segment.
+YOUTUBE_VIDEO_PATHS = {"shorts", "embed", "live", "v"}
+ONE_VIDEO_PROBLEM = (
+    "The video link must point to one video (a watch, youtu.be or shorts link), "
+    "not a playlist or a channel."
+)
 
-# Words that must never reach the public page. Matched case-insensitively on
-# word boundaries across every free-text field.
+# Hosts whose pages open only after a work or school sign-in, so public
+# visitors cannot open a one-pager stored there. Each entry also covers its
+# subdomains.
+SIGN_IN_ONLY_HOSTS = (
+    "sharepoint.com",
+    "sharepoint.us",
+    "sharepoint-df.com",
+    "teams.microsoft.com",
+    "teams.live.com",
+    "loop.microsoft.com",
+    "cloud.microsoft",
+    "web.microsoftstream.com",
+    "stream.microsoft.com",
+    "login.microsoftonline.com",
+    "login.live.com",
+    "dynamics.com",
+    "make.powerapps.com",
+    "apps.powerapps.com",
+    "make.powerautomate.com",
+    "copilotstudio.microsoft.com",
+    "admin.microsoft.com",
+)
+ONEPAGER_SIGN_IN_PROBLEM = (
+    "The one-pager link opens only after a work sign-in, so public visitors "
+    "cannot open it. Share it from a public site instead."
+)
+
+# Words that must never reach the public page. Matched across every free-text
+# field and the one-pager link, after folding case and full-width letters, and
+# also when a version number or another word is joined on (see terms_in).
 FORBIDDEN_TERMS = (
     "rapp factory",
     "confidential",
@@ -107,6 +144,23 @@ OTHER_AI_PRODUCT_TERMS = (
     "perplexity",
     "deepseek",
     "midjourney",
+    "qwen",
+    # Other vendors' agent and AI platforms.
+    "agentforce",
+    "salesforce einstein",
+    "einstein copilot",
+    "amazon bedrock",
+    "aws bedrock",
+    "bedrock agents",
+    "amazon lex",
+    "amazon q",
+    "sagemaker",
+    "vertex ai",
+    "agentspace",
+    "dialogflow",
+    "duet ai",
+    "watsonx",
+    "ibm watson",
 )
 OTHER_AI_PRODUCTS_PROBLEM = (
     "Remove the names of AI products from other companies. "
@@ -162,8 +216,15 @@ def _checked(raw: str) -> list[str]:
     ]
 
 
+def normalise(text: str) -> str:
+    """Fold full-width and other compatibility letters to plain ones (NFKC)
+    and drop invisible format characters such as zero-width spaces."""
+    text = unicodedata.normalize("NFKC", text or "")
+    return "".join(ch for ch in text if unicodedata.category(ch) != "Cf")
+
+
 def slugify(text: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    slug = re.sub(r"[^a-z0-9]+", "-", normalise(text).lower()).strip("-")
     return slug[:60].strip("-")
 
 
@@ -202,6 +263,8 @@ def classify_video_url(url: str) -> str:
         raise SubmissionError("The video link must be a plain public https link.")
     host = (parts.hostname or "").lower()
     if host in YOUTUBE_HOSTS:
+        if not is_single_youtube_video(host, parts):
+            raise SubmissionError(ONE_VIDEO_PROBLEM)
         return "youtube"
     raise SubmissionError(
         f"The video must be a public YouTube link (got {host or 'no host'}). "
@@ -209,13 +272,77 @@ def classify_video_url(url: str) -> str:
     )
 
 
-def forbidden_terms_in(text: str, terms: tuple[str, ...] = FORBIDDEN_TERMS) -> list[str]:
-    found = []
-    lowered = (text or "").lower()
-    for term in terms:
-        if re.search(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])", lowered):
-            found.append(term)
+def is_single_youtube_video(host: str, parts: urllib.parse.SplitResult) -> bool:
+    """True for a link to one video: watch?v=, youtu.be/<id>, shorts/<id>."""
+    segments = [s for s in parts.path.split("/") if s]
+    if host == "youtu.be":
+        return len(segments) == 1 and bool(YOUTUBE_ID_RE.match(segments[0]))
+    if segments == ["watch"]:
+        ids = urllib.parse.parse_qs(parts.query).get("v", [])
+        return len(ids) == 1 and bool(YOUTUBE_ID_RE.match(ids[0]))
+    return (
+        len(segments) == 2
+        and segments[0] in YOUTUBE_VIDEO_PATHS
+        and bool(YOUTUBE_ID_RE.match(segments[1]))
+    )
+
+
+def is_sign_in_only_host(host: str) -> bool:
+    host = (host or "").lower().rstrip(".")
+    return any(host == h or host.endswith("." + h) for h in SIGN_IN_ONLY_HOSTS)
+
+
+# Spaces out joined words: "AzureOpenAI" -> "Azure Open AI", "GPT4o" -> "GPT 4o".
+_JOIN_RE = re.compile(
+    r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=[0-9])"
+)
+
+
+def _term_re(term: str) -> re.Pattern:
+    # Words of a term may be joined or split by spaces, hyphens or underscores.
+    # A digit may follow the term (GPT4), a letter may not (so "nda" never
+    # matches "ndash").
+    body = r"[\W_]*".join(re.escape(w) for w in term.split())
+    return re.compile(r"(?<![^\W_])" + body + r"(?![^\W\d_])")
+
+
+def _compound_terms(word: str, vocabulary: list[str]) -> set[str]:
+    """Terms that make up a lower-case word built only from terms, such as
+    "azureopenai". An optional version tail ("chatgpt4o") is allowed."""
+    found: set[str] = set()
+    i = 0
+    while i < len(word):
+        if word[i].isdigit() and found:
+            return found
+        term = next((t for t in vocabulary if word.startswith(t, i)), None)
+        if term is None:
+            return set()
+        found.add(term)
+        i += len(term)
     return found
+
+
+def forbidden_terms_in(text: str, terms: tuple[str, ...] = FORBIDDEN_TERMS) -> list[str]:
+    """Return the terms found in text.
+
+    The text is folded with NFKC first, so full-width letters match. A term
+    still matches with a version number joined on (GPT4), inside a joined
+    word written in capitals (AzureFunctions), and inside a lower-case word
+    built only from listed terms (azureopenai).
+    """
+    plain = normalise(text)
+    forms = (plain.casefold(), _JOIN_RE.sub(" ", plain).casefold())
+    vocabulary = sorted(
+        {t for t in FORBIDDEN_TERMS + OTHER_AI_PRODUCT_TERMS + tuple(terms) if " " not in t},
+        key=len, reverse=True,
+    )
+    compounds: set[str] = set()
+    for word in re.findall(r"[^\W_]+", forms[0]):
+        compounds |= _compound_terms(word, vocabulary)
+    return [
+        term for term in terms
+        if term in compounds or any(_term_re(term).search(form) for form in forms)
+    ]
 
 
 def other_ai_products_in(text: str) -> bool:
@@ -273,6 +400,7 @@ def validate(sections: dict[str, str]) -> tuple[dict, list[str]]:
     if not team:
         problems.append("Add the owning team or channel for credit.")
 
+    onepager_text = ""
     if onepager:
         try:
             parts, _port = split_url(onepager)
@@ -280,19 +408,25 @@ def validate(sections: dict[str, str]) -> tuple[dict, list[str]]:
                 raise ValueError
         except ValueError:
             problems.append("The one-pager link must be a public https link.")
+        else:
+            if is_sign_in_only_host(parts.hostname):
+                problems.append(ONEPAGER_SIGN_IN_PROBLEM)
+        # The link shows on the public card, so its words are checked too.
+        onepager_text = urllib.parse.unquote_plus(onepager)
 
     for item in REQUIRED_CONFIRMATIONS:
         if item not in confirmed:
             problems.append(f"Confirm: {item}")
 
     free_text = "\n".join([title, description, team])
-    terms = forbidden_terms_in(free_text)
+    checked_text = "\n".join([free_text, onepager_text])
+    terms = forbidden_terms_in(checked_text)
     if terms:
         problems.append(
             "Remove these words, which cannot appear on the public page: "
             + ", ".join(sorted(terms)) + "."
         )
-    if other_ai_products_in(free_text):
+    if other_ai_products_in(checked_text):
         problems.append(OTHER_AI_PRODUCTS_PROBLEM)
     if EMAIL_RE.search(free_text) or HANDLE_RE.search(free_text):
         problems.append(
@@ -396,14 +530,14 @@ def apply_entry(manifest: dict, entry: dict, issue: int, today: str) -> dict:
     ]
     for t in kept:
         t.pop("_drop", None)
-    previous = next(
-        (
-            t for t in tools
-            if t.get("kind") == "demo"
-            and t.get("id") == clean["id"]
-            and t.get("submission_issue") == clean["submission_issue"]
-        ),
-        None,
+    # The earlier entry from this issue: the same id, or the one a retitled
+    # resubmission replaces. Its library link (graduated_to) carries over.
+    own = [
+        t for t in tools
+        if t.get("kind") == "demo" and t.get("submission_issue") == clean["submission_issue"]
+    ]
+    previous = next((t for t in own if t.get("id") == clean["id"]), None) or next(
+        (t for t in own if t.get("graduated_to")), None
     )
     if previous and previous.get("graduated_to"):
         clean["graduated_to"] = previous["graduated_to"]
