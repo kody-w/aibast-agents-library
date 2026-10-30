@@ -2,8 +2,8 @@
   "schema": "aibast-rapp-guide-content-contract/1.0",
   "version": 1,
   "source": "docs/rapp-guide.html",
-  "trusted_source_commit": "90ce1827be168159e41586ac35f0e0b12299282d",
-  "trusted_source_blob_oid": "6178d0096dca16841d69ca1af07fda68a4c728c0",
+  "trusted_source_commit": "4ef8aea7fb36503d7d59e8a73a0504418379227b",
+  "trusted_source_blob_oid": "78afa60ddf1a650ef2fd6ce546620136c98b0659",
   "normalization": "Remove script, style, template, and comments; join rendered text with spaces; collapse Unicode whitespace.",
   "content_section_ids": [
     "overview",
@@ -111,21 +111,21 @@
     },
     {
       "id": "tools",
-      "normalized_visible_text_sha256": "d8ed58a5c5a3370ef6efb87c18b90b6aa0171fdee802ad3403e11614a0526c50"
+      "normalized_visible_text_sha256": "7eee3a5905506c6f6f05fe5dc24144be235e45bd849691b6ae82e5a83146bc1a"
     }
   ],
   "sidebar_links": [
     {
       "href": "#overview",
-      "label": "§ Introduction"
+      "label": "\u00a7 Introduction"
     },
     {
       "href": "#architecture",
-      "label": "§ Architecture"
+      "label": "\u00a7 Architecture"
     },
     {
       "href": "#principles",
-      "label": "§ Core Principles"
+      "label": "\u00a7 Core Principles"
     },
     {
       "href": "#step1",
@@ -185,27 +185,27 @@
     },
     {
       "href": "#team-setup",
-      "label": "§ Team Setup Guide"
+      "label": "\u00a7 Team Setup Guide"
     },
     {
       "href": "#scaling",
-      "label": "§ Scaling to 20+ Projects"
+      "label": "\u00a7 Scaling to 20+ Projects"
     },
     {
       "href": "#roadmap",
-      "label": "§ Speed Barriers Broken"
+      "label": "\u00a7 Speed Barriers Broken"
     },
     {
       "href": "#tools",
-      "label": "§ Tool Browser"
+      "label": "\u00a7 Experimental tools"
     },
     {
       "href": "../index.html",
-      "label": "↗ Agents Library"
+      "label": "\u2197 Agents Library"
     },
     {
       "href": "index.html",
-      "label": "↗ Quick Start"
+      "label": "\u2197 Quick Start"
     }
   ],
   "external_hrefs": [
@@ -214,7 +214,8 @@
     "https://m365.cloud.microsoft:443/chat/?titleId=T_afded7db-f8c5-703a-5502-2cc9f31b66da&source=embedded-builder",
     "https://m365.cloud.microsoft/chat/?titleId=T_04778775-1214-29c8-3bc4-218e26088499&source=embedded-builder&auth=2",
     "https://copilotstudio.microsoft.com",
-    "https://m365.cloud.microsoft:443/chat/?titleId=T_9c21fece-1d32-64df-b68d-db4d0a3cc446&source=embedded-builder"
+    "https://m365.cloud.microsoft:443/chat/?titleId=T_9c21fece-1d32-64df-b68d-db4d0a3cc446&source=embedded-builder",
+    "https://github.com/microsoft/aibast-agents-library#attribution"
   ],
   "content_external_links": [
     {
@@ -232,6 +233,10 @@
     {
       "section_id": "step9",
       "href": "https://m365.cloud.microsoft:443/chat/?titleId=T_9c21fece-1d32-64df-b68d-db4d0a3cc446&source=embedded-builder"
+    },
+    {
+      "section_id": "tools",
+      "href": "https://github.com/microsoft/aibast-agents-library#attribution"
     }
   ],
   "quiz_ids": [
@@ -247,13 +252,13 @@
         "To generate documentation for compliance purposes"
       ],
       "submit_quiz_correct_index": 1,
-      "data_correct": "✓ Correct! The 6 quality gates are strategic checkpoints where humans apply taste and judgment. Each gate takes 15-60 minutes but prevents days or weeks of wasted work.",
-      "data_incorrect": "✗ Not quite. The gates aren't about slowing things down or replacing AI - they're strategic checkpoints to prevent wasted cycles. Review the Core Principles section.",
+      "data_correct": "\u2713 Correct! The 6 quality gates are strategic checkpoints where humans apply taste and judgment. Each gate takes 15-60 minutes but prevents days or weeks of wasted work.",
+      "data_incorrect": "\u2717 Not quite. The gates aren't about slowing things down or replacing AI - they're strategic checkpoints to prevent wasted cycles. Review the Core Principles section.",
       "data_review_section": "principles",
       "persistent_completion_key": "quiz-completed"
     }
   ],
-  "copy_button_count": 7,
+  "copy_button_count": 8,
   "copy_button_mappings": [
     {
       "button_label": "Copy",
@@ -303,6 +308,13 @@
       "target_tag": "pre",
       "target_tag_ordinal": 30,
       "target_normalized_text_sha256": "dc45e4d1119e8c40fbad5f35dfe6b2c4286cfeafde75c0fa374bc7e984dceb32"
+    },
+    {
+      "button_label": "Copy",
+      "target_id": null,
+      "target_tag": "pre",
+      "target_tag_ordinal": 50,
+      "target_normalized_text_sha256": "ccfea2144ad1997981ae67fa98a6e722b0225899b145bbb57c979e4c4af8e55c"
     }
   ],
   "fallback_toggle_mappings": [
