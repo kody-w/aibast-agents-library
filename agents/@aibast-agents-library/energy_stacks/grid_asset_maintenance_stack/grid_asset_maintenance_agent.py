@@ -320,7 +320,12 @@ def _digits(text):
         lambda m: m.group(0)[:m.start(3) - m.start(0)] + _spelled(m.group(3)), text)
 
 
-_VOLTAGE = re.compile(r"\b(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?\s*kv\b")
+# A measure is a number with its unit: a voltage ('11 kV', '33/11 kV'), a rating ('20 MVA', '500 kVA') or a length
+# ('1.2 km'). Every unit works the same way: a measure the request states rules out a record that states a
+# different one of the same unit, so '15 MVA transformer' never drafts the 20 MVA unit and '11 kV line' never picks
+# the 33 kV line.
+_UNIT_WORDS = ("kv", "kva", "mva", "km")
+_MEASURE = re.compile(r"\b(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?\s*(" + "|".join(_UNIT_WORDS) + r")\b")
 # 'transformer 1' and 'transformer number 1' are transformer T1. A number followed by a unit, a slash or a decimal
 # point is a measure, not a designator: 'transformer 33/11 kV', 'transformer 33 kV' and 'transformer 20 MVA' name
 # a voltage or a rating, never transformer number 33 or 20.
@@ -329,11 +334,12 @@ _DESIGNATOR = re.compile(r"\b" + _KINDS + _NUMBER_WORD + r"[\s-]?(\d+)\b"
 
 
 def _qualifiers(text):
-    """Numbers that tell assets apart: {'kv': {'11', '33'}, 'panel': {'4'}, 't': {'2'}, ...}."""
+    """Numbers that tell assets apart: {'kv': {'11', '33'}, 'mva': {'20'}, 'km': {'1.2'}, 'panel': {'4'}, 't': {'2'},
+    ...}."""
     found = {}
     text = _digits(text)
-    for match in _VOLTAGE.finditer(text):
-        found.setdefault("kv", set()).update(v for v in match.groups() if v)
+    for first, second, unit in _MEASURE.findall(text):
+        found.setdefault(unit, set()).update(str(float(v)) for v in (first, second) if v)
     for kind, number in _DESIGNATOR.findall(text):
         found.setdefault("t" if kind == "transformer" else kind, set()).add(str(int(number)))
     return found
@@ -371,16 +377,16 @@ def _resolve(value, default, items, key):
         return named[0] if len(named) == 1 else named
     q = _digits(q)
     asked = _words(q)
-    # A voltage or a panel, feeder, joint or transformer number in the request rules out every record that carries a
-    # different one, so 'Ashby Road panel 2' never drafts panel 4's work order and '11 kV line' never picks the
-    # 33 kV line.
+    # A measure (voltage, rating, length) or a panel, feeder, joint or transformer number in the request rules out
+    # every record that carries a different one, so 'Ashby Road panel 2' never drafts panel 4's work order, '11 kV
+    # line' never picks the 33 kV line and '15 MVA transformer' never picks the 20 MVA one.
     wanted = _qualifiers(q)
     ruled_out = [item for item in items if _conflicts(wanted, _record_qualifiers(item, key))]
     items = [item for item in items if item not in ruled_out]
     vocab = [(item, *_record_words(item, key)) for item in items]
     # A designator the request names ('RMU 22', 'RMU22', 'panel 4') counts as a naming word for every record that
     # carries it, however the record spells it (SG-1140's keyword is 'rmu-22').
-    designators = {(kind, n) for kind, numbers in wanted.items() if kind != "kv" for n in numbers}
+    designators = {(kind, n) for kind, numbers in wanted.items() if kind not in _UNIT_WORDS for n in numbers}
     carried = {id(item): {(kind, n) for kind, numbers in _record_qualifiers(item, key).items() for n in numbers}
                for item in items}
     scores = []

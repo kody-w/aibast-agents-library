@@ -1,4 +1,4 @@
-"""One cumulative corpus per matcher, seeded from every repro and control in review rounds 1 to 5.
+"""One cumulative corpus per matcher, seeded from every repro and control in review rounds 1 to 6.
 
 These matchers were patched round by round, and each narrow patch broke a case an earlier round had fixed. This
 file keeps every case in one place so a change to either matcher is checked against all of them at once.
@@ -106,6 +106,22 @@ SUPPLIER_CORPUS = [
     ("Where can I find the evaluation weights?", PACK, "Evaluation"),
     ("Is there a risk of losing marks for late certificates?", PACK, "Quality documents"),
     ("Does the loss tolerance apply on delivery?", PACK, "Specification"),
+    # round 6: a framing word ('until', 'shipping', 'weeks', 'in terms of', 'portal') next to an everyday 'risk',
+    # 'lost', 'pay' or 'access' does not turn a question about how a bid is scored or which quality documents it
+    # needs into an off-pack subject
+    ("Is a bid at risk until the type test certificate is provided?", PACK, "Quality documents"),
+    ("Is there a risk of a lower score if our shipping lead time is 13 weeks?", PACK, "Evaluation"),
+    ("Are marks lost until the certificate arrives?", PACK, "Quality documents"),
+    ("How much weight do you pay to lead time in weeks?", PACK, "Evaluation"),
+    ("In terms of evaluation, how much weight do you pay to price?", PACK, "Evaluation"),
+    ("Does the evaluation panel access our ISO 9001 certificate through the portal?", PACK, "Quality documents"),
+    # other phrasings of the same rule, and controls that must stay off-pack
+    ("Do we lose marks if the ISO certificate arrives after the deadline?", PACK, "Quality documents"),
+    ("Is the quality score at risk if shipping documents are late?", PACK, "Quality documents"),
+    ("Is the warranty scored in the evaluation?", NEW, "warranty"),
+    ("Who bears the risk if the certificate is lost in transit?", NEW, RISK),
+    ("When do you pay us for a scored bid?", NEW, PAYMENT),
+    ("Where can I download the tender documents?", NEW, ACCESS),
 ]
 
 
@@ -218,6 +234,16 @@ ASSET_CORPUS = [
     ("Millbrook transformer 20 MVA", "TX-0417"),
     ("Millbrook transformer thirty three eleven kV", "TX-0417"),
     ("the 1.2 km section", "CB-2208"),
+    # round 6: a stated rating that differs rules an asset out, the way a voltage does
+    ("the 15 MVA transformer", "TX-0388"),
+    ("15 MVA transformer", "TX-0388"),
+    ("the 20 MVA transformer", "TX-0417"),
+    ("fifteen MVA transformer", "TX-0388"),
+    ("the 15MVA transformer at Calder Lane", "TX-0388"),
+    ("Millbrook 15 MVA transformer", None),
+    ("the 40 MVA transformer", None),
+    ("the 1.2 km feeder 7 section", "CB-2208"),
+    ("feeder 7, 2 km section", None),
 ]
 
 
