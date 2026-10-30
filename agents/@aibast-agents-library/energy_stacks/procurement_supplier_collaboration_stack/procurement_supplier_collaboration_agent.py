@@ -101,29 +101,32 @@ RFQS = [
           "keywords": ["sealed tank", "sealed"]},
      ],
      # Subjects the published pack and its clarifications are silent on. A question that raises one of them is a
-    # new clarification for every bidder, even when it also contains a word the pack does cover ('payment due
-    # after delivery' is about payment, not the closing date or the delivery lots). Keywords are words or phrases
-    # that only that subject uses: a common word on its own ('pay attention', 'the risk of half marks', 'access to
-    # our certificate', 'the title of the specification') says nothing about the subject and must not turn a
-    # question the pack answers into a new clarification.
+     # new clarification for every bidder, even when it also contains a word the pack does cover ('payment due
+     # after delivery' is about payment, not the closing date or the delivery lots). A subject is raised two ways:
+     # by a keyword that only that subject uses ('insurance', 'payment terms'), or by a pair: a subject word
+     # ('risk', 'pay', 'download') and a word that frames it as that subject ('bears', 'until', 'where') in the
+     # same sentence, in any order and any common word form. A common word on its own ('pay attention', 'the risk
+     # of half marks', 'access to our certificate', 'the title of the specification') says nothing about the
+     # subject and must not turn a question the pack answers into a new clarification.
     "not_covered": [
-        {"subject": "payment terms", "keywords": ["payment", "payment terms", "invoice", "invoicing", "retention",
-                                                   "advance payment", "deposit", "pay us", "pay you", "pay on",
-                                                   "pay within", "pay after", "pay in advance", "paid on",
-                                                   "paid within", "paid after", "get paid", "be paid",
-                                                   "pay the supplier", "pay suppliers"]},
-        {"subject": "access to the tender documents", "keywords": [
-            "portal access", "access the portal", "access to the portal", "access the tender",
-            "access to the tender", "access the documents", "access the rfq", "access to the rfq",
-            "portal login", "log in", "login", "password", "where do i download", "where can i download",
-            "how do i download", "how can i download", "download link", "cannot download", "can't download",
-            "unable to download"]},
-        {"subject": "risk, insurance and liability", "keywords": [
-            "insurance", "insured", "liability", "liable", "incoterm", "incoterms", "in transit", "transit risk",
-            "risk of loss", "risk passes", "risk pass", "risk transfer", "transfer of risk", "carries the risk",
-            "carry the risk", "bears the risk", "bear the risk", "title transfer", "title pass", "transfer of title",
-            "passing of title", "title to the goods", "damage in transit", "damaged on delivery",
-            "damaged during delivery"]},
+        {"subject": "payment terms",
+         "keywords": ["payment", "invoice", "invoicing", "retention", "deposit", "upfront"],
+         "pairs": [[["pay", "paid"],
+                    ["us", "supplier", "suppliers", "when", "soon", "after", "within", "before", "advance",
+                     "upfront", "on delivery", "on receipt", "day", "week", "month", "net", "terms"]]]},
+        {"subject": "access to the tender documents",
+         "keywords": ["portal access", "portal login", "log in", "login", "password", "download link"],
+         "pairs": [[["download", "access"],
+                    ["where", "how do i", "how can i", "cannot", "can't", "unable", "link", "portal",
+                     "tender documents", "rfq documents", "tender pack", "rfq pack"]]]},
+        {"subject": "risk, insurance and liability",
+         "keywords": ["insurance", "insured", "insure", "liability", "liable", "incoterm", "in transit",
+                      "transit risk", "title transfer", "transfer of title", "passing of title"],
+         "pairs": [[["risk", "lost", "damage", "damaged", "title"],
+                    ["bear", "bore", "borne", "carry", "hold", "pass", "transfer", "responsible",
+                     "who pays", "who covers", "covered", "until", "during delivery", "on delivery",
+                     "after delivery", "before delivery", "transit", "ship", "shipped", "shipping", "shipment",
+                     "arrive", "arrival", "unloading"]]]},
          {"subject": "splitting the award between suppliers", "keywords": [
              "two suppliers", "multiple suppliers", "several suppliers", "more than one supplier",
              "between suppliers", "split award", "dual award", "joint bid", "consortium", "subcontract"]},
@@ -275,6 +278,19 @@ def _join(items):
 def _keyword_hit(keyword, text):
     """Whole-word match on the keyword or a common word form of it (see _keyword_pattern)."""
     return re.search(_keyword_pattern(keyword), text) is not None
+
+
+def _raises(subject, text):
+    """True when the question raises an off-pack subject: one of its own keywords anywhere, or a subject word and a
+    framing word of one of its pairs in the same sentence ('who bears risk during delivery', 'risk passes on
+    delivery', 'where can I download'), never a common word on its own ('the risk of half marks')."""
+    if any(_keyword_hit(k, text) for k in subject.get("keywords", [])):
+        return True
+    for sentence in re.split(r"[.?!;]+", text):
+        for topic, frame in subject.get("pairs", []):
+            if any(_keyword_hit(k, sentence) for k in topic) and any(_keyword_hit(k, sentence) for k in frame):
+                return True
+    return False
 
 
 def _id_named(item_id, text):
@@ -460,8 +476,7 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         # One incidental pack word does not answer a question about a subject the pack is silent on: the whole
         # question goes to every bidder as a new clarification; related pack text is shown only as context (the
         # published clarifications are listed below in any case).
-        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", [])
-                                      if any(_keyword_hit(k, q) for k in u["keywords"])]
+        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", []) if _raises(u, q)]
         lines = [f"# Supplier Question - {rfq['id']}", "",
                  f"**RFQ:** {rfq['id']} ({rfq['route']}), closes {_date(rfq['closes_in_days'])} "
                  f"(in {rfq['closes_in_days']} days)",
