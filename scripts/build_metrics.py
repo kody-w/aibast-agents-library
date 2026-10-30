@@ -4579,6 +4579,10 @@ def main():
             ]["combined_agent_distribution_fetch_events"],
             "agents": stats.get("total_agents", len(agents)),
             "stacks": stats.get("total_stacks", 0),
+            # The solutions the catalog page renders (one card per name in
+            # solutions/catalog.json). The stack total can be larger: it also
+            # counts a stack the catalog does not show.
+            "solutions": stats.get("advertised_solutions", 0),
             "verticals": stats.get("total_verticals", 0),
             "publishers": stats.get("publishers", 0),
             "categories": stats.get("categories", 0),

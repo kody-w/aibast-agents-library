@@ -170,3 +170,108 @@ def test_rapp_guide_states_the_real_solution_counts():
             str(ACADEMY["summary"]["skills"]),
         )
     ]
+
+
+# --- The metrics page and every other page that states a solution count -----
+
+import shutil
+import subprocess
+import sys
+
+import pytest
+
+METRICS = _load("state/metrics.json")
+
+# Pages a reader opens that may state a solution count by hand. The RAPP guide
+# is checked above, phrase by phrase, and is excluded here.
+COUNTED_PAGES = sorted(
+    {
+        ROOT / "index.html",
+        ROOT / "metrics.html",
+        ROOT / "README.md",
+        ROOT / "why.html",
+        *(ROOT / "docs").glob("*.html"),
+    }
+    - {ROOT / "docs" / "rapp-guide.html"}
+)
+
+# A number followed by a noun that means "solution in the library".
+SOLUTION_COUNT = re.compile(
+    r"(?<![\w#&.-])(\d{2,3})\+?\s+"
+    r"(?:(?:published|certified|complete|catalog-advertised|advertised|ready-to-deploy|deployable)\s+)*"
+    r"(?:solutions?|workshops?|workshop quests|use cases)\b",
+    re.IGNORECASE,
+)
+
+
+def test_metrics_snapshot_states_the_catalog_solution_count():
+    # The metrics page links "N solutions in the library" to the catalog, so it
+    # needs the catalog's own number, not the stack total (which also counts a
+    # stack the catalog does not render).
+    assert METRICS["totals"]["solutions"] == SOLUTIONS
+
+
+def test_metrics_builder_counts_the_catalog_solutions(tmp_path):
+    out = tmp_path / "metrics.json"
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "build_metrics.py"), "--offline", "--out", str(out)],
+        capture_output=True, text=True, timeout=180, cwd=str(ROOT),
+    )
+    assert result.returncode == 0, result.stderr[:800]
+    totals = json.loads(out.read_text(encoding="utf-8"))["totals"]
+    assert totals["solutions"] == SOLUTIONS == STATS["advertised_solutions"]
+
+
+def _render_stack_hint(snapshot: dict) -> str:
+    """Run the page's own renderStacks() against a snapshot and return the hint."""
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("node is not installed")
+    html = (ROOT / "metrics.html").read_text(encoding="utf-8")
+    start = html.index("function renderStacks()")
+    end = html.index("\nfunction ", start + 1)
+    script = """
+const M = %s;
+const els = {};
+const $ = id => (els[id] = els[id] || { innerHTML: '', textContent: '' });
+const num = v => (v === null || v === undefined) ? '-' : Number(v).toLocaleString('en-US');
+const esc = s => String(s);
+const pretty = s => String(s);
+const OWNER = 'o', REPO = 'r';
+%s
+renderStacks();
+process.stdout.write(els['stack-hint'].innerHTML || els['stack-hint'].textContent);
+""" % (json.dumps(snapshot), html[start:end])
+    result = subprocess.run(
+        [node, "-"], input=script, capture_output=True, text=True, timeout=60
+    )
+    assert result.returncode == 0, result.stderr[:800]
+    return result.stdout
+
+
+def test_metrics_library_link_states_the_number_the_catalog_shows():
+    hint = _render_stack_hint(METRICS)
+    link = re.search(r'<a href="library.html">([^<]*)</a>', hint)
+    assert link, hint
+    assert [int(n.replace(",", "")) for n in re.findall(r"[\d,]+", link.group(1))] == [SOLUTIONS], hint
+
+
+def test_metrics_library_link_follows_the_data_not_a_literal():
+    # Change the data; the page must follow it.
+    snapshot = json.loads(json.dumps(METRICS))
+    snapshot["totals"]["solutions"] = 41
+    snapshot["totals"]["stacks"] = 45
+    hint = _render_stack_hint(snapshot)
+    link = re.search(r'<a href="library.html">([^<]*)</a>', hint)
+    assert link and re.findall(r"\d+", link.group(1)) == ["41"], hint
+
+
+@pytest.mark.parametrize("page", COUNTED_PAGES, ids=lambda p: str(p.relative_to(ROOT)))
+def test_no_page_states_a_solution_count_the_data_disagrees_with(page):
+    text = page.read_text(encoding="utf-8")
+    stale = [
+        (m.group(0), text.count("\n", 0, m.start()) + 1)
+        for m in SOLUTION_COUNT.finditer(text)
+        if int(m.group(1)) != SOLUTIONS
+    ]
+    assert not stale, f"{page.name} states a count that is not {SOLUTIONS}: {stale}"

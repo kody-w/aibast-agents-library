@@ -1317,7 +1317,7 @@ footer {
   <section class="section" data-metric="workshop_adoption" aria-labelledby="workshop-heading">
     <div class="section-head">
       <h2 id="workshop-heading">Workshop adoption</h2>
-      <div class="hint" id="workshop-hint">66 catalog-advertised workshop quests</div>
+      <div class="hint" id="workshop-hint">catalog-advertised workshop quests</div>
     </div>
     <div class="workshop-summary" id="workshop-summary" aria-live="polite"></div>
     <p class="coverage-status" id="workshop-coverage" role="status" aria-live="polite" aria-atomic="true">Workshop signal coverage is loading.</p>
@@ -2119,9 +2119,14 @@ function renderStacks() {
     return;
   }
   const total = M.totals.stacks || rows.length;
+  // The link goes to the catalog, so it states the catalog's own count.
+  const solutions = M.totals.solutions;
+  const libraryLink = solutions === undefined || solutions === null
+    ? '<a href="library.html">browse the library</a>'
+    : `<a href="library.html">${num(solutions)} solutions in the library</a>`;
   $('stack-hint').innerHTML = rows.length < total
-    ? `the unit a customer actually deploys — top ${rows.length} of ${num(total)}, <a href="library.html">all ${num(total)} in the library</a>`
-    : 'the unit a customer actually deploys';
+    ? `the unit a customer actually deploys — top ${rows.length} of ${num(total)} stacks, ${libraryLink}`
+    : `the unit a customer actually deploys — ${libraryLink}`;
   table.innerHTML =
     `<caption>Deployable stack adoption and catalog size</caption>
      <thead><tr><th scope="col">Stack</th><th scope="col">Vertical</th><th class="num" scope="col">Agents</th><th class="num" scope="col">Lines</th><th class="num" scope="col">Downloads</th></tr></thead>
