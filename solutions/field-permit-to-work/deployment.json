@@ -73,6 +73,30 @@
       "persona": "Operations Manager",
       "prompt": "How are we doing on permit safety this month?",
       "operation": "safety_kpis"
+    },
+    {
+      "case_id": "PTW-08",
+      "persona": "Crew Lead",
+      "prompt": "Is the Hilltop pole replacement request ready to raise a permit?",
+      "operation": "work_request_check"
+    },
+    {
+      "case_id": "PTW-09",
+      "persona": "Permit Coordinator",
+      "prompt": "Has the control room confirmed the isolation for the Hilltop Line 3 job? Draft the crew notice.",
+      "operation": "isolation_confirmation"
+    },
+    {
+      "case_id": "PTW-10",
+      "persona": "Crew Lead",
+      "prompt": "Can my crew accept the Cedar Hill permit on site yet?",
+      "operation": "acceptance_readiness"
+    },
+    {
+      "case_id": "PTW-11",
+      "persona": "Safety Auditor",
+      "prompt": "Pull the audit trail for the archived Riverside link box permit. Is anything missing?",
+      "operation": "audit_trail"
     }
   ],
   "write_controls": {
@@ -93,14 +117,18 @@
       "authorization_route",
       "crew_briefing",
       "clearance_check",
-      "safety_kpis"
+      "safety_kpis",
+      "work_request_check",
+      "isolation_confirmation",
+      "acceptance_readiness",
+      "audit_trail"
     ],
     "manual_global_instructions": "solutions/field-permit-to-work/manual/GLOBAL-INSTRUCTIONS.md",
     "manual_knowledge_files": [
       "manual/knowledge/aibast_field-permit-to-work-synthetic-records.md",
       "manual/knowledge/aibast_field-permit-to-work-rules-and-guardrails.md"
     ],
-    "manual_skill_count": 7,
+    "manual_skill_count": 11,
     "required_connections": [
       "Bind only customer-approved systems after security, privacy, and business-owner review"
     ],

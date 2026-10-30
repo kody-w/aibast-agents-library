@@ -2675,7 +2675,8 @@
     "Permit Coordinator",
     "Authorized Person",
     "Crew Lead",
-    "Operations Manager"
+    "Operations Manager",
+    "Safety Auditor"
    ],
    "featured_tools": [
     "Microsoft Copilot Studio",
@@ -2700,7 +2701,11 @@
     "Tracks sign-offs and timing so permits are ready for the planned start",
     "Confirms every crew member has acknowledged the briefing before work starts",
     "Reconciles people, tools and site status before a permit is cleared",
-    "Rolls up permit safety performance and the hazards that matter most"
+    "Rolls up permit safety performance and the hazards that matter most",
+    "Checks a new work request for missing isolation points, competencies and method before a permit is raised",
+    "Shows the control room isolation confirmation and drafts the permit update and crew notice",
+    "Confirms isolation, sign-offs and the briefing are all in place before the crew lead accepts on site",
+    "Rebuilds the signed chain of custody for an archived permit and flags any missing signature"
    ],
    "onepager": "60. Field Permit to Work Agent one-pager.pptx",
    "demo_video": "60-Field Permit to Work Agent.mp4",

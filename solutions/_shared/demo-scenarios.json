@@ -6,8 +6,8 @@
     "solutions/*/evals/transcripts.json"
   ],
   "summary": {
-    "scenarios": 387,
-    "recorded": 377,
+    "scenarios": 391,
+    "recorded": 381,
     "not_recorded": 10
   },
   "agents": {
@@ -254,7 +254,11 @@
         "field-permit-to-work-authorization-route",
         "field-permit-to-work-crew-briefing",
         "field-permit-to-work-clearance-check",
-        "field-permit-to-work-safety-kpis"
+        "field-permit-to-work-safety-kpis",
+        "field-permit-to-work-work-request-check",
+        "field-permit-to-work-isolation-confirmation",
+        "field-permit-to-work-acceptance-readiness",
+        "field-permit-to-work-audit-trail"
       ]
     },
     "@aibast-agents-library/field-service-dispatch": {
@@ -1703,6 +1707,22 @@
       "case_id": "ESA-01",
       "recorded": true
     },
+    "field-permit-to-work-acceptance-readiness": {
+      "agent_id": "@aibast-agents-library/field-permit-to-work",
+      "title": "Crew Lead: Permit acceptance readiness",
+      "prompt": "Can my crew accept the Cedar Hill permit on site yet?",
+      "folder": "field-permit-to-work",
+      "case_id": "PTW-10",
+      "recorded": true
+    },
+    "field-permit-to-work-audit-trail": {
+      "agent_id": "@aibast-agents-library/field-permit-to-work",
+      "title": "Safety Auditor: Archived permit audit trail",
+      "prompt": "Pull the audit trail for the archived Riverside link box permit. Is anything missing?",
+      "folder": "field-permit-to-work",
+      "case_id": "PTW-11",
+      "recorded": true
+    },
     "field-permit-to-work-authorization-route": {
       "agent_id": "@aibast-agents-library/field-permit-to-work",
       "title": "Permit Coordinator: Sign-off route and timing",
@@ -1735,6 +1755,14 @@
       "case_id": "PTW-03",
       "recorded": true
     },
+    "field-permit-to-work-isolation-confirmation": {
+      "agent_id": "@aibast-agents-library/field-permit-to-work",
+      "title": "Permit Coordinator: Control room isolation confirmation",
+      "prompt": "Has the control room confirmed the isolation for the Hilltop Line 3 job? Draft the crew notice.",
+      "folder": "field-permit-to-work",
+      "case_id": "PTW-09",
+      "recorded": true
+    },
     "field-permit-to-work-permit-queue": {
       "agent_id": "@aibast-agents-library/field-permit-to-work",
       "title": "Permit Coordinator: Daily permit queue",
@@ -1757,6 +1785,14 @@
       "prompt": "How are we doing on permit safety this month?",
       "folder": "field-permit-to-work",
       "case_id": "PTW-07",
+      "recorded": true
+    },
+    "field-permit-to-work-work-request-check": {
+      "agent_id": "@aibast-agents-library/field-permit-to-work",
+      "title": "Crew Lead: Work request check",
+      "prompt": "Is the Hilltop pole replacement request ready to raise a permit?",
+      "folder": "field-permit-to-work",
+      "case_id": "PTW-08",
       "recorded": true
     },
     "field-service-dispatch-dispatch-dashboard": {

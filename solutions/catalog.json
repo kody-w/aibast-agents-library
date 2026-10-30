@@ -7991,7 +7991,7 @@
     "@aibast-agents-library/field-permit-to-work": {
       "display_name": "Field Permit to Work Agent",
       "sales_headline": "No crew starts work on an unconfirmed isolation",
-      "card_pitch": "Give permit coordinators and authorized persons a drafted risk assessment, an isolation check against the live switching state, visible sign-off timing, crew acknowledgements and close-out reconciliation, while every safety decision stays with authorized people.",
+      "card_pitch": "Give permit coordinators and authorized persons a drafted risk assessment, an isolation check against the live switching state, visible sign-off timing, crew acknowledgements, control room isolation confirmation, on-site acceptance checks, close-out reconciliation and archived audit trails, while every safety decision stays with authorized people.",
       "why_try": "The demo follows one high-risk transformer permit from the morning queue to close-out, catching a missing lockout and a missing tool along the way.",
       "customer_challenge": "Permit-to-work relies on paper-heavy steps and phone calls; isolation plans can diverge from the live network state, and close-out checks get rushed.",
       "microsoft_ai_story": "Copilot Studio and Microsoft Teams provide the assistant; work-management, network control and crew briefing systems can be bound read-only with least-privilege access, while Power Automate approvals stay with authorized people.",
@@ -8009,13 +8009,18 @@
         "Operations Manager",
         "Permit Coordinator",
         "Power Automate",
+        "Safety Auditor",
+        "acceptance_readiness",
+        "audit_trail",
         "authorization_route",
         "clearance_check",
         "crew_briefing",
         "isolation_check",
+        "isolation_confirmation",
         "permit_queue",
         "risk_assessment",
-        "safety_kpis"
+        "safety_kpis",
+        "work_request_check"
       ],
       "journey_stage": "Protect",
       "blueprint_role": "Separates permit preparation and safety checks from issuing, switching and clearance authority, which stay with authorized people.",
@@ -8054,6 +8059,26 @@
           "label": "Operations Manager: Permit safety roll-up",
           "prompt": "How are we doing on permit safety this month?",
           "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-safety-kpis"
+        },
+        {
+          "label": "Crew Lead: Work request check",
+          "prompt": "Is the Hilltop pole replacement request ready to raise a permit?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-work-request-check"
+        },
+        {
+          "label": "Permit Coordinator: Control room isolation confirmation",
+          "prompt": "Has the control room confirmed the isolation for the Hilltop Line 3 job? Draft the crew notice.",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-isolation-confirmation"
+        },
+        {
+          "label": "Crew Lead: Permit acceptance readiness",
+          "prompt": "Can my crew accept the Cedar Hill permit on site yet?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-acceptance-readiness"
+        },
+        {
+          "label": "Safety Auditor: Archived permit audit trail",
+          "prompt": "Pull the audit trail for the archived Riverside link box permit. Is anything missing?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-audit-trail"
         }
       ],
       "architecture": {
@@ -8100,6 +8125,26 @@
             "operation": "safety_kpis",
             "name": "Permit safety roll-up",
             "purpose": "Use when a manager asks how permit safety is performing this month."
+          },
+          {
+            "operation": "work_request_check",
+            "name": "Work request check",
+            "purpose": "Use when someone asks whether a new work request is complete enough to raise a permit."
+          },
+          {
+            "operation": "isolation_confirmation",
+            "name": "Control room isolation confirmation",
+            "purpose": "Use when someone asks whether the control room has confirmed the isolation, or wants the permit update and crew notice drafted."
+          },
+          {
+            "operation": "acceptance_readiness",
+            "name": "Permit acceptance readiness",
+            "purpose": "Use when a crew lead asks whether the crew can accept the permit on site yet."
+          },
+          {
+            "operation": "audit_trail",
+            "name": "Archived permit audit trail",
+            "purpose": "Use when someone asks for the audit trail or chain of custody of an archived permit."
           }
         ],
         "easy_mode": [
@@ -8110,7 +8155,7 @@
           "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
         ],
         "local_install_prompt": "Install Field Permit to Work Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-permit-to-work/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect customer systems or execute external actions.",
-        "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Field Permit to Work Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-permit-to-work/deployment.json. Upload the two synthetic knowledge files and 7 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+        "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Field Permit to Work Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-permit-to-work/deployment.json. Upload the two synthetic knowledge files and 11 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
         "required_connections": [
           "Use only approved, read-only, least-privilege connections to work-management, network control and crew briefing systems; the packaged demonstration uses synthetic knowledge files."
         ],
