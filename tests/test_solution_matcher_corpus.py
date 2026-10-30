@@ -1,4 +1,4 @@
-"""One cumulative corpus per matcher, seeded from every repro and control in review rounds 1 to 6.
+"""One cumulative corpus per matcher, seeded from every repro and control in review rounds 1 to 7.
 
 These matchers were patched round by round, and each narrow patch broke a case an earlier round had fixed. This
 file keeps every case in one place so a change to either matcher is checked against all of them at once.
@@ -122,6 +122,17 @@ SUPPLIER_CORPUS = [
     ("Who bears the risk if the certificate is lost in transit?", NEW, RISK),
     ("When do you pay us for a scored bid?", NEW, PAYMENT),
     ("Where can I download the tender documents?", NEW, ACCESS),
+    # round 7: an anchor frames only the clause it sits in. A second clause or sentence that asks about an
+    # off-pack subject still goes to every bidder, and a clause that opens by asking the subject ('where can I
+    # download', 'how do I access') is not overruled by an anchor later in it
+    ("Who bears the risk during delivery? Also, what are the evaluation criteria?", NEW, RISK),
+    ("Where can I download the tender documents and the evaluation criteria?", NEW, ACCESS),
+    ("How is quality evaluated, and who bears the risk during delivery?", NEW, RISK),
+    ("How do I access the portal to upload our ISO certificate?", NEW, ACCESS),
+    ("What are the evaluation criteria? Who carries the risk while the units are shipped?", NEW, RISK),
+    ("How are bids scored, and when will you pay us?", NEW, PAYMENT),
+    ("Where can I find the evaluation criteria and the quality documents?", PACK, "Evaluation"),
+    ("How is quality evaluated, and what is the closing date?", PACK, "Closing date"),
 ]
 
 
@@ -244,6 +255,20 @@ ASSET_CORPUS = [
     ("the 40 MVA transformer", None),
     ("the 1.2 km feeder 7 section", "CB-2208"),
     ("feeder 7, 2 km section", None),
+    # round 7: units are compared within their dimension (kVA with MVA, m with km, V with kV), and a measure that
+    # rules out the only record carrying it leaves no substitute that matches on a shared class word alone
+    ("the 15000 kVA transformer", "TX-0388"),
+    ("15000 kVA transformer", "TX-0388"),
+    ("the 20000 kVA transformer", "TX-0417"),
+    ("500 kVA transformer", None),
+    ("Millbrook transformer 15000 kVA", None),
+    ("the 2 km cable", None),
+    ("the 0.5 km cable section", None),
+    ("the 2km underground cable", None),
+    ("the 1200 m cable", "CB-2208"),
+    ("the 1.2 km cable", "CB-2208"),
+    ("the 11000 V overhead line", "OH-3302"),
+    ("the 33000 V line", "OH-3310"),
 ]
 
 
@@ -277,6 +302,27 @@ def test_asset_resolver_corpus(words, expected):
 def test_asset_resolver_empty_request_is_the_default():
     assert outcome(resolve("")) == "TX-0417"
     assert outcome(resolve(None, "SG-1123")) == "SG-1123"
+
+
+# (request, expected rfq or requisition id) for the procurement id resolver: an id with a space or without its
+# hyphen (round 2), and words that name the record.
+FIND_CORPUS = [
+    ("rfq 3301", "rfq", "RFQ-3301"),
+    ("rfq3301", "rfq", "RFQ-3301"),
+    ("the RFQ-3301 bids", "rfq", "RFQ-3301"),
+    ("req 7712", "req", "REQ-7712"),
+    ("req7712", "req", "REQ-7712"),
+    ("requisition REQ-7712", "req", "REQ-7712"),
+]
+
+
+@pytest.mark.parametrize("words, kind, expected", FIND_CORPUS, ids=[c[0] for c in FIND_CORPUS])
+def test_procurement_id_resolver_corpus(words, kind, expected):
+    if kind == "rfq":
+        found = PROCUREMENT._find(words, PROCUREMENT.DEFAULT_RFQ, PROCUREMENT._rfqs(), "id")
+    else:
+        found = PROCUREMENT._find(words, PROCUREMENT.DEFAULT_REQUISITION, PROCUREMENT._requisitions(), "id")
+    assert found is not None and not isinstance(found, list) and found["id"] == expected
 
 
 # (request, default, expected work order) for completed jobs, which share the same resolver.
