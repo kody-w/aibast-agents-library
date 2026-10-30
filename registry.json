@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-30T04:54:45.811628+00:00",
+  "generated_at": "2026-10-30T07:52:44.858085+00:00",
   "stats": {
     "total_agents": 93,
     "publishers": 1,
@@ -10,7 +10,7 @@
     "total_multi_agent_stacks": 2,
     "total_solution_containers": 71,
     "total_verticals": 13,
-    "advertised_solutions": 73,
+    "advertised_solutions": 72,
     "demo_proven_agents": 73,
     "source_verified_solutions": 72,
     "curated_copy_solutions": 72,

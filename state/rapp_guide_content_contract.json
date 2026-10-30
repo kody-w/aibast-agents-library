@@ -2,8 +2,8 @@
   "schema": "aibast-rapp-guide-content-contract/1.0",
   "version": 1,
   "source": "docs/rapp-guide.html",
-  "trusted_source_commit": "cac06c6a1028a1742f0800afbedc85f272716a41",
-  "trusted_source_blob_oid": "722afab6b04b5924108c1e4511af55e17ed49bea",
+  "trusted_source_commit": "b5d06e330a74baa59a19a93fcf1ae2ef0c86c572",
+  "trusted_source_blob_oid": "6cf53e01a32e4ed15721b530817a247051ea8d62",
   "normalization": "Remove script, style, template, and comments; join rendered text with spaces; collapse Unicode whitespace.",
   "content_section_ids": [
     "overview",
@@ -59,7 +59,7 @@
     },
     {
       "id": "step5",
-      "normalized_visible_text_sha256": "7c8dd47040c004be1a4efc0c986863985d500bb5bb728bce867ea4a34c33774b"
+      "normalized_visible_text_sha256": "f1baaddd55fcf8d736e2f12c5e0388bbc1c81c127e2bd276eb8891d52a2d45d0"
     },
     {
       "id": "step6",
@@ -107,7 +107,7 @@
     },
     {
       "id": "roadmap",
-      "normalized_visible_text_sha256": "b7acb84b5b077523a9ab12d4eb435db073ed16b97996ec175073e2441cb9c835"
+      "normalized_visible_text_sha256": "e68f0c89703219c08189249a9bac4445e67a820131a2e4721604cdf3c5ff6c67"
     },
     {
       "id": "tools",
