@@ -228,18 +228,25 @@ _SECRET_VALUE_PATTERNS = [
     re.compile(r"eyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}"),
     re.compile(r"(?i)bearer\s+[A-Za-z0-9._\-~+/]{12,}=*"),
 ]
-# A setting name whose value is a key. The key word must be a whole part of
-# the name (api_key, AUTH_TOKEN, apiKey, password), so "Author:" and
-# "Authorization flow:" are ordinary text.
+# A setting name that may hold a key. Any name containing a key word is looked
+# at (DBPASSWORD, OPENAI_APIKEY, accessToken, api_key); _redact_assignment then
+# decides, so "Author:" and "Primary key: customer_id" stay ordinary text.
 _ASSIGNMENT = re.compile(
-    r"\b((?:[A-Za-z0-9]+[_\-])*(?:[a-z0-9]+(?:Key|Token|Secret|Password|Passwd|Pwd|Credentials?|Auth)"
-    r"|(?i:key|token|secret|password|passwd|pwd|credentials?|auth))(?:[_\-][A-Za-z0-9]+)*)"
+    r"(?i)\b([A-Z0-9_\-]*(?:key|token|secret|password|passwd|pwd|passphrase|credential|auth|connection[_\-]?string|conn[_\-]?str)"
+    r"[A-Z0-9_\-]*)"
     r"(\s*[:=]\s*[\"']?)([^\s\"',}]{4,})"
 )
-# Name parts that are always keys whatever the value looks like. A bare "key"
-# or "auth" ("Primary key: customer_id") is redacted only when the value looks
-# generated: letters and digits together, or very long.
-_STRONG_SECRET_PART = re.compile(r"(?i)(token|secret|password|passwd|pwd|credential|apikey|api_key|api-key|private)")
+# Words that always mean a key wherever they sit in the name, joined or not,
+# whatever the value looks like. Checked with _ and - removed, ignoring case.
+_STRONG_SECRET_PART = re.compile(
+    r"(?i)(token|secret|password|passwd|pwd|passphrase|credential|apikey|accesskey|privatekey|authkey"
+    r"|signingkey|encryptionkey|connectionstring|connstr)"
+)
+# "key" and "auth" alone count only as a whole part of the name (MYAPP_AUTH,
+# primaryKey), never inside a word ("Author", "keyboard"). A whole-part "auth"
+# is a key; a bare "key" ("Primary key: customer_id") is redacted only when the
+# value looks generated: letters and digits together, or very long.
+_NAME_PART = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+")
 _LONG_RANDOM = re.compile(r"\b(?=[A-Za-z0-9_\-+=]*\d)(?=[A-Za-z0-9_\-+=]*[A-Za-z])[A-Za-z0-9_\-+=]{32,}\b")
 _SECRET_FLAG = re.compile(r"(?i)^--?[a-z0-9_\-]*(key|token|secret|password|auth|credential)[a-z0-9_\-]*$")
 REDACTED = "[REDACTED]"
@@ -259,7 +266,9 @@ def redact_text(text):
 def _redact_assignment(match):
     name, sep, value = match.group(1), match.group(2), match.group(3)
     looks_generated = (re.search(r"\d", value) and re.search(r"[A-Za-z]", value) and len(value) >= 8) or len(value) >= 24
-    if _STRONG_SECRET_PART.search(name) or looks_generated:
+    joined = re.sub(r"[_\-]", "", name)
+    parts = [part.lower() for chunk in re.split(r"[_\-]+", name) for part in _NAME_PART.findall(chunk)]
+    if _STRONG_SECRET_PART.search(joined) or "auth" in parts or looks_generated:
         return name + sep + REDACTED
     return match.group(0)
 
