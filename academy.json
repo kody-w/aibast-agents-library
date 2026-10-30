@@ -1,13 +1,13 @@
 {
   "schema": "aibast-academy/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-30T12:24:25.010021+00:00",
+  "generated_at": "2026-10-30T13:18:46.384105+00:00",
   "title": "Microsoft AI Academy",
   "description": "A hands-on catalog for exploring experimental AIBAST agents through scenario quests, guided builds, evidence reviews, and portable Microsoft implementation patterns.",
   "disclaimer": "Microsoft AI Academy is an experimental AIBAST learning experience. It is not an official Microsoft credential, certification, training program, or replacement for Microsoft Learn. Activities use synthetic data and self-reported milestones unless a course states otherwise.",
   "summary": {
     "courses": 72,
-    "skills": 516,
+    "skills": 519,
     "paths": 6,
     "industries": 13,
     "points_per_course": 150
@@ -4146,11 +4146,13 @@
       "industry": "Financial Services",
       "journey_stage": "Optimize",
       "personas": [
+        "Compliance Analyst",
         "Head of Payments Operations",
         "Payments Analyst",
         "Payments Operations Lead",
         "Payments Repair Analyst",
-        "Reconciliation Analyst"
+        "Reconciliation Analyst",
+        "Treasury Analyst"
       ],
       "platforms": [
         "Microsoft Copilot Studio",
@@ -4166,7 +4168,7 @@
         "reconciliation"
       ],
       "outcomes": [
-        "Better releases: screening, risk and drivers in one view",
+        "Better releases: flags and evidence in one view",
         "Earlier break resolution: breaks are ranked by value before the cutoff",
         "Faster triage: failed payments arrive with a repair plan"
       ],
@@ -4177,9 +4179,21 @@
       "added_at": "2026-10-08T01:53:29-04:00",
       "has_demo_video": true,
       "has_onepager": true,
-      "demo_cases": 7,
-      "manual_steps": 26,
+      "demo_cases": 10,
+      "manual_steps": 32,
       "skills": [
+        {
+          "name": "correspondent-limits",
+          "title": "Correspondent limits and nostro funding",
+          "description": "Use when someone asks about correspondent limit use, projected nostro balances, or a funding request for treasury.",
+          "path": "solutions/payments-operations/manual/skills/aibast_correspondent-limits_09/SKILL.md"
+        },
+        {
+          "name": "customer-verification",
+          "title": "Customer verification draft",
+          "description": "Use when someone asks how to verify a flagged payment with the customer; the call goes to the contact on file and the analyst decides.",
+          "path": "solutions/payments-operations/manual/skills/aibast_customer-verification_10/SKILL.md"
+        },
         {
           "name": "daily-kpi-brief",
           "title": "Daily payments KPI brief",
@@ -4217,13 +4231,19 @@
           "path": "solutions/payments-operations/manual/skills/aibast_repair-plan_03/SKILL.md"
         },
         {
+          "name": "sanctions-review-queue",
+          "title": "Sanctions review queue",
+          "description": "Use when a compliance analyst asks which sanctions alerts to review first and what evidence to compare; flags come from the screening service and the analyst decides.",
+          "path": "solutions/payments-operations/manual/skills/aibast_sanctions-review-queue_08/SKILL.md"
+        },
+        {
           "name": "validate-payment",
           "title": "Scheme-rule validation",
           "description": "Use when an analyst asks why a payment failed or passed validation against rail limits, currencies, account presence, and reference uniqueness.",
           "path": "solutions/payments-operations/manual/skills/aibast_validate-payment_02/SKILL.md"
         }
       ],
-      "skill_count": 7,
+      "skill_count": 10,
       "primary_path": "regulated-public-services",
       "path_ids": [
         "regulated-public-services"
