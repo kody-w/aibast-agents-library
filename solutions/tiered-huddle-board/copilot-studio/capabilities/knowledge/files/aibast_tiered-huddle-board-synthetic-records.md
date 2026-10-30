@@ -96,7 +96,7 @@ Every value the agent uses, exactly as bundled in the portable agent source. `ho
   "waiting_on": "Jordan Pike",
   "hours_in_tier": 18,
   "hours_open": 18,
-  "mitigation": "Biomedical engineering replaced the sensor pad; the fall-risk patient stays in room 409 until the alarm holds for a full shift.",
+  "mitigation": "Biomedical engineering replaced the sensor pad; the fall-risk patient stays in room 409 until the alarm holds for 24 hours (two full shifts).",
   "hold_hours_required": 24,
   "hold_hours_done": 16,
   "unit_tried": "Moved the fall-risk patient to room 409.",
@@ -114,7 +114,7 @@ Every value the agent uses, exactly as bundled in the portable agent source. `ho
   "waiting_on": "Amir Sadeghi",
   "hours_in_tier": 14,
   "hours_open": 21,
-  "mitigation": "The vendor reset the room controllers; hourly rounding stays in place until the system holds for a full shift.",
+  "mitigation": "The vendor reset the room controllers; hourly rounding stays in place until the system holds for a full 12-hour shift.",
   "hold_hours_required": 12,
   "hold_hours_done": 12,
   "unit_tried": "Started hourly rounding on the four rooms.",
@@ -360,7 +360,7 @@ Operation: `closure_check`; arguments: `{"operation": "closure_check", "issue": 
 **Can it close now? No. Mitigated is not closed.**
 Only Jordan Pike, who raised it, can confirm the fix held.
 
-**Mitigation:** Biomedical engineering replaced the sensor pad; the fall-risk patient stays in room 409 until the alarm holds for a full shift.
+**Mitigation:** Biomedical engineering replaced the sensor pad; the fall-risk patient stays in room 409 until the alarm holds for 24 hours (two full shifts).
 **Hold period:** 16 of 24 h done; 8 h to go before Jordan Pike is asked to confirm.
 
 **Other mitigated items waiting on their originator:** HB-2033 (Amir Sadeghi)
