@@ -244,13 +244,20 @@ def _ranked():
     return sorted(_assets(), key=lambda a: (-a["p90"], -a["p180"]))
 
 
-_STOPWORDS = {"the", "a", "an", "of", "for", "to", "on", "at", "in", "and", "our", "its", "asset", "job"}
+_STOPWORDS = {"the", "a", "an", "of", "for", "to", "on", "at", "in", "and", "our", "its", "asset", "job", "one", "ones"}
 
 
 def _words(text):
-    """Lower-case words and ids (TX-0417 stays one word); a trailing plural s is dropped so 'cables' meets 'cable'."""
+    """Lower-case words and ids (TX-0417 stays one word); a trailing plural s is dropped so 'cables' meets 'cable'.
+
+    Numbers are not words: a number only tells assets apart through _qualifiers (a voltage, or a panel, feeder,
+    joint, RMU or transformer number), so '1.2 km' in a cable's name never meets a '1' or '2' in the request, and
+    'one' is a pronoun ('the Millbrook one'), not a number, unless it follows a designator.
+    """
     words = set()
-    for word in re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", str(text).lower()):
+    for word in re.findall(r"[a-z0-9]+(?:[-.][a-z0-9]+)*", str(text).lower()):
+        if re.fullmatch(r"[\d.]+", word) or len(word) < 2:
+            continue
         if len(word) > 3 and word.endswith("s") and not word.endswith("ss"):
             word = word[:-1]
         if word not in _STOPWORDS:
@@ -273,6 +280,83 @@ def _id_named(item_id, text):
     return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
 
 
+_UNITS = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+          "nine": 9}
+_TEENS = {"ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
+          "seventeen": 17, "eighteen": 18, "nineteen": 19}
+_TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80,
+         "ninety": 90}
+_NUMBER = (r"(?:(?:" + "|".join(_TENS) + r")(?:[\s-]+(?:" + "|".join(_UNITS) + r"))?|(?:"
+           + "|".join(list(_TEENS) + list(_UNITS)) + r"))")
+_SPELLED = re.compile(r"\b(?:(" + "|".join(_TENS) + r")(?:[\s-]+(" + "|".join(_UNITS) + r"))?|("
+                      + "|".join(list(_TEENS) + list(_UNITS)) + r"))\b")
+_KINDS = r"(panel|feeder|joint|t|rmu|transformer)"
+_NUMBER_WORD = r"(?:\s+(?:number|no\.?|#))?"
+# A spelled number counts as a number in exactly two places: right after a designator ('panel two', 'T one',
+# 'transformer number one', 'RMU twenty two'), or in a run that ends in a unit ('eleven kV', 'thirty-three eleven
+# kV' = 33/11 kV). Anywhere else it is an ordinary word ('the Millbrook one').
+_SPELLED_DESIGNATOR = re.compile(r"\b" + _KINDS + _NUMBER_WORD + r"([\s-]+)(" + _NUMBER + r")\b")
+_SPELLED_MEASURE = re.compile(r"\b(" + _NUMBER + r"(?:[\s/-]+" + _NUMBER + r")?)\s*(?=kv\b|kva\b|mva\b)")
+
+
+def _spelled(words):
+    """'twenty two' -> '22', 'eleven' -> '11'."""
+    def number(match):
+        tens, unit, single = match.groups()
+        if single:
+            return str(_TEENS.get(single, _UNITS.get(single)))
+        return str(_TENS[tens] + _UNITS.get(unit or "zero", 0))
+    return _SPELLED.sub(number, words)
+
+
+def _digits(text):
+    """Spelled-out numbers as digits where they are numbers, so a spoken request reads like a typed one:
+    'panel two' -> 'panel 2', 'eleven kV' -> '11 kV', 'thirty-three eleven kV' -> '33/11 kV', 'RMU twenty two' ->
+    'RMU 22'. 'The Millbrook one' is unchanged."""
+    text = str(text).lower()
+    text = _SPELLED_MEASURE.sub(
+        lambda m: "/".join(_spelled(part) for part in re.findall(_NUMBER, m.group(1))) + " ", text)
+    return _SPELLED_DESIGNATOR.sub(
+        lambda m: m.group(0)[:m.start(3) - m.start(0)] + _spelled(m.group(3)), text)
+
+
+# A measure is a number with its unit: a voltage ('11 kV', '33/11 kV'), a rating ('20 MVA', '500 kVA') or a length
+# ('1.2 km'). Every unit works the same way: a measure the request states rules out a record that states a
+# different one of the same unit, so '15 MVA transformer' never drafts the 20 MVA unit and '11 kV line' never picks
+# the 33 kV line.
+_UNIT_WORDS = ("kv", "kva", "mva", "km")
+_MEASURE = re.compile(r"\b(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?\s*(" + "|".join(_UNIT_WORDS) + r")\b")
+# 'transformer 1' and 'transformer number 1' are transformer T1. A number followed by a unit, a slash or a decimal
+# point is a measure, not a designator: 'transformer 33/11 kV', 'transformer 33 kV' and 'transformer 20 MVA' name
+# a voltage or a rating, never transformer number 33 or 20.
+_DESIGNATOR = re.compile(r"\b" + _KINDS + _NUMBER_WORD + r"[\s-]?(\d+)\b"
+                         r"(?!\s*(?:[/.]\d|kv\b|kva\b|mva\b|km\b|mm\b|m\b|%))")
+
+
+def _qualifiers(text):
+    """Numbers that tell assets apart: {'kv': {'11', '33'}, 'mva': {'20'}, 'km': {'1.2'}, 'panel': {'4'}, 't': {'2'},
+    ...}."""
+    found = {}
+    text = _digits(text)
+    for first, second, unit in _MEASURE.findall(text):
+        found.setdefault(unit, set()).update(str(float(v)) for v in (first, second) if v)
+    for kind, number in _DESIGNATOR.findall(text):
+        found.setdefault("t" if kind == "transformer" else kind, set()).add(str(int(number)))
+    return found
+
+
+def _record_qualifiers(item, key):
+    fields = [item[key], item.get("name", ""), item.get("site", ""), item.get("asset", ""),
+              item.get("asset_name", "")] + list(item.get("keywords", []))
+    return _qualifiers(" ".join(fields))
+
+
+def _conflicts(asked, carried):
+    """True when the request names a number of a kind the record also has, and the record's number differs:
+    'panel 2' against panel 4, '11 kV' against a 33 kV line, 'T1' against transformer T2."""
+    return any(kind in carried and not (numbers & carried[kind]) for kind, numbers in asked.items())
+
+
 def _resolve(value, default, items, key):
     """Id or words from the record; empty -> the default; no match -> None; a tie -> the tied records (a list).
 
@@ -291,14 +375,28 @@ def _resolve(value, default, items, key):
     named = [item for item in items if _id_named(item[key], q)]
     if named:
         return named[0] if len(named) == 1 else named
+    q = _digits(q)
     asked = _words(q)
+    # A measure (voltage, rating, length) or a panel, feeder, joint or transformer number in the request rules out
+    # every record that carries a different one, so 'Ashby Road panel 2' never drafts panel 4's work order, '11 kV
+    # line' never picks the 33 kV line and '15 MVA transformer' never picks the 20 MVA one.
+    wanted = _qualifiers(q)
+    ruled_out = [item for item in items if _conflicts(wanted, _record_qualifiers(item, key))]
+    items = [item for item in items if item not in ruled_out]
     vocab = [(item, *_record_words(item, key)) for item in items]
+    # A designator the request names ('RMU 22', 'RMU22', 'panel 4') counts as a naming word for every record that
+    # carries it, however the record spells it (SG-1140's keyword is 'rmu-22').
+    designators = {(kind, n) for kind, numbers in wanted.items() if kind not in _UNIT_WORDS for n in numbers}
+    carried = {id(item): {(kind, n) for kind, numbers in _record_qualifiers(item, key).items() for n in numbers}
+               for item in items}
     scores = []
     for item, primary, secondary in vocab:
         score = 0.0
         for word in asked & (primary | secondary):
             shared = sum(1 for _, p, s in vocab if word in p or word in s)
             score += (1.0 if word in primary else 0.5) / shared
+        for designator in designators & carried[id(item)]:
+            score += 1.0 / sum(1 for other in items if designator in carried[id(other)])
         if score:
             scores.append((score, item))
     if not scores:
@@ -306,6 +404,13 @@ def _resolve(value, default, items, key):
     scores.sort(key=lambda pair: -pair[0])
     best = scores[0][0]
     tied = [item for score, item in scores if abs(score - best) < 1e-9]
+    if len(tied) == 1 and ruled_out:
+        # A word that names only a ruled-out record ('Millbrook' in 'T1 at Millbrook', where the Millbrook
+        # transformer is T2) means the request describes an asset that is not monitored; no substitute is offered.
+        winner = set().union(*_record_words(tied[0], key))
+        named_elsewhere = set().union(*(_record_words(item, key)[0] for item in ruled_out))
+        if (asked & named_elsewhere) - winner:
+            return None
     return tied[0] if len(tied) == 1 else tied
 
 

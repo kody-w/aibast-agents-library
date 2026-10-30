@@ -164,7 +164,8 @@ def test_scan_sees_the_right_items_and_names_only(env):
     assert "skill: 2" in out and "skill: 1" in out  # per folder
     assert "conversations: 3" in out
     assert "hooks: 2" in out
-    assert "Skipped 1 file(s)" in out and "oauth-notes" not in out
+    # A command named oauth-notes is an ordinary command: carried, with key-looking values redacted.
+    assert "oauth-notes" in out and "Skipped" not in out
     # names and counts only: no file bodies
     for body in ("Be brief.", "Read the diff", "Use metric units", "Run tests before finishing", "prefers short answers"):
         assert body not in out
@@ -453,3 +454,170 @@ def test_scan_plan_apply_label_setups_by_folder_and_carry_the_naming_rule(env):
     assert BANNED_NAMES.search(description) is None
     for spec in MODULE.DETECTION.values():
         assert BANNED_NAMES.search(spec["label"]) is None
+
+
+# ── Innocent names are carried; only real key files and key content are skipped ──
+INNOCENT_SKILLS = ("authoring-guide", "design-tokens", "session-notes", "cookiecutter-template", "blog-author")
+
+
+def _innocent_home(base):
+    home = base / "innocent-home"
+    for name in INNOCENT_SKILLS + ("pdf",):
+        write(home / ".claude/skills" / name / "SKILL.md",
+              "---\nname: " + name + "\ndescription: Synthetic skill " + name + ".\n---\nDo the " + name + " steps.\n")
+    write(home / ".claude/projects/-Users-me-code-auth-service/memory/MEMORY.md", "- uses short commit messages\n")
+    # Content that really is a key: skipped by content, and named in the reply.
+    write(home / ".claude/skills/deploy-box/SKILL.md",
+          "Deploy with this.\n-----BEGIN OPENSSH PRIVATE KEY-----\nFAKEKEYMATERIALnotreal000\n-----END OPENSSH PRIVATE KEY-----\n")
+    return home
+
+
+def test_innocent_names_are_carried_and_real_key_content_is_named_when_skipped(tmp_path):
+    home = _innocent_home(tmp_path)
+    out = MODULE.AIMigrationAgent().perform(action="scan", home_path=str(home))
+    for name in INNOCENT_SKILLS + ("pdf",):
+        assert name in out, name
+    assert "skill: 6" in out
+    assert "auth-service/MEMORY.md" in out
+    # The skipped file is listed with a plain reason, and its value never shows.
+    assert "Skipped 1 file(s)" in out
+    assert "~/.claude/skills/deploy-box/SKILL.md" in out and "private key" in out
+    assert "FAKEKEYMATERIAL" not in out
+
+
+def test_known_key_files_are_skipped_by_name_and_listed(tmp_path):
+    export = tmp_path / "export"
+    write(export / "conversations.json", json.dumps([{"title": "a"}]))
+    write(export / "auth.json", json.dumps({"k": SECRETS["auth_file"]}))
+    write(export / "tokens.json", json.dumps({"k": SECRETS["oauth_file"]}))
+    write(export / "session-notes" / "conversations.json", json.dumps([{"title": "b"}]))
+    out = MODULE.AIMigrationAgent().perform(action="scan", home_path=str(tmp_path / "nohome"), export_path=str(export))
+    assert "conversations: 2" in out  # a folder named session-notes is not a key file
+    assert "Skipped 2 file(s)" in out
+    assert "- export/auth.json (it is a key or sign-in file)" in out
+    assert "- export/tokens.json (it is a key or sign-in file)" in out
+    assert_no_secrets(out)
+
+
+def test_name_filter_judges_known_key_files_not_words():
+    check = getattr(MODULE, "_is_secret_name")
+    for innocent in ("authoring-guide", "design-tokens", "session-notes", "cookiecutter-template",
+                     "blog-author", "SKILL.md", "MEMORY.md", "-Users-me-code-auth-service", "token-budget.md"):
+        assert not check(innocent), innocent
+    for secret in (".env", ".env.local", "auth.json", ".credentials.json", "credentials.json",
+                   "oauth_creds.json", "server.pem", "id_rsa", "id_ed25519", "cert.p12", "tls.key", ".netrc"):
+        assert check(secret), secret
+
+
+def test_redaction_leaves_ordinary_words_alone():
+    text = "Author: Jane Smith\nPrimary key: customer_id\nAuthorization flow: read the docs"
+    assert MODULE.redact_text(text) == text
+    for secret in ("api_key: abcd1234efgh5678", "password = hunter22x", "AUTH_TOKEN=abc123def456", "auth: xyz123abc456"):
+        assert "[REDACTED]" in MODULE.redact_text(secret), secret
+
+
+
+# Joined and camel-case setting names still hide their values, even letters-only
+# ones. Every value here is a fake placeholder; a failure names the setting only.
+JOINED_SECRET_SETTINGS = [
+    "DBPASSWORD=placeholderpass", "APIKEY=Fakefakefake", "OPENAI_APIKEY: placeholderkey",
+    "accesstoken: fakeaccessvalue", "MYAPP_AUTH=fakeauthvalue", "auth: fakeauthvalue",
+    "dbPassword: placeholderpass", "accessToken=fakeaccessvalue", "apiKey: fakeplaceholder",
+    "clientSecret=fakesecretvalue", "SMTP_PASSWD=fakepassword", "db_pwd: fakepassword",
+    "AWS_ACCESSKEY=fakeaccessvalue", "privatekey: fakeprivatevalue", "github_token=placeholdervalue",
+    "ConnectionString=fakeconnectionvalue", "connection_string: fakeconnectionvalue",
+    "authToken = 'fakeauthvalue'", "SIGNINGKEY=fakesigningvalue",
+]
+
+
+def test_redaction_hides_joined_and_camel_case_setting_names():
+    for setting in JOINED_SECRET_SETTINGS:
+        value = setting.replace("'", "").split("=" if "=" in setting else ":", 1)[1].strip()
+        redacted = MODULE.redact_text(setting)
+        assert value not in redacted and "[REDACTED]" in redacted, setting.split("=")[0].split(":")[0]
+
+
+def test_redaction_keeps_ordinary_words_and_names():
+    text = ("Author: Jane Smith\nPrimary key: customer_id\nprimaryKey: customer_id\n"
+            "Authorization flow: read the docs\nkeyboard: qwerty\nauthoring: drafts first")
+    assert MODULE.redact_text(text) == text
+    check = MODULE._is_secret_name
+    for innocent in ("auth-helper", "token-budget.md", "session-notes", "design-tokens", "authoring"):
+        assert not check(innocent), innocent
+
+
+def test_apply_does_not_copy_joined_setting_values(tmp_path, monkeypatch):
+    home = tmp_path / "home"
+    skill = home / ".claude" / "skills" / "db-setup"
+    skill.mkdir(parents=True)
+    (skill / "SKILL.md").write_text(
+        "Connect with DBPASSWORD=placeholderpass and OPENAI_APIKEY: placeholderkey\naccesstoken: fakeaccessvalue\n",
+        encoding="utf-8")
+    imports = tmp_path / "imports"
+    agents = tmp_path / "agents"
+    agents.mkdir()
+    monkeypatch.setenv("AI_MIGRATION_IMPORTS_DIR", str(imports))
+    monkeypatch.setenv("AGENTS_PATH", str(agents))
+    MODULE.AIMigrationAgent().perform(action="apply", home_path=str(home), project_path=str(tmp_path / "none"),
+                                      export_path=str(tmp_path / "none"), dry_run=False)
+    written = [f for f in imports.rglob("*") if f.is_file()]
+    assert written
+    for f in written:
+        body = f.read_text(encoding="utf-8", errors="ignore")
+        for fake in ("placeholderpass", "placeholderkey", "fakeaccessvalue"):
+            assert fake not in body, f.name
+
+
+# ── Generated agents compile for every name and on every OS ──
+TRICKY_NAMES = ["update-docs", "xlsx", "Notes", "1st-pass", "42", "név-ünnep", "日本語", "a b\tc", 'say "hi"',
+                "back\\slash", "N", "u1234", "class", "def", "__init__", "-", "x" * 200, "..", "Ünïcode Ñame"]
+
+
+@pytest.mark.parametrize("separator,home", [("/", "/home/person"), ("\\", "C:\\Users\\person")])
+def test_generated_agents_compile_for_tricky_names_and_windows_paths(tmp_path, separator, home):
+    import warnings
+    warnings.simplefilter("error", SyntaxWarning)
+    warnings.simplefilter("error", DeprecationWarning)
+    body = tmp_path / "SKILL.md"
+    body.write_text("---\ndescription: Synthetic \"\"\" quote test\n---\nSay \\N{BULLET} and \\x41.\n", encoding="utf-8")
+
+    class FakeScan:
+        def display(self, path):
+            return "~" + separator + separator.join([".claude", "skills", self.name, "SKILL.md"])
+
+    used = set()
+    for kind in ("skill", "subagent", "command"):
+        for name in TRICKY_NAMES:
+            scan = FakeScan()
+            scan.name = name
+            item = {"kind": kind, "name": name, "path": str(body)}
+            filename, source = MODULE._generated_agent(item, scan, used, "2026-01-01")
+            assert filename.endswith("_agent.py") and filename.isascii(), filename
+            assert filename[: -len(".py")].isidentifier(), filename
+            compile(source, filename, "exec")
+            namespace = {}
+            exec(compile(source, filename, "exec"), namespace)
+            classes = [v for k, v in namespace.items() if k.startswith("Imported") and isinstance(v, type)]
+            assert len(classes) == 1 and classes[0].__name__.isidentifier()
+            agent = classes[0]()
+            assert agent.metadata["name"].isidentifier()
+            assert "Synthetic" in agent.metadata["description"]
+    # Outside the home folder a Windows path keeps its drive letter; still compiles.
+    class OutsideScan:
+        def display(self, path):
+            return "C:\\Users\\Nobody\\x\\N\\u\\SKILL.md"
+    _, source = MODULE._generated_agent({"kind": "skill", "name": "outside", "path": str(body)}, OutsideScan(), set(), "2026-01-01")
+    compile(source, "outside.py", "exec")
+
+
+def test_guide_tool_development_describes_both_tool_shapes():
+    from bs4 import BeautifulSoup
+
+    soup = BeautifulSoup(GUIDE.read_text(encoding="utf-8"), "html.parser")
+    block = next(h.find_parent("div") for h in soup.select("#tools h3") if h.get_text(strip=True) == "Tool Development")
+    text = " ".join(block.get_text(" ").split())
+    # The section lists agent.py tools, so it must not say every tool is an HTML file.
+    assert "standalone HTML files" not in text
+    assert not re.search(r"All tools follow", text)
+    assert "agent.py" in text and "docs/experimental/" in text and "tools.json" in text
+    assert "HTML file" in text and "tools/" in text

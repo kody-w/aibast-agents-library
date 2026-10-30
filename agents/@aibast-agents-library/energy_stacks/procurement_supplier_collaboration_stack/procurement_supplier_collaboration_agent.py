@@ -86,10 +86,12 @@ RFQS = [
           "answer": "500 kVA, 11/0.433 kV, vector group Dyn11, losses as set in specification ES-DT-04 (no "
                     "tolerance on load losses)."},
          {"topic": "Quality documents", "keywords": ["iso", "certificate", "type test", "quality", "documents"],
+          "anchors": ["iso", "certificate", "type test", "quality"],
           "answer": "Bids must include an ISO 9001 certificate and type test certificates for the offered design. "
                     "A bid missing a type test certificate scores half marks on quality."},
          {"topic": "Evaluation", "keywords": ["evaluate", "evaluated", "evaluation", "weight", "weighting", "score", "scored",
                                                     "scoring", "criteria"],
+          "anchors": ["evaluate", "evaluation", "weight", "weighting", "score", "scoring", "criteria", "marks"],
           "answer": "Price 50%, lead time 20%, quality 20%, sustainability 10%."},
          {"topic": "Closing date", "keywords": ["close", "closing", "deadline", "extension", "due"],
           "answer": "The RFQ closes at 12:00 on the closing day shown in the portal. Extensions apply to all "
@@ -99,6 +101,50 @@ RFQS = [
          {"id": "CL-1", "question": "Is a sealed tank design acceptable?",
           "answer": "Yes, if it meets ES-DT-04; published to all bidders.",
           "keywords": ["sealed tank", "sealed"]},
+     ],
+     # Subjects the published pack and its clarifications are silent on. A question that raises one of them is a
+     # new clarification for every bidder, even when it also contains a word the pack does cover ('payment due
+     # after delivery' is about payment, not the closing date or the delivery lots). A subject is raised two ways:
+     # by a keyword that only that subject uses ('insurance', 'payment terms'), or by a pair: a subject word
+     # ('risk', 'pay', 'download') and a word that frames it as that subject ('bears', 'until', 'where') in the
+     # same sentence, in any order and any common word form. A common word on its own ('pay attention', 'the risk
+     # of half marks', 'access to our certificate', 'the title of the specification') says nothing about the
+     # subject and must not turn a question the pack answers into a new clarification.
+     #
+     # A pair is a weak reading: its words are everyday English. A pack topic's "anchors" are the words that make a
+     # question about how a bid is assessed (its score, weights, marks, certificates, quality). When the question
+     # names an anchor, the everyday reading wins over a pair: 'a risk of a lower score', 'how much weight do you
+     # pay', 'the panel access our certificate through the portal', 'marks lost until the certificate arrives'.
+     # A subject's own keyword is a strong reading and always wins ('Is the warranty scored?' is about warranty).
+    "not_covered": [
+        {"subject": "payment terms",
+         "keywords": ["payment", "invoice", "invoicing", "retention", "deposit", "upfront", "pay us", "paid us",
+                      "pay the supplier", "be paid", "get paid"],
+         "pairs": [[["pay", "paid"],
+                    ["us", "supplier", "suppliers", "when", "soon", "after", "within", "before", "advance",
+                     "upfront", "on delivery", "on receipt", "day", "week", "month", "net", "terms"]]]},
+        {"subject": "access to the tender documents",
+         "keywords": ["portal access", "portal login", "log in", "login", "password", "download link"],
+         "pairs": [[["download", "access"],
+                    ["where", "how do i", "how can i", "cannot", "can't", "unable", "link", "portal",
+                     "tender documents", "rfq documents", "tender pack", "rfq pack"]]]},
+        {"subject": "risk, insurance and liability",
+         "keywords": ["insurance", "insured", "insure", "liability", "liable", "incoterm", "in transit",
+                      "transit risk", "title transfer", "transfer of title", "passing of title"],
+         "pairs": [[["risk", "lost", "damage", "damaged", "title"],
+                    ["bear", "bore", "borne", "carry", "hold", "pass", "transfer", "responsible",
+                     "who pays", "who covers", "covered", "until", "during delivery", "on delivery",
+                     "after delivery", "before delivery", "transit", "ship", "shipped", "shipping", "shipment",
+                     "arrive", "arrival", "unloading"]]]},
+         {"subject": "splitting the award between suppliers", "keywords": [
+             "two suppliers", "multiple suppliers", "several suppliers", "more than one supplier",
+             "between suppliers", "split award", "dual award", "joint bid", "consortium", "subcontract"]},
+         {"subject": "conservator tank designs", "keywords": ["conservator"]},
+         {"subject": "warranty", "keywords": ["warranty", "guarantee", "defects liability"]},
+         {"subject": "price adjustment and currency", "keywords": ["price adjustment", "indexation", "index-linked",
+                                                                  "currency", "exchange rate", "escalation"]},
+         {"subject": "penalties", "keywords": ["penalty", "liquidated damages"]},
+         {"subject": "the budget", "keywords": ["budget"]},
      ]},
 ]
 
@@ -233,9 +279,32 @@ def _keyword_pattern(keyword):
     return r"\b" + r"[\s-]*".join([re.escape(p) for p in parts[:-1]] + [tail]) + r"\b"
 
 
+def _join(items):
+    items = list(items)
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
 def _keyword_hit(keyword, text):
     """Whole-word match on the keyword or a common word form of it (see _keyword_pattern)."""
     return re.search(_keyword_pattern(keyword), text) is not None
+
+
+def _raises(subject, text, anchored=False):
+    """True when the question raises an off-pack subject: one of its own keywords anywhere, or a subject word and a
+    framing word of one of its pairs in the same sentence ('who bears risk during delivery', 'risk passes on
+    delivery', 'where can I download'), never a common word on its own ('the risk of half marks').
+
+    anchored: the question names a pack anchor (it is about how a bid is assessed), so a pair, the weak everyday
+    reading, does not raise the subject; only the subject's own keywords do."""
+    if any(_keyword_hit(k, text) for k in subject.get("keywords", [])):
+        return True
+    if anchored:
+        return False
+    for sentence in re.split(r"[.?!;]+", text):
+        for topic, frame in subject.get("pairs", []):
+            if any(_keyword_hit(k, sentence) for k in topic) and any(_keyword_hit(k, sentence) for k in frame):
+                return True
+    return False
 
 
 def _id_named(item_id, text):
@@ -414,15 +483,31 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
             return self._ambiguous("RFQ", kwargs.get("rfq"), [f"{r['id']} ({r['route']})" for r in rfq])
         question = (kwargs.get("question") or DEFAULT_QUESTION).strip()
         q = question.lower()
+        exact = [c for c in rfq["clarifications"] if q.rstrip("?. ") == c["question"].lower().rstrip("?. ")]
         hits = [p for p in rfq["pack"] if any(_keyword_hit(k, q) for k in p["keywords"])]
-        asked_before = [c for c in rfq["clarifications"]
-                        if q.rstrip("?. ") == c["question"].lower().rstrip("?. ")
-                        or any(_keyword_hit(k, q) for k in c.get("keywords", []))]
+        asked_before = exact or [c for c in rfq["clarifications"]
+                                 if any(_keyword_hit(k, q) for k in c.get("keywords", []))]
+        # One incidental pack word does not answer a question about a subject the pack is silent on: the whole
+        # question goes to every bidder as a new clarification; related pack text is shown only as context (the
+        # published clarifications are listed below in any case).
+        anchored = any(_keyword_hit(k, q) for p in rfq["pack"] for k in p.get("anchors", []))
+        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", []) if _raises(u, q, anchored)]
         lines = [f"# Supplier Question - {rfq['id']}", "",
                  f"**RFQ:** {rfq['id']} ({rfq['route']}), closes {_date(rfq['closes_in_days'])} "
                  f"(in {rfq['closes_in_days']} days)",
                  f"**Question:** \"{question}\"", ""]
-        if hits:
+        if uncovered:
+            lines += ["**Not answered by the published RFQ pack.** The question asks about "
+                      f"{_join(uncovered)}, which neither the pack nor any published clarification covers. Draft "
+                      f"for the buyer: log it as a new clarification (CL-{len(rfq['clarifications']) + 1}) and "
+                      f"publish the answer to all {len(rfq['invited'])} invited bidders, so every bidder works "
+                      "from the same information. Do not send a partial answer to this supplier alone."]
+            related = [f"- **{p['topic']}:** {p['answer']}" for p in hits]
+            if related:
+                lines += ["", "**Related published text (context for the buyer; it does not answer the whole "
+                              "question):**"] + related
+            hits, asked_before = [], []
+        elif hits:
             lines += ["## Draft answer from the published RFQ pack"]
             lines += [f"- **{p['topic']}:** {p['answer']}" for p in hits]
             lines += ["", "Because the answer is already in the published pack, it can go to this supplier without "
@@ -434,7 +519,7 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
             lines += [f"- **{c['id']}:** {c['question']} {c['answer']}" for c in asked_before]
             lines += ["", "This answer has already been published to all bidders, so the same reply can go to this "
                           "supplier. No new clarification is needed."]
-        if not hits and not asked_before:
+        if not hits and not asked_before and not uncovered:
             lines += ["**Not answered by the published RFQ pack.** Draft for the buyer: log it as a new "
                       f"clarification (CL-{len(rfq['clarifications']) + 1}) and publish the answer to all "
                       f"{len(rfq['invited'])} invited bidders, so every bidder works from the same information."]

@@ -573,7 +573,7 @@ def test_check_cli_answers_a_video_link_with_a_bad_port(tmp_path):
 ])
 def test_other_vendors_ai_product_names_are_flagged(field, text):
     _, problems = ds.validate(ds.parse_issue_form(filled_body(**{field: text})))
-    assert ds.OTHER_AI_PRODUCTS_PROBLEM in problems, problems
+    assert _vendor_problem(problems), problems
 
 
 def test_the_other_vendors_problem_never_repeats_the_names():
@@ -638,3 +638,272 @@ def test_approve_job_runs_the_page_tests_before_opening_the_pull_request():
     report = next(s for s in steps if s.get("name") == "Report a failed page check")
     assert "failure()" in report["if"]
     assert "--remove-label \"demo: approved\"" in report["run"]
+
+
+# ------------------------------- names that are joined, versioned or full-width
+@pytest.mark.parametrize("field, text", [
+    ("description", "Built like a GPT4 helper. The agent drafts the summary."),
+    ("description", "It started as a Claude3 prototype. The agent drafts the summary."),
+    ("description", "Uses AzureOpenAI under the hood. The agent drafts the summary."),
+    ("description", "Uses azureopenai under the hood. The agent drafts the summary."),
+    ("description", "Replaces Salesforce Agentforce. The agent drafts the summary."),
+    ("description", "Replaces Google Vertex AI. The agent drafts the summary."),
+    ("description", "Moved off Amazon Bedrock. The agent drafts the summary."),
+    ("description", "Moved off IBM watsonx. The agent drafts the summary."),
+    ("title", "\uff23\uff48\uff41\uff54\uff27\uff30\uff34 Helper"),
+    ("title", "Chat\u200bGPT Helper"),
+])
+def test_joined_versioned_and_full_width_vendor_names_are_flagged(field, text):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(**{field: text})))
+    assert _vendor_problem(problems), problems
+
+
+@pytest.mark.parametrize("text", [
+    "Uses AzureOpenAI under the hood. The agent drafts the summary.",
+    "Runs on AzureFunctions. The agent drafts the summary.",
+    "Runs on \uff21\uff5a\uff55\uff52\uff45 Functions. The agent drafts the summary.",
+    "Hosted in Azure2 regions. The agent drafts the summary.",
+])
+def test_joined_and_full_width_azure_is_flagged(text):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(description=text)))
+    assert any("azure" in p for p in problems if p.startswith("Remove these words")), problems
+
+
+def test_a_full_width_title_keeps_all_its_words_in_the_web_address():
+    assert ds.slugify("\uff34\uff49\uff45\uff52\uff45\uff44 Huddle Board") == "tiered-huddle-board"
+
+
+@pytest.mark.parametrize("text", [
+    "Copilot Studio drafts the reply. Microsoft 365 Copilot summarises it in Teams.",
+    "Power Automate routes the request. Dynamics 365 and SharePoint keep the record.",
+    "PowerApps and Dataverse hold the plan. The bedrock of the process is one Teams channel.",
+    "The agenda covers standard tasks. It handles grading and abandoned carts.",
+])
+def test_microsoft_names_and_ordinary_words_still_pass(text):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(description=text)))
+    assert problems == [], problems
+
+
+def test_the_problem_text_names_none_of_the_added_platforms():
+    message = ds.OTHER_AI_PRODUCTS_PROBLEM
+    assert ds.other_ai_products_in(message) is False
+    _, problems = ds.validate(ds.parse_issue_form(
+        filled_body(description="Replaces Salesforce Agentforce. The agent drafts the summary.")
+    ))
+    assert not any("agentforce" in p.lower() for p in problems), problems
+
+
+# ------------------------------------------------------ the one-pager link
+@pytest.mark.parametrize("url", [
+    "https://chatgpt.com/share/abc",
+    "https://example.com/our-gpt4-onepager.pdf",
+])
+def test_one_pager_link_is_checked_for_other_vendors_names(url):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(onepager=url)))
+    assert _vendor_problem(problems), problems
+
+
+@pytest.mark.parametrize("url", [
+    "https://example.com/files/confidential-onepager.pdf",
+    "https://example.com/files/internal%20only/onepager.pdf",
+])
+def test_one_pager_link_is_checked_for_forbidden_words(url):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(onepager=url)))
+    assert any(p.startswith("Remove these words") for p in problems), problems
+
+
+@pytest.mark.parametrize("url", [
+    "https://microsoft.sharepoint.com/teams/x/Shared%20Documents/onepager.pdf",
+    "https://contoso-my.sharepoint.com/:b:/p/someone/EabcXYZ",
+    "https://SAMPLE.SharePoint.com/sites/demo/onepager.pdf",
+    "https://teams.microsoft.com/l/file/abc",
+    "https://loop.cloud.microsoft/p/abc",
+    "https://sample.crm.dynamics.com/main.aspx",
+])
+def test_one_pager_on_a_sign_in_only_host_is_rejected(url):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(onepager=url)))
+    assert ds.ONEPAGER_SIGN_IN_PROBLEM in problems, problems
+    assert not any("sharepoint" in p.lower() or "contoso" in p.lower() or "sample" in p.lower()
+                   for p in problems), problems
+
+
+# ------------------------------------------------ one video, not a playlist
+@pytest.mark.parametrize("url", [
+    "https://www.youtube.com/playlist?list=PLsample0000000000000000000000000",
+    "https://www.youtube.com/@SampleChannel",
+    "https://www.youtube.com/channel/UCsample000000000000000",
+    "https://www.youtube.com/",
+    "https://www.youtube.com/watch",
+    "https://www.youtube.com/watch?list=PLsample0000000000000000000000000",
+    "https://youtu.be/",
+    "https://youtu.be/9A8k0z77NFo/extra",
+])
+def test_video_link_must_point_at_one_video(url):
+    with pytest.raises(ds.SubmissionError, match="one video"):
+        ds.classify_video_url(url)
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(video=url)))
+    assert any("one video" in p for p in problems), problems
+
+
+@pytest.mark.parametrize("url", [
+    "https://www.youtube.com/watch?v=9A8k0z77NFo",
+    "https://www.youtube.com/watch?v=9A8k0z77NFo&list=PLsample0000000000000000000000000",
+    "https://m.youtube.com/watch?v=9A8k0z77NFo&t=30s",
+    "https://youtu.be/9A8k0z77NFo",
+    "https://youtu.be/9A8k0z77NFo?t=12",
+    "https://www.youtube.com/shorts/9A8k0z77NFo",
+    "https://www.youtube.com/embed/9A8k0z77NFo",
+    "https://www.youtube.com/live/9A8k0z77NFo",
+])
+def test_single_video_links_still_pass(url):
+    assert ds.classify_video_url(url) == "youtube"
+
+
+# ------------------------------------- a retitled graduate keeps its library link
+def test_a_retitled_reapproval_keeps_its_graduation():
+    manifest = {"schema": ds.MANIFEST_SCHEMA, "tools": []}
+    original = {**SAMPLE_DEMO, "submission_issue": 335, "graduated_to": "tiered-huddle-board"}
+    manifest["tools"].append(dict(original))
+    retitled = {**SAMPLE_DEMO, "id": "sample-community-demo-v2", "name": "Sample Community Demo v2"}
+    retitled.pop("submission_issue")
+    ds.apply_entry(manifest, retitled, 335, "2026-10-30")
+    demos = [t for t in manifest["tools"] if t.get("kind") == "demo"]
+    assert [(d["id"], d.get("graduated_to")) for d in demos] == [
+        ("sample-community-demo-v2", "tiered-huddle-board")
+    ]
+    assert all("_drop" not in t for t in manifest["tools"])
+
+
+def test_a_new_issue_never_inherits_another_demos_graduation():
+    manifest = {"schema": ds.MANIFEST_SCHEMA, "tools": [
+        {**SAMPLE_DEMO, "submission_issue": 335, "graduated_to": "tiered-huddle-board"}
+    ]}
+    other = {**SAMPLE_DEMO, "id": "another-demo", "name": "Another Demo"}
+    ds.apply_entry(manifest, other, 400, "2026-10-30")
+    by_id = {t["id"]: t for t in manifest["tools"]}
+    assert "graduated_to" not in by_id["another-demo"]
+    assert by_id["sample-community-demo"]["graduated_to"] == "tiered-huddle-board"
+
+
+def test_ordinary_sentences_with_platform_words_still_pass():
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(
+        description="The agent can now assist managers. Amazon queue times are not involved."
+    )))
+    assert problems == [], problems
+
+
+def test_the_form_explains_the_one_video_and_no_sign_in_rules():
+    form = FORM.read_text(encoding="utf-8")
+    assert "one video (not a playlist or channel)" in form
+    assert "must open without a sign-in" in form
+
+
+# ------------------------------------- round 4: playlists, sentence breaks, link ids
+def _vendor_problem(problems):
+    return next((p for p in problems if p.startswith(ds.OTHER_AI_PRODUCTS_PROBLEM)), None)
+
+
+@pytest.mark.parametrize("url", [
+    "https://www.youtube.com/embed/videoseries?list=PLsample0000000000000000000000000",
+    "https://www.youtube.com/embed/VideoSeries?list=PLsample0000000000000000000000000",
+    "https://www.youtube.com/embed/videoseries",
+    "https://www.youtube.com/shorts/videoseries",
+    "https://youtu.be/videoseries?list=PLsample0000000000000000000000000",
+    "https://www.youtube.com/watch?v=videoseries&list=PLsample0000000000000000000000000",
+])
+def test_an_embedded_playlist_is_not_one_video(url):
+    with pytest.raises(ds.SubmissionError, match="one video"):
+        ds.classify_video_url(url)
+
+
+@pytest.mark.parametrize("url", [
+    "https://www.youtube.com/embed/9A8k0z77NFo?list=PLsample0000000000000000000000000",
+    "https://youtu.be/9A8k0z77NFo?list=PLsample0000000000000000000000000",
+])
+def test_a_real_video_inside_a_playlist_still_passes(url):
+    assert ds.classify_video_url(url) == "youtube"
+
+
+@pytest.mark.parametrize("field, text", [
+    ("description", "Sellers list on Amazon. Q4 returns spike and the agent triages them."),
+    ("description", "Stores order from Amazon, Q3 forecasts guide stock. The agent helps."),
+    ("description", "Stores order from Amazon; Q3 forecasts guide stock. The agent helps."),
+    ("description", "Sales on Amazon Q4 were strong. The agent forecasts the next quarter."),
+    ("description", "Planners face perplexity over shift rules. The agent explains them."),
+    ("description", "The town bard wrote the anthem. The agent books the hall."),
+    ("title", "Retail Returns Triage"),
+])
+def test_ordinary_retail_words_and_english_words_pass(field, text):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(**{field: text})))
+    assert problems == [], problems
+
+
+def test_words_in_different_fields_never_join_into_a_name():
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(
+        title="Store Ops Amazon",
+        description="Q forecasts guide stock. The agent helps.",
+    )))
+    assert _vendor_problem(problems) is None, problems
+
+
+@pytest.mark.parametrize("field, text", [
+    ("description", "It replaces Amazon Q in the store. The agent drafts replies."),
+    ("description", "It replaces Amazon-Q. The agent drafts replies."),
+    ("description", "It started on Perplexity AI. The agent drafts replies."),
+    ("description", "It started on GPT4. The agent drafts replies."),
+    ("title", "Mistral Wind Farm Ops"),
+    ("team", "Gemini Squad"),
+])
+def test_listed_vendor_names_are_still_flagged(field, text):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(**{field: text})))
+    assert _vendor_problem(problems), problems
+
+
+@pytest.mark.parametrize("overrides, named, not_named", [
+    ({"title": "Gemini Reply Drafter"}, ["the title"], ["the description", "the team", "the one-pager"]),
+    ({"description": "It replaces a Gemini workflow. It drafts replies."}, ["the description"],
+     ["the title", "the team", "the one-pager"]),
+    ({"team": "Gemini Squad"}, ["the team"], ["the title", "the description", "the one-pager"]),
+    ({"onepager": "https://example.com/gemini-onepager.pdf"}, ["the one-pager link"],
+     ["the title", "the description", "the team"]),
+    ({"title": "Gemini Reply Drafter", "team": "Mistral Squad"}, ["the title", "the team"],
+     ["the description", "the one-pager"]),
+])
+def test_the_vendor_problem_says_which_field_without_the_name(overrides, named, not_named):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(**overrides)))
+    message = _vendor_problem(problems)
+    assert message, problems
+    for field in named:
+        assert field in message, message
+    for field in not_named:
+        assert field not in message, message
+    assert not ds.other_ai_products_in(message), message
+    assert "gemini" not in message.lower() and "mistral" not in message.lower()
+
+
+@pytest.mark.parametrize("url", [
+    "https://contoso.github.io/doc?id=AbNDA9xQ",
+    "https://example.com/files/1aGPT3kz.pdf",
+    "https://example.com/d/AbNDA9xQ/view",
+    "https://example.com/view?file=confidential-gpt4.pdf",
+    "https://example.com/onepager.pdf#azure",
+])
+def test_one_pager_ids_and_query_values_are_not_scanned_for_words(url):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(onepager=url)))
+    assert problems == [], problems
+
+
+@pytest.mark.parametrize("url, kind", [
+    ("https://example.com/files/confidential-onepager.pdf", "words"),
+    ("https://example.com/files/internal%20only/onepager.pdf", "words"),
+    ("https://azure-demo.example.com/onepager.pdf", "words"),
+    ("https://example.com/azureopenai-onepager.pdf", "words"),
+    ("https://chatgpt.com/share/abc", "vendor"),
+    ("https://example.com/our-gpt4-onepager.pdf", "vendor"),
+])
+def test_one_pager_host_and_path_words_are_still_checked(url, kind):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(onepager=url)))
+    if kind == "words":
+        assert any(p.startswith("Remove these words") for p in problems), problems
+    else:
+        assert _vendor_problem(problems), problems

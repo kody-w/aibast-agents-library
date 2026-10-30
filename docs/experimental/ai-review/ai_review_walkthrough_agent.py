@@ -4,9 +4,10 @@ AI Review Walkthrough Agent (rapplication)
 An educational, step-by-step walkthrough of a generic responsible AI review
 for your own AI agent or app. It teaches one stage at a time: why the stage
 matters, the questions to answer, and a worked example from an invented
-sample agent. Your answers are saved in this Brainstem's local storage and an
-export writes a Markdown review packet plus a one-page summary to a local
-folder. Nothing is sent anywhere by this agent.
+sample agent. Your answers are saved only in this Brainstem's local storage,
+and an export writes a Markdown review packet plus a one-page summary to a
+local folder. The agent itself makes no network calls, but what you type in
+chat is sent to the AI model your Brainstem uses, as with any chat.
 
 Built from Microsoft's public responsible AI guidance. Educational only.
 Every stage links the public pages it draws on ("Learn more"); the full source
@@ -698,7 +699,9 @@ class AIReviewWalkthroughAgent(BasicAgent):
         self._save(data)
         review = data["reviews"][rid]
         head = (
-            f"Started review `{rid}` ({len(STAGES)} stages). Answers stay on this device.\n"
+            f"Started review `{rid}` ({len(STAGES)} stages). Your answers are saved only in "
+            "your Brainstem's local storage, but what you type is sent to the AI model your "
+            "Brainstem uses, as with any chat.\n"
             f"{FRAMING}\n"
             "Say 'next' or 'back' to move, give answers by question id, 'check' for gaps, "
             "'status' for progress, 'export' for the packet.\n\n"
@@ -809,7 +812,7 @@ class AIReviewWalkthroughAgent(BasicAgent):
         return (
             f"Exported the review packet and a one-page summary to:\n{folder}\n"
             "Files: review-packet.md, summary.md. "
-            f"{total} open gap(s) are listed in the packet. Nothing was sent anywhere."
+            f"{total} open gap(s) are listed in the packet. The files were written to this folder only."
         )
 
     # packet ----------------------------------------------------------------

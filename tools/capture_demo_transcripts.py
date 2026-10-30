@@ -208,15 +208,18 @@ def main():
     )
     parser.add_argument(
         "--base-url",
-        default=DEFAULT_BASE_URL,
+        default=None,
         help="Brainstem to record against, for a dedicated capture Brainstem "
-        "beside the main one (default: %(default)s)",
+        f"beside the main one (default: {DEFAULT_BASE_URL})",
     )
     args = parser.parse_args()
-    global HEALTH, CHAT
-    base_url = args.base_url.rstrip("/")
-    HEALTH = f"{base_url}/health"
-    CHAT = f"{base_url}/chat"
+    if args.base_url:
+        # Only an explicit flag moves the endpoint, so a caller that already
+        # pointed HEALTH and CHAT at a capture Brainstem keeps that target.
+        global HEALTH, CHAT
+        base_url = args.base_url.rstrip("/")
+        HEALTH = f"{base_url}/health"
+        CHAT = f"{base_url}/chat"
 
     artifact = capture(
         args.case_file.resolve(),
