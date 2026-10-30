@@ -512,3 +512,129 @@ console.log(JSON.stringify({bundle: JSON.parse(await blobs[0].text()), errors}))
     assert result["errors"] == []
     assert all(t.get("kind", "tool") == "tool" for t in tools)
     assert result["bundle"]["community_tools"]["count"] == len(tools)
+
+
+# ------------------------------------------- links a browser would reject
+@pytest.mark.parametrize("url", [
+    "https://example.com:99999/x",
+    "https://example.com:abc/x",
+    "https://example.com:-1/x",
+    "https://exa mple.com/x",
+    "https://example.com/a b",
+    "https://exa_mple..com/x",
+    "https://:443/x",
+])
+def test_one_pager_links_a_browser_would_reject_are_flagged(url):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(onepager=url)))
+    assert "The one-pager link must be a public https link." in problems, problems
+
+
+@pytest.mark.parametrize("url", [
+    "https://example.com/one-pager.pdf",
+    "https://example.com:8443/x",
+    "https://docs.example.org/a/b?c=d#e",
+])
+def test_good_one_pager_links_still_pass(url):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(onepager=url)))
+    assert problems == [], problems
+
+
+@pytest.mark.parametrize("url", [
+    "https://www.youtube.com:99999/watch?v=9A8k0z77NFo",
+    "https://www.youtube.com:abc/watch?v=x",
+])
+def test_video_link_with_a_bad_port_gets_a_friendly_problem(url):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(video=url)))
+    assert "The video link is not a valid URL." in problems, problems
+
+
+def test_check_cli_answers_a_video_link_with_a_bad_port(tmp_path):
+    body = tmp_path / "body.md"
+    body.write_text(
+        filled_body(video="https://www.youtube.com:99999/watch?v=9A8k0z77NFo"), encoding="utf-8"
+    )
+    result, comment = tmp_path / "r.json", tmp_path / "c.md"
+    subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "demo_submission.py"), "check", "--offline",
+         "--body-file", str(body), "--result", str(result), "--comment", str(comment)],
+        check=True, capture_output=True,
+    )
+    assert json.loads(result.read_text())["ok"] is False
+    assert "not a valid URL" in comment.read_text()
+
+
+# --------------------------------------------- other vendors' AI products
+@pytest.mark.parametrize("field, text", [
+    ("description", "We rebuilt our ChatGPT prototype in Copilot Studio. It drafts replies."),
+    ("description", "It replaces a Gemini workflow. It drafts replies."),
+    ("description", "Built on GPT-4 first. It drafts replies."),
+    ("team", "OpenAI Partner Team"),
+    ("title", "Claude reply drafter"),
+])
+def test_other_vendors_ai_product_names_are_flagged(field, text):
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(**{field: text})))
+    assert ds.OTHER_AI_PRODUCTS_PROBLEM in problems, problems
+
+
+def test_the_other_vendors_problem_never_repeats_the_names():
+    """The comment is public, so it says what to fix without naming anyone."""
+    message = ds.OTHER_AI_PRODUCTS_PROBLEM.lower()
+    for term in ds.OTHER_AI_PRODUCT_TERMS:
+        assert not re.search(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])", message), term
+    _, problems = ds.validate(ds.parse_issue_form(
+        filled_body(description="It replaces a Gemini workflow. It drafts replies.")
+    ))
+    assert not any("gemini" in p.lower() for p in problems), problems
+
+
+def test_microsoft_product_names_are_not_flagged():
+    _, problems = ds.validate(ds.parse_issue_form(filled_body(
+        description="Copilot Studio drafts the reply. Microsoft 365 Copilot summarises it in Teams."
+    )))
+    assert problems == [], problems
+
+
+# --------------------------------------- one bad card never takes the page
+def test_one_bad_entry_is_skipped_and_the_rest_of_the_page_renders():
+    result = run_community_tools_node(
+        f"""
+community.tools.push({json.dumps({**SAMPLE_DEMO, "id": "bad-port", "onepager": "https://example.com:99999/x"})});
+community.tools.push({json.dumps({**SAMPLE_DEMO, "id": "bad-thumb", "thumbnail": "https://example.com:99999/t.jpg"})});
+community.tools.push({json.dumps({**SAMPLE_DEMO, "id": "bad-url", "url": "https://www.youtube.com:99999/watch?v=x"})});
+community.tools.push({json.dumps({**SAMPLE_DEMO, "id": "good-one"})});
+community.count = community.tools.length;
+globalThis.fetch = async () => ({{ok: true, json: async () => community}});
+""",
+        """
+await renderCommunityTools();
+console.log(JSON.stringify({
+  demos: $("demo-grid").innerHTML, tools: $("community-grid").innerHTML, errors
+}));
+""",
+    )
+    assert result["errors"] == []
+    assert "unavailable" not in result["demos"]
+    assert "unavailable" not in result["tools"]
+    assert 'data-demo-id="good-one"' in result["demos"]
+    # A bad one-pager or thumbnail only drops that link; a bad video link drops the card.
+    assert 'data-demo-id="bad-port"' in result["demos"]
+    assert "99999" not in result["demos"]
+    assert 'data-demo-id="bad-url"' not in result["demos"]
+    assert result["demos"].count('class="demo-card"') == len(DEMOS) + 3
+    assert result["tools"].count('class="community-card"') == len(
+        [t for t in MANIFEST["tools"] if t.get("kind") != "demo"]
+    )
+
+
+# ------------------------------------- the bot's demo PR gets the page test
+def test_approve_job_runs_the_page_tests_before_opening_the_pull_request():
+    yaml = pytest.importorskip("yaml")
+    steps = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))["jobs"]["approve"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    test_step = next(i for i, s in enumerate(steps) if "tests/test_community_agents.py" in s.get("run", ""))
+    pr_step = names.index("Push a branch and open a pull request")
+    assert test_step < pr_step
+    assert any(s.get("uses", "").startswith("actions/setup-node@") for s in steps[:test_step])
+    report = next(s for s in steps if s.get("name") == "Report a failed page check")
+    assert "failure()" in report["if"]
+    assert "--remove-label \"demo: approved\"" in report["run"]
