@@ -99,6 +99,27 @@ RFQS = [
          {"id": "CL-1", "question": "Is a sealed tank design acceptable?",
           "answer": "Yes, if it meets ES-DT-04; published to all bidders.",
           "keywords": ["sealed tank", "sealed"]},
+     ],
+     # Subjects the published pack and its clarifications are silent on. A question that raises one of them is a
+     # new clarification for every bidder, even when it also contains a word the pack does cover ('payment due
+     # after delivery' is about payment, not the closing date or the delivery lots).
+     "not_covered": [
+         {"subject": "payment terms", "keywords": ["payment", "pay", "paid", "invoice", "invoicing", "retention",
+                                                    "advance payment", "deposit"]},
+         {"subject": "access to the tender documents", "keywords": ["download", "access", "portal login", "log in",
+                                                                     "login", "password"]},
+         {"subject": "risk, insurance and liability", "keywords": ["risk", "transit", "insurance", "insured",
+                                                                    "liability", "liable", "title", "incoterm",
+                                                                    "incoterms", "damage", "damaged"]},
+         {"subject": "splitting the award between suppliers", "keywords": [
+             "two suppliers", "multiple suppliers", "several suppliers", "more than one supplier",
+             "between suppliers", "split award", "dual award", "joint bid", "consortium", "subcontract"]},
+         {"subject": "conservator tank designs", "keywords": ["conservator"]},
+         {"subject": "warranty", "keywords": ["warranty", "guarantee", "defects liability"]},
+         {"subject": "price adjustment and currency", "keywords": ["price adjustment", "indexation", "index-linked",
+                                                                  "currency", "exchange rate", "escalation"]},
+         {"subject": "penalties", "keywords": ["penalty", "liquidated damages"]},
+         {"subject": "the budget", "keywords": ["budget"]},
      ]},
 ]
 
@@ -231,6 +252,11 @@ def _keyword_pattern(keyword):
     else:
         tail = re.escape(last) + r"(?:s|es|d|ed|ing)?"
     return r"\b" + r"[\s-]*".join([re.escape(p) for p in parts[:-1]] + [tail]) + r"\b"
+
+
+def _join(items):
+    items = list(items)
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
 
 def _keyword_hit(keyword, text):
@@ -414,15 +440,31 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
             return self._ambiguous("RFQ", kwargs.get("rfq"), [f"{r['id']} ({r['route']})" for r in rfq])
         question = (kwargs.get("question") or DEFAULT_QUESTION).strip()
         q = question.lower()
+        exact = [c for c in rfq["clarifications"] if q.rstrip("?. ") == c["question"].lower().rstrip("?. ")]
         hits = [p for p in rfq["pack"] if any(_keyword_hit(k, q) for k in p["keywords"])]
-        asked_before = [c for c in rfq["clarifications"]
-                        if q.rstrip("?. ") == c["question"].lower().rstrip("?. ")
-                        or any(_keyword_hit(k, q) for k in c.get("keywords", []))]
+        asked_before = exact or [c for c in rfq["clarifications"]
+                                 if any(_keyword_hit(k, q) for k in c.get("keywords", []))]
+        # One incidental pack word does not answer a question about a subject the pack is silent on: the whole
+        # question goes to every bidder as a new clarification; related pack text is shown only as context (the
+        # published clarifications are listed below in any case).
+        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", [])
+                                      if any(_keyword_hit(k, q) for k in u["keywords"])]
         lines = [f"# Supplier Question - {rfq['id']}", "",
                  f"**RFQ:** {rfq['id']} ({rfq['route']}), closes {_date(rfq['closes_in_days'])} "
                  f"(in {rfq['closes_in_days']} days)",
                  f"**Question:** \"{question}\"", ""]
-        if hits:
+        if uncovered:
+            lines += ["**Not answered by the published RFQ pack.** The question asks about "
+                      f"{_join(uncovered)}, which neither the pack nor any published clarification covers. Draft "
+                      f"for the buyer: log it as a new clarification (CL-{len(rfq['clarifications']) + 1}) and "
+                      f"publish the answer to all {len(rfq['invited'])} invited bidders, so every bidder works "
+                      "from the same information. Do not send a partial answer to this supplier alone."]
+            related = [f"- **{p['topic']}:** {p['answer']}" for p in hits]
+            if related:
+                lines += ["", "**Related published text (context for the buyer; it does not answer the whole "
+                              "question):**"] + related
+            hits, asked_before = [], []
+        elif hits:
             lines += ["## Draft answer from the published RFQ pack"]
             lines += [f"- **{p['topic']}:** {p['answer']}" for p in hits]
             lines += ["", "Because the answer is already in the published pack, it can go to this supplier without "
@@ -434,7 +476,7 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
             lines += [f"- **{c['id']}:** {c['question']} {c['answer']}" for c in asked_before]
             lines += ["", "This answer has already been published to all bidders, so the same reply can go to this "
                           "supplier. No new clarification is needed."]
-        if not hits and not asked_before:
+        if not hits and not asked_before and not uncovered:
             lines += ["**Not answered by the published RFQ pack.** Draft for the buyer: log it as a new "
                       f"clarification (CL-{len(rfq['clarifications']) + 1}) and publish the answer to all "
                       f"{len(rfq['invited'])} invited bidders, so every bidder works from the same information."]
