@@ -78,6 +78,7 @@ __manifest__ = {
 DETECTION = {
     "coding-tool-a": {
         "folder": "~/.claude",
+        "label": "an AI coding tool",
         "instructions": [
             "~/.claude/CLAUDE.md",
             "{project}/CLAUDE.md",
@@ -112,6 +113,7 @@ DETECTION = {
     },
     "coding-tool-b": {
         "folder": "~/.gemini",
+        "label": "an AI coding tool",
         "instructions": ["~/.gemini/GEMINI.md", "{project}/GEMINI.md"],
         "commands": [
             "~/.gemini/commands/**/*.toml",
@@ -125,6 +127,7 @@ DETECTION = {
     },
     "coding-tool-c": {
         "folder": "~/.codex and ~/.agents",
+        "label": "an AI coding tool",
         "instructions": [
             "~/.codex/AGENTS.md",
             "~/.codex/AGENTS.override.md",
@@ -143,12 +146,20 @@ DETECTION = {
     "assistant-export": {
         # A data-export zip or folder you downloaded from a hosted assistant.
         "folder": "(the export you name)",
+        "label": "a hosted AI assistant export",
         "conversations": ["conversations.json"],
         "archive_also": ["chat.html"],
     },
 }
 
 SOURCE_IDS = tuple(DETECTION)
+
+# The model reading these replies must not turn folders into product names.
+NAMING_RULE = "Describe each setup by its folder; don't name products."
+REPLY_RULE = (
+    "Reply rule: " + NAMING_RULE + " Say \"the setup in ~/.claude\", never a product, "
+    "vendor or company name, even when you recognize the folder."
+)
 
 # What each item type becomes in a Brainstem.
 BECOMES = {
@@ -626,7 +637,8 @@ class AIMigrationAgent(BasicAgent):
                 "for review; dry run unless dry_run is false; installs generated agents "
                 "only with confirm true), undo (remove exactly what an apply added), "
                 "compare (plain-words comparison). Never reads keys or credentials, "
-                "never returns file contents, and nothing leaves the device."
+                "never returns file contents, and nothing leaves the device. "
+                "Describe each setup by its folder; don't name products."
             ),
             "parameters": {
                 "type": "object",
@@ -688,6 +700,9 @@ class AIMigrationAgent(BasicAgent):
         return os.path.dirname(os.path.abspath(__file__))
 
     def perform(self, **kwargs):
+        return REPLY_RULE + "\n\n" + self._perform(**kwargs)
+
+    def _perform(self, **kwargs):
         action = str(kwargs.get("action") or "scan").lower()
         try:
             if action == "compare":
@@ -738,7 +753,7 @@ class AIMigrationAgent(BasicAgent):
             if source == "assistant-export" and scan.export:
                 folder = os.path.basename(scan.export)
             lines.append("")
-            lines.append("Found in " + folder + ":")
+            lines.append("Setup in " + folder + " (" + DETECTION[source]["label"] + "):")
             for kind, items in groups[source].items():
                 if kind == "conversations":
                     lines.append("- conversations: %d" % sum(i.get("count", 0) for i in items))
@@ -752,6 +767,7 @@ class AIMigrationAgent(BasicAgent):
             lines.append("Skipped %d file(s) whose names look like keys, tokens or sign-ins. They were not opened." % scan.skipped)
         lines.append("")
         lines.append("Next: say \"plan\" to see what each item becomes in your Brainstem.")
+        lines.append(NAMING_RULE)
         return "\n".join(lines)
 
     def _report_plan(self, scan):
@@ -774,6 +790,7 @@ class AIMigrationAgent(BasicAgent):
         lines.append("apply writes a new staging folder under " + self._display_root() +
                      " and never changes soul.md or your existing agents. "
                      "It is a dry run until you say dry_run false.")
+        lines.append(NAMING_RULE)
         return "\n".join(lines)
 
     def _display_root(self):
@@ -863,6 +880,7 @@ class AIMigrationAgent(BasicAgent):
                 lines.append("- agents/: %d generated agent(s)" % len(agent_files))
             lines.append("soul.md and your existing agents are not touched.")
             lines.append("Say \"apply with dry_run false\" to write it. Add confirm true to also install the generated agents.")
+            lines.append(NAMING_RULE)
             return "\n".join(lines)
 
         os.makedirs(staging, exist_ok=False)
@@ -902,6 +920,7 @@ class AIMigrationAgent(BasicAgent):
             lines.append("To install the generated agents, run apply again with confirm true, or copy them yourself.")
         lines.append("Review soul.import.md and merge what you want into soul.md yourself.")
         lines.append("To remove all of it: undo with import_id " + import_id + " and dry_run false.")
+        lines.append(NAMING_RULE)
         return "\n".join(lines)
 
     # ── undo ──
