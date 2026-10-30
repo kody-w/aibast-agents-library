@@ -38,7 +38,7 @@ def fixture_package(root, slug="demo"):
 def test_every_solution_declares_one_uniquely_named_bundle_asset():
     rows = solution_bundle_assets.bundle_manifests(ROOT)
     manifests = sorted((ROOT / "solutions").glob("*/export-manifest.json"))
-    assert len(rows) == len(manifests) == 71
+    assert len(rows) == len(manifests) == 72
     for name, manifest in rows:
         assert name == f"{manifest.parent.name}-source.zip"
     assert len({name for name, _ in rows}) == len(rows)

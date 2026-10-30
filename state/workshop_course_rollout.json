@@ -1,12 +1,12 @@
 {
   "schema": "aibast-workshop-course-rollout-audit/1.0",
-  "generated_at": "2026-10-29T22:45:57Z",
-  "total": 71,
-  "passed": 71,
+  "generated_at": "2026-10-30T00:54:57Z",
+  "total": 72,
+  "passed": 72,
   "failed": 0,
   "reference_slug": "time-entry-billing",
-  "builder_total": 70,
-  "critic_total": 71,
+  "builder_total": 71,
+  "critic_total": 72,
   "excluded_non_advertised": [
     {
       "slug": "grid-outage-response",
@@ -1140,6 +1140,29 @@
         "visual_reference_only_displayed": 0,
         "manifest_items": 136,
         "zip_entries": 158
+      }
+    },
+    {
+      "slug": "procurement-supplier-collaboration",
+      "passed": true,
+      "failures": [],
+      "metrics": {
+        "locked_cases": 5,
+        "inline_scripts": 10,
+        "assisted_frames": 7,
+        "quest_hard_steps": 20,
+        "quest_report_buttons": 33,
+        "quest_preview_prompts": 5,
+        "manual_steps": 20,
+        "manual_frames": 20,
+        "manual_report_buttons": 20,
+        "manual_source_downloads": 20,
+        "visual_captures": 27,
+        "visual_reusable": 27,
+        "visual_reshoot_required": 0,
+        "visual_reference_only_displayed": 0,
+        "manifest_items": 108,
+        "zip_entries": 110
       }
     },
     {

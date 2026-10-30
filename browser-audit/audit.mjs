@@ -111,8 +111,8 @@ const slugs = requestedSlug
   ? catalogSlugs.filter((slug) => slug === requestedSlug)
   : catalogSlugs;
 
-if (advertisedNames.length !== 71 || catalogSlugs.length !== 71) {
-  throw new Error(`Expected 71 catalog workshops, found ${catalogSlugs.length}`);
+if (advertisedNames.length !== 72 || catalogSlugs.length !== 72) {
+  throw new Error(`Expected 72 catalog workshops, found ${catalogSlugs.length}`);
 }
 if (requestedSlug && slugs.length !== 1) {
   throw new Error(`Unknown workshop slug: ${requestedSlug}`);

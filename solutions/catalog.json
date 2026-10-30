@@ -9802,6 +9802,149 @@
         ]
       },
       "source": "catalog"
+    },
+    "@aibast-agents-library/procurement-supplier-collaboration": {
+      "display_name": "Procurement and Supplier Collaboration Agent",
+      "sales_headline": "Buy network materials faster, from requisition to matched invoice",
+      "card_pitch": "Give category managers, buyers, expediters and accounts payable one conversational view of source-to-pay for network materials: the right procurement route and supplier shortlist, supplier questions answered from the RFQ pack, bids scored and explained, late deliveries flagged, and invoices matched before payment.",
+      "why_try": "The demo recommends the route and shortlist for a transformer order, drafts a fair answer to a bidder's question, ranks three bids for the award panel, flags a cable delivery that puts a project at risk, and holds two invoices that fail the three-way match.",
+      "customer_challenge": "Utilities buy critical network materials through slow, manual cycles: routes are chosen inconsistently, supplier questions sit in email, bid evaluations are hard to explain, late shipments surface when crews are already waiting, and invoice mismatches are found after payment.",
+      "microsoft_ai_story": "Power Automate brings ERP requisitions, orders, receipts and invoices into Microsoft Dataverse, suppliers work in a Power Apps supplier portal, and Copilot Studio recommends routes, answers supplier questions, scores bids and checks deliveries and invoices in Microsoft Teams or Microsoft 365 Copilot, with every award and payment approved by a person.",
+      "business_value": [
+        "Recommends the procurement route and an eligible supplier shortlist for every requisition.",
+        "Scores bids on price, lead time, quality and sustainability with a narrative the award panel can defend.",
+        "Flags late deliveries before crews wait, and holds invoices that fail the three-way match."
+      ],
+      "search_terms": [
+        "Accounts Payable",
+        "Buyer",
+        "Category Manager",
+        "Expediter",
+        "Microsoft Copilot Studio",
+        "Microsoft Dataverse",
+        "Power Apps",
+        "Power Automate",
+        "Procurement and Supplier Collaboration Agent",
+        "advance shipping notice",
+        "bid evaluation",
+        "bid_evaluation",
+        "delivery_tracking",
+        "framework agreement",
+        "invoice_match",
+        "network materials",
+        "purchase order",
+        "request for quotation",
+        "sourcing",
+        "sourcing_plan",
+        "supplier portal",
+        "supplier_query",
+        "three-way match"
+      ],
+      "journey_stage": "Optimize",
+      "blueprint_role": "Separates sourcing recommendations, bid scoring and match checks from protected awards, orders, supplier messages and payments.",
+      "sample_prompts": [
+        {
+          "label": "Category Manager: Sourcing plan",
+          "prompt": "What requisitions are waiting, how should we buy each one, and who should we invite for the transformer order?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-sourcing-plan"
+        },
+        {
+          "label": "Buyer: Supplier question",
+          "prompt": "A bidder on the transformer RFQ asks if they can deliver all 24 units in two lots instead of three. What should I tell them?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-supplier-query"
+        },
+        {
+          "label": "Category Manager: Bid evaluation",
+          "prompt": "The transformer bids are in. How do they score, and who should the award panel pick?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-bid-evaluation"
+        },
+        {
+          "label": "Expediter: Delivery tracking",
+          "prompt": "Which of our open orders have delivery problems I need to chase today?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-delivery-tracking"
+        },
+        {
+          "label": "Accounts Payable Lead: Three-way match",
+          "prompt": "Which supplier invoices can go for payment approval today, and which ones need to be held?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-invoice-match"
+        }
+      ],
+      "architecture": {
+        "business_flow": [
+          "Category managers, buyers, expediters and accounts payable",
+          "Microsoft Teams or Microsoft 365 Copilot",
+          "Procurement and Supplier Collaboration Agent",
+          "Microsoft Dataverse tables filled by Power Automate from the ERP",
+          "Power Apps supplier portal: RFQs, bids, acknowledgements and shipping notices",
+          "Authorized approval by the category manager, award panel and accounts payable"
+        ],
+        "capabilities": [
+          {
+            "operation": "sourcing_plan",
+            "name": "Sourcing plan",
+            "purpose": "Use when a category manager or buyer asks which requisitions are open, how each should be bought, or which suppliers to invite."
+          },
+          {
+            "operation": "supplier_query",
+            "name": "Supplier question",
+            "purpose": "Use when a buyer asks what to tell a supplier who has a question about an open RFQ; returns a draft reply that is never sent."
+          },
+          {
+            "operation": "bid_evaluation",
+            "name": "Bid evaluation",
+            "purpose": "Use when someone asks how the bids score on price, lead time, quality and sustainability, or which supplier should win."
+          },
+          {
+            "operation": "delivery_tracking",
+            "name": "Delivery tracking",
+            "purpose": "Use when an expediter or buyer asks which purchase orders are unacknowledged or late against the committed date."
+          },
+          {
+            "operation": "invoice_match",
+            "name": "Three-way match",
+            "purpose": "Use when accounts payable asks which invoices pass the three-way match for payment approval and which must be held."
+          }
+        ],
+        "easy_mode": [
+          "Verify Power Platform CLI 2.9.3 or newer and authenticate to the approved target environment.",
+          "Initialize a modern cli-copilot project with an approved publisher prefix and preserve the generated identity settings.",
+          "Upload the two packaged synthetic knowledge files and every operation-specific SKILL.md.",
+          "Bind only approved least-privilege production connections after security, privacy, and business-owner review.",
+          "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
+        ],
+        "local_install_prompt": "Install Procurement and Supplier Collaboration Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/procurement-supplier-collaboration/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect procurement or finance systems or execute external actions.",
+        "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Procurement and Supplier Collaboration Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/procurement-supplier-collaboration/deployment.json. Upload the two synthetic knowledge files and 5 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+        "required_connections": [
+          "Use only approved, least-privilege production connections; the packaged demonstration uses synthetic knowledge files.",
+          "Microsoft Dataverse tables filled by Power Automate from the ERP: requisitions, frameworks, purchase orders, goods receipts and invoices (read-only)",
+          "Power Apps supplier portal for RFQs, bids, clarifications, acknowledgements and advance shipping notices, with authenticated supplier access",
+          "ERP finance module for payment approval, used only by accounts payable after the three-way match",
+          "Microsoft Entra ID user identity for buyers, category managers and accounts payable approvers"
+        ],
+        "manual_commands": [
+          "pac auth create",
+          "pac copilot init --name \"Procurement and Supplier Collaboration Agent\" --publisher-prefix <PREFIX> --authoring-mode cli-copilot --project-dir \"<PROJECT_DIR>\" --environment \"<ENVIRONMENT_ID>\"",
+          "pac connection list --environment \"<ENVIRONMENT_ID>\"",
+          "pac copilot pull --project-dir \"<PROJECT_DIR>\"",
+          "pac copilot push --project-dir \"<PROJECT_DIR>\"",
+          "pac copilot publish --bot \"<BOT_ID_OR_SCHEMA_NAME>\" --environment \"<ENVIRONMENT_ID>\""
+        ],
+        "acceptance_checks": [
+          "Every exposed operation has one persona-language case and one SKILL.md.",
+          "Exactly two synthetic knowledge files are present.",
+          "Responses state the relevant human approval or review boundary.",
+          "No operation claims an RFQ, award, order, supplier message, goods receipt or payment.",
+          "Publishing remains a separate user-approved step."
+        ],
+        "hard_mode": [
+          "Run pac copilot init and verify settings.mcs.yml before authoring components.",
+          "Author global instructions that preserve the packaged synthetic-only, equal-treatment and approval boundaries.",
+          "Add the two knowledge files and one skill for every exposed operation.",
+          "Create dedicated connection references only for approved systems and verify least-privilege access.",
+          "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
+        ]
+      },
+      "source": "catalog"
     }
   }
 }

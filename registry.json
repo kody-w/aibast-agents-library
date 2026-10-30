@@ -1,23 +1,23 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-29T22:46:16.392349+00:00",
+  "generated_at": "2026-10-30T00:51:35.623963+00:00",
   "stats": {
-    "total_agents": 92,
+    "total_agents": 93,
     "publishers": 1,
     "categories": 13,
-    "total_stacks": 72,
+    "total_stacks": 73,
     "total_multi_agent_stacks": 2,
-    "total_solution_containers": 70,
+    "total_solution_containers": 71,
     "total_verticals": 13,
-    "advertised_solutions": 72,
-    "demo_proven_agents": 72,
-    "source_verified_solutions": 71,
-    "curated_copy_solutions": 71,
-    "solution_onepagers": 71,
+    "advertised_solutions": 73,
+    "demo_proven_agents": 73,
+    "source_verified_solutions": 72,
+    "curated_copy_solutions": 72,
+    "solution_onepagers": 72,
     "solution_demo_videos": 64,
-    "total_lines": 49699,
-    "total_kb": 2503.8,
+    "total_lines": 50191,
+    "total_kb": 2532.2,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -63,7 +63,7 @@
       "telecom_media_gaming"
     ],
     "tier_counts": {
-      "verified": 91,
+      "verified": 92,
       "pilot": 1
     }
   },
@@ -269,6 +269,17 @@
       "path": "agents/@aibast-agents-library/energy_stacks/permit_license_management_stack",
       "agents": [
         "@aibast-agents-library/permit-license-management"
+      ],
+      "agent_count": 1,
+      "stack_type": "solution_container"
+    },
+    {
+      "stack": "procurement_supplier_collaboration",
+      "vertical": "energy",
+      "display_name": "Procurement Supplier Collaboration",
+      "path": "agents/@aibast-agents-library/energy_stacks/procurement_supplier_collaboration_stack",
+      "agents": [
+        "@aibast-agents-library/procurement-supplier-collaboration"
       ],
       "agent_count": 1,
       "stack_type": "solution_container"
@@ -5706,6 +5717,269 @@
           "Show me our permit status and any expiring soon",
           "Which permit renewals have already missed their lead time, and how many days are left?",
           "What permit evidence gap needs immediate authorized review?"
+        ]
+      },
+      "_catalog_kind": "solution",
+      "_readiness": [
+        "Demo proven",
+        "Conversation tested",
+        "Synthetic data",
+        "Production pattern"
+      ]
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/procurement-supplier-collaboration",
+      "version": "1.0.0",
+      "display_name": "Procurement and Supplier Collaboration Agent",
+      "description": "Run a utility's source-to-pay cycle for network materials from a synthetic snapshot: requisitions from the maintenance plan, capital projects and stock replenishment with the recommended route (framework direct award, mini-competition or open tender) and eligible supplier shortlist, answers to supplier questions from the published RFQ pack, weighted bid scoring with a ranked recommendation, purchase order acknowledgement and ASN delivery deviations, and the three-way match of purchase order, goods receipt and invoice. The agent never awards, orders, messages a supplier or approves a payment; an authorized person approves every step through future authenticated tools.",
+      "author": "AIBAST",
+      "tags": [
+        "procurement",
+        "sourcing",
+        "supplier-collaboration",
+        "bid-evaluation",
+        "three-way-match",
+        "energy",
+        "utilities"
+      ],
+      "category": "energy",
+      "quality_tier": "verified",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/energy_stacks/procurement_supplier_collaboration_stack/procurement_supplier_collaboration_agent.py",
+      "_size_kb": 28.4,
+      "_lines": 492,
+      "_sha256": "60e38598cbe52fb344aece4637d0524c7355d1b89ca4111330bebbb855b66c4f",
+      "_install_prefix": "procurement_supplier_collaboration__",
+      "_install_filename": "procurement_supplier_collaboration__60e38598cbe5_agent.py",
+      "_stack": "procurement_supplier_collaboration",
+      "_stack_vertical": "energy",
+      "_synthetic_data": true,
+      "_solution": {
+        "advertised_name": "Procurement and Supplier Collaboration Agent",
+        "sharepoint_list_name": "Procurement and Supplier Collaboration Agent",
+        "slot": 73,
+        "executive_summary": "Help a utility buy critical network materials faster: recommend the procurement route and supplier shortlist for every requisition, answer supplier questions from the RFQ pack, score bids on price, lead time, quality and sustainability, flag late deliveries, and hold invoices that fail the three-way match, while every award and payment stays with an authorized person.",
+        "industries": [
+          "Energy and Utilities"
+        ],
+        "personas": [
+          "Category Manager",
+          "Buyer",
+          "Accounts Payable Lead"
+        ],
+        "featured_tools": [
+          "Microsoft Dataverse",
+          "Power Apps",
+          "Power Automate"
+        ],
+        "agent_requirements": [
+          "Microsoft Copilot Studio"
+        ],
+        "capabilities": [
+          "Recommend the route and supplier shortlist",
+          "Answer bidders from the published RFQ pack",
+          "Score bids on price, lead time and quality",
+          "Flag late deliveries and unmatched invoices"
+        ],
+        "outcomes": [
+          "Shortened the cycle for routine orders",
+          "Treated every bidder the same way",
+          "Gave the award panel a clear recommendation",
+          "Paid only invoices that matched the order"
+        ],
+        "customer_scenario": [
+          "Procurement routes differed from buyer to buyer",
+          "Supplier questions sat unanswered in email",
+          "Bid evaluations were hard to explain",
+          "Late shipments and invoice errors surfaced late"
+        ],
+        "slide_title": "Procurement and Supplier Collaboration Agent",
+        "slide_summary": "Recommends how to buy, scores bids fairly, chases late deliveries and holds invoices that do not match.",
+        "scenario_name": "A regional distribution company",
+        "challenge_intro": "A regional distribution company struggled to buy network materials on time:",
+        "actions_intro": "The company leveraged the Procurement and Supplier Collaboration Agent to:",
+        "outcomes_intro": "With the agent\u2019s help, the company:",
+        "opportunity_statements": [
+          "Recommend the procurement route and an eligible supplier shortlist for requisitions from maintenance, projects and stock",
+          "Answer suppliers and score bids from the published RFQ pack, ranking price, lead time, quality and sustainability",
+          "Chase deliveries and match invoices, flagging late shipping notices and holding invoices that fail the three-way match"
+        ],
+        "module_name": null,
+        "module_description": null,
+        "source_verified": true,
+        "sales_headline": "Buy network materials faster, from requisition to matched invoice",
+        "card_pitch": "Give category managers, buyers, expediters and accounts payable one conversational view of source-to-pay for network materials: the right procurement route and supplier shortlist, supplier questions answered from the RFQ pack, bids scored and explained, late deliveries flagged, and invoices matched before payment.",
+        "why_try": "The demo recommends the route and shortlist for a transformer order, drafts a fair answer to a bidder's question, ranks three bids for the award panel, flags a cable delivery that puts a project at risk, and holds two invoices that fail the three-way match.",
+        "customer_challenge_copy": "Utilities buy critical network materials through slow, manual cycles: routes are chosen inconsistently, supplier questions sit in email, bid evaluations are hard to explain, late shipments surface when crews are already waiting, and invoice mismatches are found after payment.",
+        "microsoft_ai_story": "Power Automate brings ERP requisitions, orders, receipts and invoices into Microsoft Dataverse, suppliers work in a Power Apps supplier portal, and Copilot Studio recommends routes, answers supplier questions, scores bids and checks deliveries and invoices in Microsoft Teams or Microsoft 365 Copilot, with every award and payment approved by a person.",
+        "business_value": [
+          "Recommends the procurement route and an eligible supplier shortlist for every requisition.",
+          "Scores bids on price, lead time, quality and sustainability with a narrative the award panel can defend.",
+          "Flags late deliveries before crews wait, and holds invoices that fail the three-way match."
+        ],
+        "search_terms": [
+          "Accounts Payable",
+          "Buyer",
+          "Category Manager",
+          "Expediter",
+          "Microsoft Copilot Studio",
+          "Microsoft Dataverse",
+          "Power Apps",
+          "Power Automate",
+          "Procurement and Supplier Collaboration Agent",
+          "advance shipping notice",
+          "bid evaluation",
+          "bid_evaluation",
+          "delivery_tracking",
+          "framework agreement",
+          "invoice_match",
+          "network materials",
+          "purchase order",
+          "request for quotation",
+          "sourcing",
+          "sourcing_plan",
+          "supplier portal",
+          "supplier_query",
+          "three-way match"
+        ],
+        "journey_stage": "Optimize",
+        "blueprint_role": "Separates sourcing recommendations, bid scoring and match checks from protected awards, orders, supplier messages and payments.",
+        "sample_prompts": [
+          {
+            "label": "Category Manager: Sourcing plan",
+            "prompt": "What requisitions are waiting, how should we buy each one, and who should we invite for the transformer order?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-sourcing-plan"
+          },
+          {
+            "label": "Buyer: Supplier question",
+            "prompt": "A bidder on the transformer RFQ asks if they can deliver all 24 units in two lots instead of three. What should I tell them?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-supplier-query"
+          },
+          {
+            "label": "Category Manager: Bid evaluation",
+            "prompt": "The transformer bids are in. How do they score, and who should the award panel pick?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-bid-evaluation"
+          },
+          {
+            "label": "Expediter: Delivery tracking",
+            "prompt": "Which of our open orders have delivery problems I need to chase today?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-delivery-tracking"
+          },
+          {
+            "label": "Accounts Payable Lead: Three-way match",
+            "prompt": "Which supplier invoices can go for payment approval today, and which ones need to be held?",
+            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=procurement-supplier-collaboration-invoice-match"
+          }
+        ],
+        "architecture": {
+          "business_flow": [
+            "Category managers, buyers, expediters and accounts payable",
+            "Microsoft Teams or Microsoft 365 Copilot",
+            "Procurement and Supplier Collaboration Agent",
+            "Microsoft Dataverse tables filled by Power Automate from the ERP",
+            "Power Apps supplier portal: RFQs, bids, acknowledgements and shipping notices",
+            "Authorized approval by the category manager, award panel and accounts payable"
+          ],
+          "capabilities": [
+            {
+              "operation": "sourcing_plan",
+              "name": "Sourcing plan",
+              "purpose": "Use when a category manager or buyer asks which requisitions are open, how each should be bought, or which suppliers to invite."
+            },
+            {
+              "operation": "supplier_query",
+              "name": "Supplier question",
+              "purpose": "Use when a buyer asks what to tell a supplier who has a question about an open RFQ; returns a draft reply that is never sent."
+            },
+            {
+              "operation": "bid_evaluation",
+              "name": "Bid evaluation",
+              "purpose": "Use when someone asks how the bids score on price, lead time, quality and sustainability, or which supplier should win."
+            },
+            {
+              "operation": "delivery_tracking",
+              "name": "Delivery tracking",
+              "purpose": "Use when an expediter or buyer asks which purchase orders are unacknowledged or late against the committed date."
+            },
+            {
+              "operation": "invoice_match",
+              "name": "Three-way match",
+              "purpose": "Use when accounts payable asks which invoices pass the three-way match for payment approval and which must be held."
+            }
+          ],
+          "easy_mode": [
+            "Verify Power Platform CLI 2.9.3 or newer and authenticate to the approved target environment.",
+            "Initialize a modern cli-copilot project with an approved publisher prefix and preserve the generated identity settings.",
+            "Upload the two packaged synthetic knowledge files and every operation-specific SKILL.md.",
+            "Bind only approved least-privilege production connections after security, privacy, and business-owner review.",
+            "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
+          ],
+          "local_install_prompt": "Install Procurement and Supplier Collaboration Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/procurement-supplier-collaboration/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect procurement or finance systems or execute external actions.",
+          "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Procurement and Supplier Collaboration Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/procurement-supplier-collaboration/deployment.json. Upload the two synthetic knowledge files and 5 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+          "required_connections": [
+            "Use only approved, least-privilege production connections; the packaged demonstration uses synthetic knowledge files.",
+            "Microsoft Dataverse tables filled by Power Automate from the ERP: requisitions, frameworks, purchase orders, goods receipts and invoices (read-only)",
+            "Power Apps supplier portal for RFQs, bids, clarifications, acknowledgements and advance shipping notices, with authenticated supplier access",
+            "ERP finance module for payment approval, used only by accounts payable after the three-way match",
+            "Microsoft Entra ID user identity for buyers, category managers and accounts payable approvers"
+          ],
+          "manual_commands": [
+            "pac auth create",
+            "pac copilot init --name \"Procurement and Supplier Collaboration Agent\" --publisher-prefix <PREFIX> --authoring-mode cli-copilot --project-dir \"<PROJECT_DIR>\" --environment \"<ENVIRONMENT_ID>\"",
+            "pac connection list --environment \"<ENVIRONMENT_ID>\"",
+            "pac copilot pull --project-dir \"<PROJECT_DIR>\"",
+            "pac copilot push --project-dir \"<PROJECT_DIR>\"",
+            "pac copilot publish --bot \"<BOT_ID_OR_SCHEMA_NAME>\" --environment \"<ENVIRONMENT_ID>\""
+          ],
+          "acceptance_checks": [
+            "Every exposed operation has one persona-language case and one SKILL.md.",
+            "Exactly two synthetic knowledge files are present.",
+            "Responses state the relevant human approval or review boundary.",
+            "No operation claims an RFQ, award, order, supplier message, goods receipt or payment.",
+            "Publishing remains a separate user-approved step."
+          ],
+          "hard_mode": [
+            "Run pac copilot init and verify settings.mcs.yml before authoring components.",
+            "Author global instructions that preserve the packaged synthetic-only, equal-treatment and approval boundaries.",
+            "Add the two knowledge files and one skill for every exposed operation.",
+            "Create dedicated connection references only for approved systems and verify least-privilege access.",
+            "Pull before push, inspect every generated file, replay every locked case, and stop before publish."
+          ]
+        },
+        "curated_copy": true,
+        "source": "catalog",
+        "origin": null,
+        "onepager": "73. Procurement and Supplier Collaboration Agent one-pager.pptx",
+        "demo_video": null,
+        "has_onepager": true,
+        "has_demo_video": false,
+        "promise_coverage": 100,
+        "is_primary": true,
+        "aliases": [],
+        "package": {
+          "slug": "procurement-supplier-collaboration",
+          "quest_url": "solutions/procurement-supplier-collaboration/quest.html",
+          "manual_tutorial_url": "solutions/procurement-supplier-collaboration/manual-tutorial.html",
+          "export_manifest_url": "solutions/procurement-supplier-collaboration/export-manifest.json"
+        }
+      },
+      "_demo": {
+        "slug": "procurement-supplier-collaboration",
+        "case_count": 5,
+        "personas": [
+          "Accounts Payable Lead",
+          "Buyer",
+          "Category Manager",
+          "Expediter"
+        ],
+        "prompts": [
+          "What requisitions are waiting, how should we buy each one, and who should we invite for the transformer order?",
+          "A bidder on the transformer RFQ asks if they can deliver all 24 units in two lots instead of three. What should I tell them?",
+          "The transformer bids are in. How do they score, and who should the award panel pick?"
         ]
       },
       "_catalog_kind": "solution",
