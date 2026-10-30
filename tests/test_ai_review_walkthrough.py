@@ -257,7 +257,7 @@ def test_export_writes_the_packet_and_summary(agent):
         if index < len(MOD.STAGES) - 1:
             agent.perform(action="next")
     out = agent.perform(action="export")
-    assert "Nothing was sent anywhere" in out and "0 open gap(s)" in out
+    assert "written to this folder only" in out and "0 open gap(s)" in out
     packet = next(v for k, v in agent.store.files.items() if k.endswith("review-packet.md"))
     summary = next(v for k, v in agent.store.files.items() if k.endswith("summary.md"))
     for title in EXPECTED_ORDER:
@@ -425,3 +425,32 @@ def test_every_experimental_page_with_a_production_address_is_rendered_per_ring(
         relative = path.relative_to(ROOT).as_posix()
         if canonical in path.read_text(encoding="utf-8"):
             assert relative in pages.RING_PAGES_URL_PATHS, relative
+
+
+# The answers are typed into Brainstem chat, so they go to the model like any
+# chat message. Only the saved review and the export stay local. No surface may
+# claim otherwise, and the page and the start reply must say so plainly.
+FALSE_PRIVACY = re.compile(
+    r"(answers? stays? on (?:this|your) device|stays? on your device|sends? nothing anywhere|"
+    r"nothing (?:was|is) sent anywhere)",
+    re.I,
+)
+TRUTHFUL_PRIVACY = re.compile(r"sent to the AI model your Brainstem uses", re.I)
+
+
+def test_no_surface_claims_answers_never_leave_the_device(agent):
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    entry = next(t for t in manifest["tools"] if t["name"].endswith(TOOL_ID))
+    start = agent.perform(action="start", system_name="Synthetic helpdesk bot")
+    surfaces = {
+        "agent source": AGENT_PATH.read_text(encoding="utf-8"),
+        "page": PAGE_PATH.read_text(encoding="utf-8"),
+        "guide card": _guide_card(),
+        "tools.json entry": json.dumps(entry),
+        "start reply": start,
+    }
+    for label, text in surfaces.items():
+        assert not FALSE_PRIVACY.search(text), (label, FALSE_PRIVACY.search(text).group(0))
+    assert TRUTHFUL_PRIVACY.search(start)
+    assert TRUTHFUL_PRIVACY.search(surfaces["page"])
+    assert "local storage" in start and "local storage" in surfaces["page"]

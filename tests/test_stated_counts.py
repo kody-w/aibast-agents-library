@@ -109,6 +109,19 @@ def test_field_notes_state_the_real_counts():
     assert not re.search(r"\d[\d,]* lines", size)
 
 
+def test_every_field_note_states_the_real_agent_and_industry_counts():
+    """No note may state a stale count, not only the two checked above."""
+    notes = [note for topic in _load("field-notes.json")["topics"] for note in topic["notes"]]
+    agent_note = next(n for n in notes if n["id"] == "what-is-an-agent")["answer"]
+    assert _numbers(r"publishes (\d+) of them", agent_note) == [STATS["total_agents"]]
+    for note in notes:
+        text = note.get("question", "") + " " + note["answer"]
+        for value in re.findall(r"(\d+) industries", text):
+            assert int(value) == STATS["total_verticals"], (note["id"], value)
+        for value in re.findall(r"(\d+) agents\b", text):
+            assert int(value) == STATS["total_agents"], (note["id"], value)
+
+
 def _guide_text_before_tools() -> str:
     text = (ROOT / "docs" / "rapp-guide.html").read_text(encoding="utf-8")
     end = text.index('id="tools"')
