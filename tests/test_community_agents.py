@@ -2,6 +2,7 @@
 rule that community demos stay out of the agent library until one graduates."""
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -288,6 +289,77 @@ def test_check_cli_writes_result_and_comment(tmp_path):
     )
     assert json.loads(result.read_text())["ok"] is False
     assert "needs a few changes" in comment.read_text()
+
+
+def test_check_cli_finishes_on_a_very_long_word_of_listed_names(tmp_path):
+    """Round 8: one word made of 1200 listed names used to raise
+    RecursionError, so no comment was written and the submitter got no reply."""
+    body = tmp_path / "body.md"
+    body.write_text(
+        filled_body(description="Tags: " + "gpt" * 1200 + ". The agent drafts."), encoding="utf-8"
+    )
+    result, comment = tmp_path / "r.json", tmp_path / "c.md"
+    subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "demo_submission.py"), "check", "--offline",
+         "--body-file", str(body), "--result", str(result), "--comment", str(comment)],
+        check=True, capture_output=True,
+    )
+    problems = json.loads(result.read_text())["problems"]
+    assert any(p.startswith(ds.OTHER_AI_PRODUCTS_PROBLEM) for p in problems)
+    assert "needs a few changes" in comment.read_text()
+
+
+def _run_comment_step(tmp_path, files: dict[str, str]) -> list[str]:
+    """Run the check job's 'Comment and label' step with a stand-in gh."""
+    yaml = pytest.importorskip("yaml")
+    steps = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))["jobs"]["check"]["steps"]
+    step = next(s for s in steps if s.get("name") == "Comment and label")
+    runner = tmp_path / "runner"
+    runner.mkdir()
+    for name, text in files.items():
+        (runner / name).write_text(text, encoding="utf-8")
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    log = tmp_path / "gh.log"
+    gh = bin_dir / "gh"
+    gh.write_text(
+        "#!/bin/sh\n"
+        'printf \'%s\\n\' "$*" >> "$GH_LOG"\n'
+        'if [ "$1 $2" = "issue comment" ]; then cat "$5" >> "$GH_LOG"; fi\n',
+        encoding="utf-8",
+    )
+    gh.chmod(0o755)
+    py = bin_dir / "python"
+    py.write_text(f'#!/bin/sh\nexec "{sys.executable}" "$@"\n', encoding="utf-8")
+    py.chmod(0o755)
+    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}",
+           "RUNNER_TEMP": str(runner), "NUMBER": "7", "GH_LOG": str(log)}
+    subprocess.run(["bash", "-e", "-c", step["run"]], env=env, check=True, capture_output=True)
+    return log.read_text(encoding="utf-8").splitlines()
+
+
+def test_comment_step_runs_and_replies_when_the_check_crashed(tmp_path):
+    """Round 8: when the check step crashed, the 'Comment and label' step was
+    skipped, so the issue got no reply and no label."""
+    yaml = pytest.importorskip("yaml")
+    steps = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))["jobs"]["check"]["steps"]
+    check = next(s for s in steps if s.get("name") == "Check the submission")
+    step = next(s for s in steps if s.get("name") == "Comment and label")
+    assert "!cancelled()" in step.get("if", ""), "the step must run after a failed check"
+    assert f"steps.{check['id']}.outcome" in step["if"]
+    lines = _run_comment_step(tmp_path, {})
+    assert any(line.startswith("issue comment 7") for line in lines)
+    assert any("could not finish" in line for line in lines)
+    assert any('--add-label demo: needs changes' in line for line in lines)
+
+
+def test_comment_step_still_posts_the_check_result(tmp_path):
+    lines = _run_comment_step(tmp_path, {
+        "comment.md": "Thank you. This demo passed.\n",
+        "result.json": '{"ok": true, "problems": []}\n',
+    })
+    assert "Thank you. This demo passed." in lines
+    assert any('--add-label demo: ready for review' in line for line in lines)
 
 
 # ------------------------------------------------------------ the workflow

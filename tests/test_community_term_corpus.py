@@ -22,13 +22,17 @@ The rules the cases pin down:
     ("RAPP/Factory", "RAPP-Factory"). An opening bracket, a quote, a comma
     or a dash used as punctuation is a break ("perplexity (AI", "perplexity—AI").
   * A possessive joins ("Google’s Bard").
+  * An en or em dash with no space around it joins the words of a name only
+    when every word starts with a capital ("Vertex—AI", "Open–AI"), so
+    "perplexity—AI helps" passes. With a space around it, it is a break.
   * A name made of two words is a name however it is spaced ("OpenAI",
     "Open AI", "open-ai"), and a joined link word is read both split at
     capitals and whole ("OpenAI.pdf", "OpenAIDemo.pdf").
   * A one-word vendor name whose parts are everyday words, written with only
     a space between the parts, matches only when every part starts with a
     capital: "Open AI" and "Dialog Flow" flag, "an open AI standard" and "the
-    dialog flow of the agent" pass. Joined forms ("openai", "open-ai",
+    dialog flow of the agent" pass. "agent space" and "mid journey" are
+    listed this way too. Joined forms ("openai", "open-ai",
     "DialogFlow.pdf") match in any case.
   * A one-letter last word takes no digit ("Amazon Q4" is a sales quarter).
   * Everyday words pass unless the vendor word is next to them
@@ -230,6 +234,41 @@ CORPUS = [
     ("round 7", "title", "OpenAI", _set(V)),
     ("round 7", "title", "open-ai", _set(V)),
     ("round 7", "title", "DialogFlow.pdf", _set(V)),
+    # ---------------------------------------------- controls named in earlier rounds' evidence
+    ("round 3", "description", "Uses Azure. The agent drafts.", _set(W)),
+    ("round 5", "description", "Ask Amazon. Q4 is busy.", PASS),
+    ("round 5", "description", "This is RAPP Factory output. The agent drafts replies.", _set(W)),
+    ("round 5", "description", "Built with Salesforce·Einstein. The agent drafts replies.", _set(V)),
+    # ---------------------------------------------- round 8: Agent Space and Mid Journey as two words
+    ("round 8", "title", "Agent Space", _set(V)),
+    ("round 8", "description", "Replaces Agent Space. The agent drafts.", _set(V)),
+    ("round 8", "onepager", "https://example.com/Agent_Space.pdf", _set(V)),
+    ("round 8", "onepager", "https://example.com/files/agent-space-demo.pdf", _set(V)),
+    ("round 8", "description", "Built with Mid-Journey images. The agent drafts.", _set(V)),
+    ("round 8", "onepager", "https://example.com/Mid_Journey.pdf", _set(V)),
+    ("round 8", "title", "Agentspace", _set(V)),
+    ("round 8", "title", "Midjourney", _set(V)),
+    ("round 8", "title", "Mid Journey", _set(V)),
+    ("round 8", "title", "Deep Seek Team", _set(V)),
+    ("round 8", "title", "Sage-Maker", _set(V)),
+    ("round 8", "description", "agent space", PASS),
+    ("round 8", "description", "mid journey", PASS),
+    ("round 8", "description", "Field teams share one agent space. The agent drafts.", PASS),
+    ("round 8", "description", "Drivers get a mid journey check. The agent drafts.", PASS),
+    # ---------------------------------------------- round 8: a long word of listed names must not crash
+    ("round 8", "description", "Tags: " + "gpt" * 1200 + ". The agent drafts.", _set(V)),
+    ("round 8", "description", "Tags: " + "azure" * 1500 + ". The agent drafts.", _set(W)),
+    # ---------------------------------------------- round 8: a bare en or em dash inside a capitalised name
+    ("round 8", "description", "Moved off Vertex—AI. The agent drafts.", _set(V)),
+    ("round 8", "description", "Moved off Amazon–Bedrock. The agent drafts.", _set(V)),
+    ("round 8", "description", "Built on Open–AI first.", _set(V)),
+    ("round 8", "description", "Built on Open—AI first.", _set(V)),
+    ("round 8", "description", "Built on open-ai first.", _set(V)),
+    ("round 8", "description", "perplexity—AI helps", PASS),
+    ("round 8", "description", "Planners face perplexity – AI helps. The agent explains.", PASS),
+    ("round 8", "description", "Planners face perplexity — AI helps. The agent explains.", PASS),
+    ("round 8", "description", "Sales on Amazon—Q4 were strong. The agent helps.", PASS),
+    ("round 8", "description", "Our bedrock—agents handle it. The agent explains.", PASS),
 ]
 
 
@@ -245,7 +284,7 @@ def _kinds(field: str, text: str) -> frozenset:
 
 @pytest.mark.parametrize(
     "source, field, text, expected", CORPUS,
-    ids=[f"{s}|{f}|{t}" for s, f, t, _ in CORPUS],
+    ids=[f"{s}|{f}|{t[:80]}" for s, f, t, _ in CORPUS],
 )
 def test_term_corpus(source, field, text, expected):
     assert _kinds(field, text) == expected
