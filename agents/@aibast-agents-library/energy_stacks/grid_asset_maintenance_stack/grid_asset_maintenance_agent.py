@@ -244,13 +244,20 @@ def _ranked():
     return sorted(_assets(), key=lambda a: (-a["p90"], -a["p180"]))
 
 
-_STOPWORDS = {"the", "a", "an", "of", "for", "to", "on", "at", "in", "and", "our", "its", "asset", "job"}
+_STOPWORDS = {"the", "a", "an", "of", "for", "to", "on", "at", "in", "and", "our", "its", "asset", "job", "one", "ones"}
 
 
 def _words(text):
-    """Lower-case words and ids (TX-0417 stays one word); a trailing plural s is dropped so 'cables' meets 'cable'."""
+    """Lower-case words and ids (TX-0417 stays one word); a trailing plural s is dropped so 'cables' meets 'cable'.
+
+    Numbers are not words: a number only tells assets apart through _qualifiers (a voltage, or a panel, feeder,
+    joint, RMU or transformer number), so '1.2 km' in a cable's name never meets a '1' or '2' in the request, and
+    'one' is a pronoun ('the Millbrook one'), not a number, unless it follows a designator.
+    """
     words = set()
-    for word in re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", str(text).lower()):
+    for word in re.findall(r"[a-z0-9]+(?:[-.][a-z0-9]+)*", str(text).lower()):
+        if re.fullmatch(r"[\d.]+", word) or len(word) < 2:
+            continue
         if len(word) > 3 and word.endswith("s") and not word.endswith("ss"):
             word = word[:-1]
         if word not in _STOPWORDS:
@@ -279,25 +286,46 @@ _TEENS = {"ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
           "seventeen": 17, "eighteen": 18, "nineteen": 19}
 _TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80,
          "ninety": 90}
+_NUMBER = (r"(?:(?:" + "|".join(_TENS) + r")(?:[\s-]+(?:" + "|".join(_UNITS) + r"))?|(?:"
+           + "|".join(list(_TEENS) + list(_UNITS)) + r"))")
 _SPELLED = re.compile(r"\b(?:(" + "|".join(_TENS) + r")(?:[\s-]+(" + "|".join(_UNITS) + r"))?|("
                       + "|".join(list(_TEENS) + list(_UNITS)) + r"))\b")
+_KINDS = r"(panel|feeder|joint|t|rmu|transformer)"
+_NUMBER_WORD = r"(?:\s+(?:number|no\.?|#))?"
+# A spelled number counts as a number in exactly two places: right after a designator ('panel two', 'T one',
+# 'transformer number one', 'RMU twenty two'), or in a run that ends in a unit ('eleven kV', 'thirty-three eleven
+# kV' = 33/11 kV). Anywhere else it is an ordinary word ('the Millbrook one').
+_SPELLED_DESIGNATOR = re.compile(r"\b" + _KINDS + _NUMBER_WORD + r"([\s-]+)(" + _NUMBER + r")\b")
+_SPELLED_MEASURE = re.compile(r"\b(" + _NUMBER + r"(?:[\s/-]+" + _NUMBER + r")?)\s*(?=kv\b|kva\b|mva\b)")
 
 
-def _digits(text):
-    """Spelled-out numbers as digits, so a spoken request reads like a typed one: 'panel two' -> 'panel 2',
-    'eleven kV' -> '11 kV', 'thirty-three kV' -> '33 kV', 'RMU twenty two' -> 'RMU 22'."""
+def _spelled(words):
+    """'twenty two' -> '22', 'eleven' -> '11'."""
     def number(match):
         tens, unit, single = match.groups()
         if single:
             return str(_TEENS.get(single, _UNITS.get(single)))
         return str(_TENS[tens] + _UNITS.get(unit or "zero", 0))
-    return _SPELLED.sub(number, str(text).lower())
+    return _SPELLED.sub(number, words)
+
+
+def _digits(text):
+    """Spelled-out numbers as digits where they are numbers, so a spoken request reads like a typed one:
+    'panel two' -> 'panel 2', 'eleven kV' -> '11 kV', 'thirty-three eleven kV' -> '33/11 kV', 'RMU twenty two' ->
+    'RMU 22'. 'The Millbrook one' is unchanged."""
+    text = str(text).lower()
+    text = _SPELLED_MEASURE.sub(
+        lambda m: "/".join(_spelled(part) for part in re.findall(_NUMBER, m.group(1))) + " ", text)
+    return _SPELLED_DESIGNATOR.sub(
+        lambda m: m.group(0)[:m.start(3) - m.start(0)] + _spelled(m.group(3)), text)
 
 
 _VOLTAGE = re.compile(r"\b(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?\s*kv\b")
-# 'transformer 1' and 'transformer number 1' are transformer T1; 'transformer 20 MVA' is a rating, not a number.
-_DESIGNATOR = re.compile(r"\b(panel|feeder|joint|t|rmu|transformer)(?:\s+(?:number|no\.?|#))?[\s-]?(\d+)\b"
-                         r"(?!\s*mva)")
+# 'transformer 1' and 'transformer number 1' are transformer T1. A number followed by a unit, a slash or a decimal
+# point is a measure, not a designator: 'transformer 33/11 kV', 'transformer 33 kV' and 'transformer 20 MVA' name
+# a voltage or a rating, never transformer number 33 or 20.
+_DESIGNATOR = re.compile(r"\b" + _KINDS + _NUMBER_WORD + r"[\s-]?(\d+)\b"
+                         r"(?!\s*(?:[/.]\d|kv\b|kva\b|mva\b|km\b|mm\b|m\b|%))")
 
 
 def _qualifiers(text):
