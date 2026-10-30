@@ -305,7 +305,7 @@ html[data-theme="dark"] {
     <h2 id="related-heading">Related resources</h2>
     <p>Official Microsoft references and independent community projects. Credit stays with each owner.</p>
     <div class="community-grid" id="community-grid"><p>Loading related resources...</p></div>
-    <p class="small-print" id="community-note"></p>
+    <p class="small-print" id="community-note">This is a curated, non-exhaustive list. Descriptions are paraphrased from each owner's listing. Inclusion is not an endorsement, partnership or verified benchmark.</p>
   </section>
 </main>
 <div class="footer">
@@ -344,8 +344,20 @@ async function getJSON(paths, { required = false } = {}) {
 }
 
 function publicHttps(value) {
-  const url = new URL(value);
-  return url.protocol === "https:" && !url.username && !url.password;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+function validEntry(tool) {
+  return Boolean(tool)
+    && ["name", "author", "description", "url"].every(
+      key => typeof tool[key] === "string" && tool[key].trim()
+    )
+    && publicHttps(tool.url);
 }
 
 async function getCommunityTools() {
@@ -355,17 +367,33 @@ async function getCommunityTools() {
       || typeof doc.note !== "string") {
     throw new Error("Invalid community tools manifest");
   }
-  for (const tool of doc.tools) {
-    if (!tool || ["name", "author", "description", "url"].some(
-      key => typeof tool[key] !== "string" || !tool[key].trim()
-    )) {
-      throw new Error("Invalid community tool entry");
+  // One bad entry is skipped; it never takes the rest of the page down.
+  const tools = doc.tools.filter(tool => {
+    if (validEntry(tool)) return true;
+    console.warn("Skipped a community entry with missing text or a link that is not public HTTPS", tool && tool.id);
+    return false;
+  });
+  return { ...doc, tools };
+}
+
+function renderEach(entries, render) {
+  return entries.map(entry => {
+    try {
+      return render(entry);
+    } catch (error) {
+      console.warn("Skipped a community entry that could not be shown", entry && entry.id, error);
+      return "";
     }
-    if (!publicHttps(tool.url)) {
-      throw new Error("Community tool links must be public HTTPS URLs");
-    }
-  }
-  return doc;
+  }).join("");
+}
+
+function toolCard(tool) {
+  return `
+      <article class="community-card">
+        <a class="name" href="${esc(tool.url)}" target="_blank" rel="noopener noreferrer">${esc(tool.name)}</a>
+        <div class="author">${esc(tool.author)}</div>
+        <p class="desc">${esc(tool.description)}</p>
+      </article>`;
 }
 
 function demoCard(demo) {
@@ -400,22 +428,20 @@ function demoCard(demo) {
       </article>`;
 }
 
+// The manifest's own "note" documents the file for maintainers; visitors see this.
+const PUBLIC_NOTE = "This is a curated, non-exhaustive list. Descriptions are paraphrased from each owner's listing. Inclusion is not an endorsement, partnership or verified benchmark.";
+
 async function renderCommunityTools() {
   $("submit-demo").href = SUBMIT_URL;
+  $("community-note").textContent = PUBLIC_NOTE;
   try {
     const doc = await getCommunityTools();
     const demos = doc.tools.filter(entry => kindOf(entry) === "demo");
     const tools = doc.tools.filter(entry => kindOf(entry) === "tool");
-    $("community-note").textContent = doc.note;
-    $("demo-grid").innerHTML = demos.length
-      ? demos.map(demoCard).join("")
-      : '<p class="empty">No demos yet. Be the first to submit one.</p>';
-    $("community-grid").innerHTML = tools.map(tool => `
-      <article class="community-card">
-        <a class="name" href="${esc(tool.url)}" target="_blank" rel="noopener noreferrer">${esc(tool.name)}</a>
-        <div class="author">${esc(tool.author)}</div>
-        <p class="desc">${esc(tool.description)}</p>
-      </article>`).join("");
+    const demoCards = renderEach(demos, demoCard);
+    $("demo-grid").innerHTML = demoCards
+      || '<p class="empty">No demos yet. Be the first to submit one.</p>';
+    $("community-grid").innerHTML = renderEach(tools, toolCard);
   } catch (error) {
     console.error("Unable to load community agents", error);
     $("demo-grid").innerHTML = '<p role="alert">Community agents are unavailable. Please try again later.</p>';

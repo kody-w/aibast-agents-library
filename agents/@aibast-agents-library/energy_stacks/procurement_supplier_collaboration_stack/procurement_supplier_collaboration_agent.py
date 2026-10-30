@@ -14,6 +14,7 @@ person to approve.
 
 import sys
 import os
+import re
 from datetime import datetime, timedelta
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates"))
 from basic_agent import BasicAgent
@@ -55,7 +56,8 @@ REQUISITIONS = [
      "keywords": ["req-7712", "transformer", "500 kva"]},
     {"id": "REQ-7710", "item": "33 kV XLPE cable, 3 x 300 mm2", "qty": "6 km", "unit_estimate": None,
      "value": 1380000, "source": "Capital project: Fenwick 33 kV reinforcement", "framework": None,
-     "category": "HV cable", "critical": True, "need_in_days": 160, "keywords": ["req-7710", "33 kv cable", "xlpe"]},
+     "category": "HV cable", "critical": True, "need_in_days": 160,
+     "keywords": ["req-7710", "33 kv cable", "xlpe", "cable", "fenwick"]},
     {"id": "REQ-7715", "item": "Pole-top fuse kit, 11 kV", "qty": 400, "unit_estimate": 95,
      "source": "Maintenance plan: overhead line refurbishment, quarter 1", "framework": "FW-OH-19",
      "category": "Overhead line fittings", "critical": False, "need_in_days": 45,
@@ -74,18 +76,20 @@ RFQS = [
     {"id": "RFQ-3301", "requisition": "REQ-7712", "route": "Mini-competition under framework FW-DT-22",
      "closes_in_days": 6, "invited": ["Brightwater Transformers", "Halden Transformer Works",
                                       "Kelso Electrical Supply"],
+     "keywords": ["rfq-3301", "req-7712", "transformer", "distribution transformer", "500 kva", "fw-dt-22"],
      "pack": [
-         {"topic": "Delivery lots", "keywords": ["lot", "lots", "deliver", "delivery", "split", "two"],
+         {"topic": "Delivery lots", "keywords": ["lot", "deliver", "delivery", "split"],
           "answer": "Delivery is 24 units in three lots of 8 to Central Stores. Lot dates are set at award from each "
                     "bidder's quoted lead time. A different lot plan may be offered only as a variant bid under "
                     "section 5.3, alongside a compliant bid."},
-         {"topic": "Specification", "keywords": ["spec", "specification", "vector", "dyn11", "losses", "rating"],
+         {"topic": "Specification", "keywords": ["spec", "specification", "vector", "dyn11", "loss", "rating"],
           "answer": "500 kVA, 11/0.433 kV, vector group Dyn11, losses as set in specification ES-DT-04 (no "
                     "tolerance on load losses)."},
          {"topic": "Quality documents", "keywords": ["iso", "certificate", "type test", "quality", "documents"],
           "answer": "Bids must include an ISO 9001 certificate and type test certificates for the offered design. "
                     "A bid missing a type test certificate scores half marks on quality."},
-         {"topic": "Evaluation", "keywords": ["evaluat", "weight", "score", "scored", "criteria"],
+         {"topic": "Evaluation", "keywords": ["evaluate", "evaluated", "evaluation", "weight", "weighting", "score", "scored",
+                                                    "scoring", "criteria"],
           "answer": "Price 50%, lead time 20%, quality 20%, sustainability 10%."},
          {"topic": "Closing date", "keywords": ["close", "closing", "deadline", "extension", "due"],
           "answer": "The RFQ closes at 12:00 on the closing day shown in the portal. Extensions apply to all "
@@ -93,7 +97,8 @@ RFQS = [
      ],
      "clarifications": [
          {"id": "CL-1", "question": "Is a sealed tank design acceptable?",
-          "answer": "Yes, if it meets ES-DT-04; published to all bidders."},
+          "answer": "Yes, if it meets ES-DT-04; published to all bidders.",
+          "keywords": ["sealed tank", "sealed"]},
      ]},
 ]
 
@@ -212,17 +217,59 @@ def _route(req):
     return "Three written quotes", "no framework covers it and it is below the tender threshold"
 
 
+def _keyword_pattern(keyword):
+    """Whole words, a hyphen or space between words optional, and the common endings on the last word.
+
+    'close' must not hit 'disclose' and 'rating' must not hit 'operating' (the match starts on a word boundary),
+    while 'weight' meets 'weighted', 'deliver' meets 'delivered', 'delivery' meets 'deliveries', 'loss' meets
+    'losses' and 'nurse call' meets 'nurse-call'.
+    """
+    parts = [p for p in re.split(r"[\s-]+", keyword.strip().lower()) if p]
+    last = parts[-1]
+    if len(last) > 2 and last.endswith("y") and last[-2] not in "aeiou":
+        tail = re.escape(last[:-1]) + r"(?:y|ies|ied)"
+    else:
+        tail = re.escape(last) + r"(?:s|es|d|ed|ing)?"
+    return r"\b" + r"[\s-]*".join([re.escape(p) for p in parts[:-1]] + [tail]) + r"\b"
+
+
+def _keyword_hit(keyword, text):
+    """Whole-word match on the keyword or a common word form of it (see _keyword_pattern)."""
+    return re.search(_keyword_pattern(keyword), text) is not None
+
+
+def _id_named(item_id, text):
+    """True when the id appears anywhere in the text, with its hyphen, a space or nothing: 'REQ-7712', 'req 7712'
+    and 'req7712' all name REQ-7712."""
+    parts = [re.escape(p) for p in str(item_id).lower().split("-") if p]
+    return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
+
+
 def _find(value, default, items, key):
+    """Id or words; empty -> the default; no match -> None; a tie -> the tied records (a list).
+
+    Keywords match whole words only, and each record scores the words in the keywords it matches, so 'Fenwick
+    cable' finds the cable requisition and a request that fits two records equally is asked about, not guessed.
+    """
     if not value:
         return next(i for i in items if i[key] == default)
     q = str(value).lower().strip()
     for item in items:
         if q == item[key].lower():
             return item
+    named = [item for item in items if _id_named(item[key], q)]
+    if named:
+        return named[0] if len(named) == 1 else named
+    scores = []
     for item in items:
-        if any(k in q for k in item.get("keywords", [])):
-            return item
-    return None
+        score = sum(len(k.split()) for k in item.get("keywords", []) if _keyword_hit(k, q))
+        if score:
+            scores.append((score, item))
+    if not scores:
+        return None
+    best = max(score for score, _ in scores)
+    tied = [item for score, item in scores if score == best]
+    return tied[0] if len(tied) == 1 else tied
 
 
 def _scores(rfq_id):
@@ -289,7 +336,8 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
                     },
                     "rfq": {
                         "type": "string",
-                        "description": "RFQ id such as RFQ-3301. Optional; defaults to RFQ-3301.",
+                        "description": "RFQ id such as RFQ-3301 or words such as 'transformer RFQ'. Optional; "
+                                       "defaults to RFQ-3301.",
                     },
                     "question": {
                         "type": "string",
@@ -321,6 +369,9 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         focus = _find(kwargs.get("requisition"), DEFAULT_REQUISITION, _requisitions(), "id")
         if focus is None:
             return self._unknown("requisition", kwargs.get("requisition"), [r["id"] for r in _requisitions()])
+        if isinstance(focus, list):
+            return self._ambiguous("requisition", kwargs.get("requisition"),
+                                   [f"{r['id']} ({r['item']})" for r in focus])
         policy = _policy()
         lines = [f"# Sourcing Plan - {COMPANY}", "",
                  f"**Open requisitions:** {len(_requisitions())} | **Shortlist shown for:** {focus['id']}", "",
@@ -359,9 +410,14 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         rfq = _find(kwargs.get("rfq"), DEFAULT_RFQ, _rfqs(), "id")
         if rfq is None:
             return self._unknown("RFQ", kwargs.get("rfq"), [r["id"] for r in _rfqs()])
+        if isinstance(rfq, list):
+            return self._ambiguous("RFQ", kwargs.get("rfq"), [f"{r['id']} ({r['route']})" for r in rfq])
         question = (kwargs.get("question") or DEFAULT_QUESTION).strip()
         q = question.lower()
-        hits = [p for p in rfq["pack"] if any(k in q for k in p["keywords"])]
+        hits = [p for p in rfq["pack"] if any(_keyword_hit(k, q) for k in p["keywords"])]
+        asked_before = [c for c in rfq["clarifications"]
+                        if q.rstrip("?. ") == c["question"].lower().rstrip("?. ")
+                        or any(_keyword_hit(k, q) for k in c.get("keywords", []))]
         lines = [f"# Supplier Question - {rfq['id']}", "",
                  f"**RFQ:** {rfq['id']} ({rfq['route']}), closes {_date(rfq['closes_in_days'])} "
                  f"(in {rfq['closes_in_days']} days)",
@@ -371,7 +427,14 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
             lines += [f"- **{p['topic']}:** {p['answer']}" for p in hits]
             lines += ["", "Because the answer is already in the published pack, it can go to this supplier without "
                           "changing the terms for other bidders."]
-        else:
+        if asked_before:
+            if hits:
+                lines += [""]
+            lines += [f"## Already answered in published clarification {', '.join(c['id'] for c in asked_before)}"]
+            lines += [f"- **{c['id']}:** {c['question']} {c['answer']}" for c in asked_before]
+            lines += ["", "This answer has already been published to all bidders, so the same reply can go to this "
+                          "supplier. No new clarification is needed."]
+        if not hits and not asked_before:
             lines += ["**Not answered by the published RFQ pack.** Draft for the buyer: log it as a new "
                       f"clarification (CL-{len(rfq['clarifications']) + 1}) and publish the answer to all "
                       f"{len(rfq['invited'])} invited bidders, so every bidder works from the same information."]
@@ -386,6 +449,8 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         rfq = _find(kwargs.get("rfq"), DEFAULT_RFQ, _rfqs(), "id")
         if rfq is None:
             return self._unknown("RFQ", kwargs.get("rfq"), [r["id"] for r in _rfqs()])
+        if isinstance(rfq, list):
+            return self._ambiguous("RFQ", kwargs.get("rfq"), [f"{r['id']} ({r['route']})" for r in rfq])
         weights = _policy()["weights"]
         rows = _scores(rfq["id"])
         top, runner = rows[0], rows[1]
@@ -475,6 +540,11 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         lines += ["", "**Status:** Draft - accounts payable approves matched invoices for payment in the finance "
                       "module and resolves holds with the supplier. Nothing has been paid or sent.", "", BOUNDARY]
         return "\n".join(lines)
+
+    def _ambiguous(self, kind, value, candidates) -> str:
+        return (f"# Which {kind} did you mean?\n\n`{value}` matches more than one {kind} equally well, so none was "
+                f"picked. Name one of these by its id:\n\n" + "\n".join(f"- {c}" for c in candidates)
+                + f"\n\n{BOUNDARY}")
 
     def _unknown(self, kind, value, ids) -> str:
         return (f"# Unknown {kind}\n\nNo {kind} in the synthetic snapshot matches `{value}`; no substitute was "

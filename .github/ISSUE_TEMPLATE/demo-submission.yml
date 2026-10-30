@@ -19,7 +19,7 @@ body:
     id: video
     attributes:
       label: Public video URL
-      description: A public YouTube link or a public Microsoft Stream link, starting with https://.
+      description: A public YouTube link, starting with https://. Microsoft Stream videos need a sign-in, so they cannot be shown on the public page.
       placeholder: https://www.youtube.com/watch?v=...
     validations:
       required: true

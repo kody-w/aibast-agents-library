@@ -14,6 +14,7 @@ authorized engineer to approve.
 
 import sys
 import os
+import re
 from datetime import datetime, timedelta
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates"))
 from basic_agent import BasicAgent
@@ -243,18 +244,69 @@ def _ranked():
     return sorted(_assets(), key=lambda a: (-a["p90"], -a["p180"]))
 
 
+_STOPWORDS = {"the", "a", "an", "of", "for", "to", "on", "at", "in", "and", "our", "its", "asset", "job"}
+
+
+def _words(text):
+    """Lower-case words and ids (TX-0417 stays one word); a trailing plural s is dropped so 'cables' meets 'cable'."""
+    words = set()
+    for word in re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", str(text).lower()):
+        if len(word) > 3 and word.endswith("s") and not word.endswith("ss"):
+            word = word[:-1]
+        if word not in _STOPWORDS:
+            words.add(word)
+    return words
+
+
+def _record_words(item, key):
+    """(Words that name the record: its id, site and keywords; words that only describe it: name and class)."""
+    naming = [item[key], item.get("site", ""), item.get("asset", "")] + list(item.get("keywords", []))
+    describing = [item.get("name", ""), item.get("class", ""), item.get("asset_name", "")]
+    primary = set().union(*(_words(f) for f in naming))
+    return primary, set().union(*(_words(f) for f in describing)) - primary
+
+
+def _id_named(item_id, text):
+    """True when the id appears anywhere in the text, with its hyphen, a space or nothing: 'TX-0417', 'asset tx 0417'
+    and 'tx0417' all name TX-0417."""
+    parts = [re.escape(p) for p in str(item_id).lower().split("-") if p]
+    return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
+
+
 def _resolve(value, default, items, key):
-    """Id or words from the record; empty -> the default; no match -> None."""
+    """Id or words from the record; empty -> the default; no match -> None; a tie -> the tied records (a list).
+
+    Every record is scored on the whole words it shares with the request. A word only one record has (a site such
+    as Orchard Way, or an id) counts in full; a word several records share (a class word such as transformer, or
+    Calder, which names both a substation and a line) counts for less, and a word that only describes a record
+    counts half as much as one that names it. The best record wins only when it beats the next one; a tie is
+    returned so the caller asks which one was meant instead of guessing.
+    """
     if not value:
         return next(i for i in items if i[key] == default)
     q = str(value).lower().strip()
     for item in items:
         if q == item[key].lower():
             return item
-    for item in items:
-        if any(k in q for k in item["keywords"]):
-            return item
-    return None
+    named = [item for item in items if _id_named(item[key], q)]
+    if named:
+        return named[0] if len(named) == 1 else named
+    asked = _words(q)
+    vocab = [(item, *_record_words(item, key)) for item in items]
+    scores = []
+    for item, primary, secondary in vocab:
+        score = 0.0
+        for word in asked & (primary | secondary):
+            shared = sum(1 for _, p, s in vocab if word in p or word in s)
+            score += (1.0 if word in primary else 0.5) / shared
+        if score:
+            scores.append((score, item))
+    if not scores:
+        return None
+    scores.sort(key=lambda pair: -pair[0])
+    best = scores[0][0]
+    tied = [item for score, item in scores if abs(score - best) < 1e-9]
+    return tied[0] if len(tied) == 1 else tied
 
 
 # ---------------------------------------------------------------------------
@@ -367,6 +419,9 @@ class GridAssetMaintenanceAgent(BasicAgent):
         asset = _resolve(kwargs.get("asset"), DEFAULT_ASSET, _assets(), "id")
         if asset is None:
             return self._unknown("asset", kwargs.get("asset"), [a["id"] for a in _assets()])
+        if isinstance(asset, list):
+            return self._ambiguous("asset", kwargs.get("asset"),
+                                   [f"{a['id']} ({a['name']}, {a['site']})" for a in asset])
         policy = _policy()
         rec = _recommendation(asset)
         head = [f"# Preventive Work Order Draft - {asset['id']}", "",
@@ -416,6 +471,9 @@ class GridAssetMaintenanceAgent(BasicAgent):
         if job is None:
             return self._unknown("work order", kwargs.get("work_order"),
                                  [j["work_order"] for j in _completed_jobs()])
+        if isinstance(job, list):
+            return self._ambiguous("work order", kwargs.get("work_order"),
+                                   [f"{j['work_order']} ({j['asset_name']})" for j in job])
         missing = [m for m in job["required"] if m not in job["measurements"]]
         parts_cost = sum(qty * cost for _, qty, cost in job["parts"])
         lines = [f"# Asset Register Update Check - {job['work_order']}", "",
@@ -473,6 +531,11 @@ class GridAssetMaintenanceAgent(BasicAgent):
     def _unknown(self, kind, value, ids) -> str:
         return (f"# Unknown {kind.title()}\n\nNo {kind} in the synthetic snapshot matches `{value}`; no substitute "
                 f"was used. Known: {', '.join(ids)}.\n\n{BOUNDARY}")
+
+    def _ambiguous(self, kind, value, candidates) -> str:
+        return (f"# Which {kind} did you mean?\n\n`{value}` matches more than one {kind} equally well, so none was "
+                f"picked. Name one of these by its id:\n\n" + "\n".join(f"- {c}" for c in candidates)
+                + f"\n\n{BOUNDARY}")
 
 
 # ---------------------------------------------------------------------------

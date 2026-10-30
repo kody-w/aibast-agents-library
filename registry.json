@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-30T09:24:40.101634+00:00",
+  "generated_at": "2026-10-30T08:54:48.686175+00:00",
   "stats": {
     "total_agents": 93,
     "publishers": 1,
@@ -10,14 +10,14 @@
     "total_multi_agent_stacks": 2,
     "total_solution_containers": 71,
     "total_verticals": 13,
-    "advertised_solutions": 73,
+    "advertised_solutions": 72,
     "demo_proven_agents": 73,
     "source_verified_solutions": 72,
     "curated_copy_solutions": 72,
     "solution_onepagers": 72,
     "solution_demo_videos": 64,
-    "total_lines": 50383,
-    "total_kb": 2545.2,
+    "total_lines": 50364,
+    "total_kb": 2541.3,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -4552,9 +4552,9 @@
     {
       "schema": "rapp-agent/1.0",
       "name": "@aibast-agents-library/field-permit-to-work",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "display_name": "Field Permit to Work Agent",
-      "description": "Keep every field permit safe and on time: check the work request before a permit is raised, draft the risk assessment, check the isolation plan against the live switching state, record the control room's isolation confirmation with a crew notification draft, track sign-offs, crew briefings and permit acceptance, verify close-out, and show each permit's audit trail, so no crew starts work on an unconfirmed isolation.",
+      "description": "Keep every field permit safe and on time: draft the risk assessment, check the isolation plan against the live switching state, track sign-offs and crew briefings, and verify close-out, so no crew starts work on an unconfirmed isolation.",
       "author": "AIBAST",
       "tags": [
         "energy",
@@ -4571,11 +4571,11 @@
         "@rapp/basic-agent"
       ],
       "_file": "agents/@aibast-agents-library/energy_stacks/field_permit_to_work_stack/field_permit_to_work_agent.py",
-      "_size_kb": 37.6,
-      "_lines": 645,
-      "_sha256": "e4c93d7c9fe4aa97e7b1fdc112ef92fe3e722f6024ac20f18cd6a9a6e2ab6f7e",
+      "_size_kb": 24.6,
+      "_lines": 453,
+      "_sha256": "cb35fe88b717817093e5208d0487701d5e7ac28d6c1839682886e05a1a596ab8",
       "_install_prefix": "field_permit_to_work__",
-      "_install_filename": "field_permit_to_work__e4c93d7c9fe4_agent.py",
+      "_install_filename": "field_permit_to_work__cb35fe88b717_agent.py",
       "_stack": "field_permit_to_work",
       "_stack_vertical": "energy",
       "_synthetic_data": true,
@@ -4592,8 +4592,7 @@
           "Permit Coordinator",
           "Authorized Person",
           "Crew Lead",
-          "Operations Manager",
-          "Safety Auditor"
+          "Operations Manager"
         ],
         "featured_tools": [
           "Microsoft Teams",
@@ -4603,15 +4602,15 @@
           "Microsoft Copilot Studio"
         ],
         "capabilities": [
-          "Checks each work request before a permit is raised",
+          "Shows every permit waiting today with its stage, risk and blocker",
           "Drafts the risk assessment with hazards, controls and PPE",
-          "Confirms the isolation with the control room before the crew accepts",
-          "Reconciles close-out and rebuilds the signed audit trail"
+          "Checks the isolation plan against the live switching state",
+          "Tracks sign-offs so permits are ready for the planned start"
         ],
         "outcomes": [
           "Every crew starts on a confirmed isolation",
           "Sign-offs are visible against each planned start",
-          "Close-out and the permit record are complete and signed"
+          "Close-out reconciles people and tools before clearance"
         ],
         "customer_scenario": [
           "Risk assessments vary in quality and take time",
@@ -4620,7 +4619,7 @@
           "Close-out checks are rushed at the end of the day"
         ],
         "slide_title": "Field Permit to Work Agent",
-        "slide_summary": "Keeps every field permit safe and on time: checks work requests, drafts risk assessments, confirms isolation before crews accept, and keeps a signed record through close-out.",
+        "slide_summary": "Keeps every field permit safe and on time: drafts risk assessments, checks isolation against the live network, and tracks sign-offs and close-out.",
         "scenario_name": "An energy network operator",
         "challenge_intro": "Field permit-to-work processes carry high stakes and many manual steps:",
         "actions_intro": "The Field Permit to Work Agent prepares and checks every step:",
@@ -4635,7 +4634,7 @@
         "module_description": null,
         "source_verified": true,
         "sales_headline": "No crew starts work on an unconfirmed isolation",
-        "card_pitch": "Give permit coordinators and authorized persons a drafted risk assessment, an isolation check against the live switching state, visible sign-off timing, crew acknowledgements, control room isolation confirmation, on-site acceptance checks, close-out reconciliation and archived audit trails, while every safety decision stays with authorized people.",
+        "card_pitch": "Give permit coordinators and authorized persons a drafted risk assessment, an isolation check against the live switching state, visible sign-off timing, crew acknowledgements and close-out reconciliation, while every safety decision stays with authorized people.",
         "why_try": "The demo follows one high-risk transformer permit from the morning queue to close-out, catching a missing lockout and a missing tool along the way.",
         "customer_challenge_copy": "Permit-to-work relies on paper-heavy steps and phone calls; isolation plans can diverge from the live network state, and close-out checks get rushed.",
         "microsoft_ai_story": "Copilot Studio and Microsoft Teams provide the assistant; work-management, network control and crew briefing systems can be bound read-only with least-privilege access, while Power Automate approvals stay with authorized people.",
@@ -4653,18 +4652,13 @@
           "Operations Manager",
           "Permit Coordinator",
           "Power Automate",
-          "Safety Auditor",
-          "acceptance_readiness",
-          "audit_trail",
           "authorization_route",
           "clearance_check",
           "crew_briefing",
           "isolation_check",
-          "isolation_confirmation",
           "permit_queue",
           "risk_assessment",
-          "safety_kpis",
-          "work_request_check"
+          "safety_kpis"
         ],
         "journey_stage": "Protect",
         "blueprint_role": "Separates permit preparation and safety checks from issuing, switching and clearance authority, which stay with authorized people.",
@@ -4703,26 +4697,6 @@
             "label": "Operations Manager: Permit safety roll-up",
             "prompt": "How are we doing on permit safety this month?",
             "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-safety-kpis"
-          },
-          {
-            "label": "Crew Lead: Work request check",
-            "prompt": "Is the Hilltop pole replacement request ready to raise a permit?",
-            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-work-request-check"
-          },
-          {
-            "label": "Permit Coordinator: Control room isolation confirmation",
-            "prompt": "Has the control room confirmed the isolation for the Hilltop Line 3 job? Draft the crew notice.",
-            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-isolation-confirmation"
-          },
-          {
-            "label": "Crew Lead: Permit acceptance readiness",
-            "prompt": "Can my crew accept the Cedar Hill permit on site yet?",
-            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-acceptance-readiness"
-          },
-          {
-            "label": "Safety Auditor: Archived permit audit trail",
-            "prompt": "Pull the audit trail for the archived Riverside link box permit. Is anything missing?",
-            "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=field-permit-to-work-audit-trail"
           }
         ],
         "architecture": {
@@ -4769,26 +4743,6 @@
               "operation": "safety_kpis",
               "name": "Permit safety roll-up",
               "purpose": "Use when a manager asks how permit safety is performing this month."
-            },
-            {
-              "operation": "work_request_check",
-              "name": "Work request check",
-              "purpose": "Use when someone asks whether a new work request is complete enough to raise a permit."
-            },
-            {
-              "operation": "isolation_confirmation",
-              "name": "Control room isolation confirmation",
-              "purpose": "Use when someone asks whether the control room has confirmed the isolation, or wants the permit update and crew notice drafted."
-            },
-            {
-              "operation": "acceptance_readiness",
-              "name": "Permit acceptance readiness",
-              "purpose": "Use when a crew lead asks whether the crew can accept the permit on site yet."
-            },
-            {
-              "operation": "audit_trail",
-              "name": "Archived permit audit trail",
-              "purpose": "Use when someone asks for the audit trail or chain of custody of an archived permit."
             }
           ],
           "easy_mode": [
@@ -4799,7 +4753,7 @@
             "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
           ],
           "local_install_prompt": "Install Field Permit to Work Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-permit-to-work/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect customer systems or execute external actions.",
-          "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Field Permit to Work Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-permit-to-work/deployment.json. Upload the two synthetic knowledge files and 11 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+          "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Field Permit to Work Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/field-permit-to-work/deployment.json. Upload the two synthetic knowledge files and 7 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
           "required_connections": [
             "Use only approved, read-only, least-privilege connections to work-management, network control and crew briefing systems; the packaged demonstration uses synthetic knowledge files."
           ],
@@ -4845,13 +4799,12 @@
       },
       "_demo": {
         "slug": "field-permit-to-work",
-        "case_count": 11,
+        "case_count": 7,
         "personas": [
           "Authorized Person",
           "Crew Lead",
           "Operations Manager",
-          "Permit Coordinator",
-          "Safety Auditor"
+          "Permit Coordinator"
         ],
         "prompts": [
           "Which work permits are waiting for today?",
@@ -5162,11 +5115,11 @@
         "@rapp/basic-agent"
       ],
       "_file": "agents/@aibast-agents-library/energy_stacks/grid_asset_maintenance_stack/grid_asset_maintenance_agent.py",
-      "_size_kb": 26.9,
-      "_lines": 486,
-      "_sha256": "59fec2feb90f7f5767300b67b06a0abdf74185980cd877cf2d7c9f5f9032e798",
+      "_size_kb": 30.1,
+      "_lines": 549,
+      "_sha256": "6afa868fa640c6fcda133e6fe0b44ec9be614cd492478b0ece15285baed449ec",
       "_install_prefix": "grid_asset_maintenance__",
-      "_install_filename": "grid_asset_maintenance__59fec2feb90f_agent.py",
+      "_install_filename": "grid_asset_maintenance__6afa868fa640_agent.py",
       "_stack": "grid_asset_maintenance",
       "_stack_vertical": "energy",
       "_synthetic_data": true,
@@ -5797,11 +5750,11 @@
         "@rapp/basic-agent"
       ],
       "_file": "agents/@aibast-agents-library/energy_stacks/procurement_supplier_collaboration_stack/procurement_supplier_collaboration_agent.py",
-      "_size_kb": 28.4,
-      "_lines": 492,
-      "_sha256": "60e38598cbe52fb344aece4637d0524c7355d1b89ca4111330bebbb855b66c4f",
+      "_size_kb": 32.2,
+      "_lines": 562,
+      "_sha256": "e55da319ca2fa5ba1c9fa02b99151cf562188d9796ea237204bb3fd9c313b648",
       "_install_prefix": "procurement_supplier_collaboration__",
-      "_install_filename": "procurement_supplier_collaboration__60e38598cbe5_agent.py",
+      "_install_filename": "procurement_supplier_collaboration__e55da319ca2f_agent.py",
       "_stack": "procurement_supplier_collaboration",
       "_stack_vertical": "energy",
       "_synthetic_data": true,
@@ -11795,11 +11748,11 @@
         "@rapp/basic-agent"
       ],
       "_file": "agents/@aibast-agents-library/healthcare_stacks/tiered_huddle_board_stack/tiered_huddle_board_agent.py",
-      "_size_kb": 23.8,
-      "_lines": 447,
-      "_sha256": "9b909a45fcddb7212a4ef4bf5ebb11d3bac0f6b03e65ef5715f08d0865317909",
+      "_size_kb": 25.9,
+      "_lines": 487,
+      "_sha256": "13e6df043a751b6846366fc5ef32472c9c3e5c87065f0bbf90abfcae7faf87d3",
       "_install_prefix": "tiered_huddle_board__",
-      "_install_filename": "tiered_huddle_board__9b909a45fcdd_agent.py",
+      "_install_filename": "tiered_huddle_board__13e6df043a75_agent.py",
       "_stack": "tiered_huddle_board",
       "_stack_vertical": "healthcare",
       "_synthetic_data": true,
