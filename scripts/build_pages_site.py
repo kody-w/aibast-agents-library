@@ -111,6 +111,16 @@ RING_SKILL_PATHS = frozenset(
 )
 FRONTIER_BOOTSTRAP_PATHS = frozenset({"beta/frontier.sh", "beta/frontier.ps1"})
 
+# Pages that show an install command for an experimental tool. The command is
+# written with the production Pages address; each ring serves its own copy.
+RING_PAGES_URL_PATHS = frozenset(
+    {
+        "docs/rapp-guide.html",
+        "docs/experimental/tools.json",
+        "docs/experimental/ai-migration/index.html",
+    }
+)
+
 RAPP_BRAINSTEM_PUBLIC_FILES = frozenset(
     {"rapp_brainstem/README.md", "rapp_brainstem/VERSION"}
 )
@@ -946,6 +956,39 @@ def render_frontier_page(text: str, owner: str, repo: str, branch: str) -> str:
     return text.replace(f"{canonical}/releases", f"{ring}/releases")
 
 
+def render_pages_base(path: PurePosixPath, text: str, owner: str, repo: str) -> str:
+    """Point production Pages addresses in an install command at the serving ring."""
+    if (owner, repo) == (CANONICAL_OWNER, CANONICAL_REPO):
+        return text
+    canonical = f"https://{CANONICAL_OWNER}.github.io/{CANONICAL_REPO}/"
+    if canonical not in text:
+        raise BuildError(
+            f"{path} no longer contains {canonical!r}; "
+            "update RING_PAGES_URL_PATHS before publishing"
+        )
+    return text.replace(canonical, f"https://{owner.lower()}.github.io/{repo}/")
+
+
+def prepare_ring_pages_data(
+    root: Path,
+    included: frozenset[PurePosixPath],
+    entries: dict[PurePosixPath, SourceEntry],
+    owner: str,
+    repo: str,
+) -> dict[PurePosixPath, bytes]:
+    """Non-HTML files in RING_PAGES_URL_PATHS (HTML is handled in prepare_html)."""
+    prepared: dict[PurePosixPath, bytes] = {}
+    for path in sorted(included, key=lambda item: item.as_posix()):
+        if path.as_posix() not in RING_PAGES_URL_PATHS or path.suffix.lower() == ".html":
+            continue
+        source = _assert_regular_source(root, entries[path])
+        text = source.read_bytes().decode("utf-8")
+        rendered = render_pages_base(path, text, owner, repo)
+        if rendered != text:
+            prepared[path] = rendered.encode("utf-8")
+    return prepared
+
+
 def prepare_html(
     root: Path,
     included: frozenset[PurePosixPath],
@@ -968,6 +1011,8 @@ def prepare_html(
             raise BuildError(f"Could not read HTML file {path}: {exc}") from exc
         if path == PurePosixPath("beta/index.html"):
             text = render_frontier_page(text, owner, repo, ring_branch)
+        if path.as_posix() in RING_PAGES_URL_PATHS:
+            text = render_pages_base(path, text, owner, repo)
         rewritten, count, page_broken = rewrite_html(
             path, text, included, entries, owner, repo, ref
         )
@@ -1427,11 +1472,13 @@ def build_site(
     prepared_installers = prepare_installers(
         root, included, entries, owner, repo, ring_branch
     )
+    prepared_data = prepare_ring_pages_data(root, included, entries, owner, repo)
 
     _clean_output(output)
     try:
         _copy_artifact(
-            root, output, included, {**prepared_html, **prepared_installers}
+            root, output, included,
+            {**prepared_html, **prepared_data, **prepared_installers},
         )
         if overlay_value is not None:
             _copy_overlay(Path(overlay_value).expanduser(), output)
