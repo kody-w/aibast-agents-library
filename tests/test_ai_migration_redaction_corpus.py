@@ -1,7 +1,7 @@
 """One cumulative corpus for the AI Migration key matchers.
 
 Every case comes from a reviewed report or an earlier test: the redaction rounds
-before PR #362, #362 itself, #366, #370 and the round after it. The corpus only grows.
+before PR #362, #362 itself, #366, #370, #376 and the round after it. The corpus only grows.
 Never delete a case to make a change pass; if two cases truly conflict, stop and
 ask. Every value here is a synthetic placeholder, and a failure names the case
 number and the setting name only, never the value.
@@ -156,6 +156,52 @@ REDACT_TEXT_CORPUS = [
     ("SESSION_SECRET_MAX=placeholdervalue", ("placeholdervalue",)),
     ("Deploy with:\nSECRET_KEY=changemeplease\nJWT_SECRET_KEY: fakejwtsigningvalue\nDB_PASSWORD_PROD=placeholderpass",
      ("changemeplease", "fakejwtsigningvalue", "placeholderpass")),
+
+    # ── Round 7 ──
+    # A count word somewhere in the name does not excuse a numeric secret: only
+    # a whole count or limit name (its last word is the count) keeps a number.
+    ("INPUT_PASSWORD=48213907", ("48213907",)),
+    ("CONTEXT_API_KEY=482139075512", ("482139075512",)),
+    ("USAGE_API_TOKEN=4821390755", ("4821390755",)),
+    ("PER_USER_SECRET=99887766", ("99887766",)),
+    # Fail-closed controls for the count rule.
+    ("USAGE_TOKEN=4821390755", ("4821390755",)),
+    ("password: 48213907", ("48213907",)),
+    ("PIN_PASSWORD=4821", ("4821",)),
+    ("PASSWORD_MAX=48213907", ("48213907",)),
+    ("SECRET_LIMIT=99887766", ("99887766",)),
+    ("MAX_TOKEN=placeholdervalue", ("placeholdervalue",)),
+    ("token_budget: placeholdervalue", ("placeholdervalue",)),
+    ("PASSWORD_MIN_LENGTH: placeholderpass", ("placeholderpass",)),
+    # Settings that only describe a secret (its type, address, name, file or
+    # store) keep their values; these are what a user needs to rewire a setup.
+    ("token_type: bearer", ()),
+    ("token_endpoint: https://login.example.com/oauth2/v2.0/token", ()),
+    ("TOKEN_URL=https://login.example.com/token", ()),
+    ("key_vault_name: kv-prod-eastus2", ()),
+    ("KEY_VAULT_URL=https://example-prod.vault.azure.net/", ()),
+    ("credentials_path: ~/.config/app/creds.json", ()),
+    ("password_policy: strong", ()),
+    ("secret_name: app-signing", ()),
+    ("SECRET_STORE=keychain", ()),
+    ("api_key_env: MY_SERVICE_API_KEY", ()),
+    ("apiKeyEnvVar: MY_SERVICE_API_KEY", ()),
+    ("tokenFile: ~/.config/app/token.json", ()),
+    ("credential_provider: azure-cli", ()),
+    ("use_credential_manager: true", ()),
+    ("primary_key_column: order_id2024", ()),
+    # A key-shaped value is still hidden under a describing name.
+    ("secret_name: Zq8rTmw2LpXvZq8rTmw2LpXvZq8rTmw2LpXv", ("Zq8rTmw2LpXvZq8rTmw2LpXvZq8rTmw2LpXv",)),
+    ("token_endpoint: Bearer abcdefghijklmnop12", ("abcdefghijklmnop12",)),
+    ("api_key_env: sk-abcdefghijklmnop1234", ("sk-abcdefghijklmnop1234",)),
+    # Nothing is ever taken from another line.
+    ("token_type: bearer\ntoken_endpoint: https://login.example.com/oauth2/v2.0/token", ()),
+    ("token_type: Bearer\ntoken_endpoint: https://login.example.com/oauth2/v2.0/token", ()),
+    ("password:\nnote: keep answers short", ()),
+    ("api_key =\nnote: keep answers short", ()),
+    # A YAML value written on the next, indented line is still hidden.
+    ("password:\n  placeholderpass\nnote: keep answers short", ("placeholderpass",)),
+    ("db:\n  password: |\n    placeholderpass\n  host: db.example.com", ("placeholderpass",)),
 ]
 
 # Text that must survive next to a hidden value.
@@ -166,6 +212,13 @@ KEPT_NEXT_TO_SECRETS = [
     ("note: DB_PASSWORD=placeholderpass", ("note:",)),
     ("Use max_tokens: 4096 with SECRET_KEY=changemeplease and auth_method: oauth",
      ("max_tokens: 4096", "auth_method: oauth")),
+    # Round 7: a hidden bearer value never takes the next line's setting with it.
+    ("Authorization: Bearer abcdefghijklmnop12\ntoken_endpoint: https://login.example.com/oauth2/v2.0/token",
+     ("\ntoken_endpoint: https://login.example.com/oauth2/v2.0/token", "Authorization: ")),
+    ("Bearer abcdefghijklmnop12\nTOKEN_URL=https://login.example.com/token", ("\nTOKEN_URL=https://login.example.com/token",)),
+    ("INPUT_PASSWORD=48213907\nmax_tokens: 4096\ntoken_type: bearer",
+     ("\nmax_tokens: 4096\ntoken_type: bearer",)),
+    ("password:\n  placeholderpass\nnote: keep answers short", ("password:", "\nnote: keep answers short")),
 ]
 
 # (file name, is a key file). Round 3 report plus the earlier tests.
@@ -233,8 +286,8 @@ def test_server_args_corpus(index):
 
 def test_corpus_has_not_shrunk():
     # The corpus only grows. Raise these floors when you add cases; never lower them.
-    assert len(REDACT_TEXT_CORPUS) >= 108
-    assert len(KEPT_NEXT_TO_SECRETS) >= 4
+    assert len(REDACT_TEXT_CORPUS) >= 145
+    assert len(KEPT_NEXT_TO_SECRETS) >= 8
     assert len(SECRET_NAME_CORPUS) >= 25
     assert len(SERVER_ARGS_CORPUS) >= 3
 
