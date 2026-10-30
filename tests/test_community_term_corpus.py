@@ -25,6 +25,11 @@ The rules the cases pin down:
   * A name made of two words is a name however it is spaced ("OpenAI",
     "Open AI", "open-ai"), and a joined link word is read both split at
     capitals and whole ("OpenAI.pdf", "OpenAIDemo.pdf").
+  * A one-word vendor name whose parts are everyday words, written with only
+    a space between the parts, matches only when every part starts with a
+    capital: "Open AI" and "Dialog Flow" flag, "an open AI standard" and "the
+    dialog flow of the agent" pass. Joined forms ("openai", "open-ai",
+    "DialogFlow.pdf") match in any case.
   * A one-letter last word takes no digit ("Amazon Q4" is a sales quarter).
   * Everyday words pass unless the vendor word is next to them
     ("perplexity", "bard", "bedrock").
@@ -209,6 +214,22 @@ CORPUS = [
     ("probe 6", "description", "Keep the plan open. AI helps the planner. The agent drafts.", PASS),
     ("probe 6", "description", "Planners face perplexity (AI helps) and Amazon (Q4) sales. The agent helps.", PASS),
     ("probe 6", "description", "Stores sell on Amazon Q 4 days a week. The agent helps.", PASS),
+    # ---------------------------------------------- round 7: ordinary words in lower case
+    ("round 7", "description", "the dialog flow of the agent", PASS),
+    ("round 7", "description", "an open AI standard", PASS),
+    ("round 7", "description", "a sales agent force", PASS),
+    ("round 7", "description", "deep seek and find", PASS),
+    ("round 7", "description", "sage maker of bread", PASS),
+    # ---------------------------------------------- round 7: names that must still flag
+    ("round 7", "title", "Open AI", _set(V)),
+    ("round 7", "title", "Dialog Flow", _set(V)),
+    ("round 7", "title", "Agent Force", _set(V)),
+    ("round 7", "title", "Deep Seek", _set(V)),
+    ("round 7", "title", "Sage Maker", _set(V)),
+    ("round 7", "title", "Watson X", _set(V)),
+    ("round 7", "title", "OpenAI", _set(V)),
+    ("round 7", "title", "open-ai", _set(V)),
+    ("round 7", "title", "DialogFlow.pdf", _set(V)),
 ]
 
 

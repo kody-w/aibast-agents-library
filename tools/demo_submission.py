@@ -137,7 +137,9 @@ FORBIDDEN_TERMS = (
 # Everyday English words are listed only with the vendor word that makes them
 # a product name ("perplexity ai", "google bard"). A name made of two words is
 # listed with a space ("open ai"), so "OpenAI", "Open AI" and "open-ai" all
-# match it; see the word-matching rules below.
+# match it; see the word-matching rules below. A name the vendor writes as one
+# word but that reads as ordinary words when spaced is also listed in
+# SPACED_NAMES_NEED_CAPITALS, so "an open AI standard" passes.
 OTHER_AI_PRODUCT_TERMS = (
     "chatgpt",
     "open ai",
@@ -171,6 +173,19 @@ OTHER_AI_PRODUCT_TERMS = (
     "watson x",
     "ibm watson",
 )
+# Names the vendor writes as one word ("OpenAI", "Dialogflow") whose parts are
+# everyday words. Written with a space between the parts, they match only when
+# every part starts with a capital ("Open AI", "Dialog Flow"), so prose such as
+# "the dialog flow of the agent" passes. Joined forms ("openai", "open-ai",
+# "open_ai", "DialogFlow.pdf") still match in any case (rule 8).
+SPACED_NAMES_NEED_CAPITALS = frozenset({
+    "open ai",
+    "deep seek",
+    "agent force",
+    "sage maker",
+    "dialog flow",
+    "watson x",
+})
 OTHER_AI_PRODUCTS_PROBLEM = "Remove the names of AI products from other companies."
 
 # A host a browser URL parser accepts: dot-separated letters, digits and hyphens.
@@ -334,6 +349,9 @@ def is_sign_in_only_host(host: str) -> bool:
 #    ids, which have a digit followed by a letter ("AbNDA9xQ").
 # 7. A lower-case word built only from listed names ("azureopenai") counts as
 #    those names.
+# 8. A name in SPACED_NAMES_NEED_CAPITALS that the text spells across words
+#    divided only by whitespace matches only when every one of those words
+#    starts with a capital ("Open AI", not "an open AI standard").
 
 # Spaces out joined words: "AzureOpenAI" -> "Azure Open AI", "GPT4o" -> "GPT 4o".
 _JOIN_RE = re.compile(
@@ -348,8 +366,9 @@ _JOINING_MARKS = frozenset("-‐‑/\\.·∙•+:~|")
 # id ("AbNDA9xQ", "1aGPT3kz"), so a link never splits it at capitals.
 _OPAQUE_RE = re.compile(r"[0-9][A-Za-z]")
 
-# A stream is a list of (word, joined to the word before).
-_Stream = list[tuple[str, bool]]
+# A stream is a list of (word, joined to the word before, divided from the
+# word before by whitespace only, starts with a capital).
+_Stream = list[tuple[str, bool, bool, bool]]
 
 
 def _is_join(separator: str) -> bool:
@@ -365,33 +384,45 @@ def _streams(text: str, keep_ids: bool) -> tuple[_Stream, _Stream]:
     split: _Stream = []
     end = None
     for match in _WORD_RE.finditer(plain):
-        joined = end is not None and _is_join(plain[end:match.start()])
+        separator = plain[end:match.start()] if end is not None else ""
+        joined = end is not None and _is_join(separator)
+        spaced = joined and separator.isspace()
         end = match.end()
         word = match.group(0)
-        whole.append((word.casefold(), joined))
+        whole.append((word.casefold(), joined, spaced, word[0].isupper()))
         pieces = [word] if keep_ids and _OPAQUE_RE.search(word) else _JOIN_RE.sub(" ", word).split()
-        split.extend((p.casefold(), joined if k == 0 else True) for k, p in enumerate(pieces))
+        split.extend(
+            (p.casefold(), joined if k == 0 else True, spaced if k == 0 else False, p[0].isupper())
+            for k, p in enumerate(pieces)
+        )
     return whole, split
 
 
 def _spelled_at(stream: _Stream, start: int, term: str) -> bool:
-    """True when the words from stream[start] on spell the term (rules 4, 5)."""
+    """True when the words from stream[start] on spell the term (rules 4, 5, 8)."""
     words = term.split()
     key = "".join(words)
     divisions = set(itertools.accumulate(len(w) for w in words[:-1]))
     one_letter = len(words[-1]) == 1
+    needs_capitals = term in SPACED_NAMES_NEED_CAPITALS
+    spaced_any = False
+    capitals_all = True
     pos = 0
     for i in range(start, len(stream)):
-        word, joined = stream[i]
+        word, joined, spaced, capital = stream[i]
         if i > start and not joined:
             return False
+        if i > start and spaced:
+            spaced_any = True
+        capitals_all = capitals_all and capital
+        rule8_ok = not (needs_capitals and spaced_any and not capitals_all)
         rest = key[pos:]
         if word == rest:
             following = stream[i + 1] if i + 1 < len(stream) else None
             digit_next = bool(following and following[1] and following[0][0].isdigit())
-            return not (one_letter and digit_next)
+            return not (one_letter and digit_next) and rule8_ok
         if word.startswith(rest):
-            return word[len(rest)].isdigit() and not one_letter
+            return word[len(rest)].isdigit() and not one_letter and rule8_ok
         if rest.startswith(word) and pos + len(word) in divisions:
             pos += len(word)
             continue
@@ -429,7 +460,7 @@ def forbidden_terms_in(
     streams = _streams(text, keep_ids)
     vocabulary = list(dict.fromkeys(FORBIDDEN_TERMS + OTHER_AI_PRODUCT_TERMS + tuple(terms)))
     compounds: set[str] = set()
-    for word, _joined in streams[0]:
+    for word, *_rest in streams[0]:
         compounds |= _compound_terms(word, vocabulary)
     return [
         term for term in terms
