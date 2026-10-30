@@ -37,6 +37,37 @@
     },
     {
       "schema": "rapp-agent/1.0",
+      "kind": "rapplication",
+      "name": "@aibast-agents-library/ai-review-walkthrough",
+      "version": "1.0.0",
+      "display_name": "AI Review Walkthrough",
+      "description": "Walk through a responsible AI review of your own AI agent or app, one stage at a time, in chat. Built from Microsoft's public responsible AI guidance. Educational only.",
+      "author": "AIBAST",
+      "tags": [
+        "experimental",
+        "responsible-ai",
+        "education",
+        "local-first"
+      ],
+      "category": "experimental",
+      "quality_tier": "experimental",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "docs/experimental/ai-review/ai_review_walkthrough_agent.py",
+      "_size_kb": 42.2,
+      "_lines": 876,
+      "_sha256": "8d9843c282ef95ec35fa8c91115674be5f3f916426e4c00fff14b521ea84ebd7",
+      "_install_filename": "ai_review_walkthrough_agent.py",
+      "_url": "https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-review/ai_review_walkthrough_agent.py",
+      "install_command": "curl -fsSL https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-review/ai_review_walkthrough_agent.py -o ~/.brainstem/src/rapp_brainstem/agents/ai_review_walkthrough_agent.py",
+      "guide_url": "docs/experimental/ai-review/index.html",
+      "remove": "Delete ai_review_walkthrough_agent.py from your Brainstem's agents folder.",
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+    },
+    {
+      "schema": "rapp-agent/1.0",
       "kind": "web-tool",
       "name": "@aibast-agents-library/project-tracker",
       "version": "1.0.0",
@@ -76,5 +107,5 @@
       "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
     }
   ],
-  "count": 3
+  "count": 4
 }
