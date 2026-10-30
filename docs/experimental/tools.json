@@ -25,9 +25,9 @@
         "@rapp/basic-agent"
       ],
       "_file": "docs/experimental/ai-migration/ai_migration_agent.py",
-      "_size_kb": 47.1,
-      "_lines": 1064,
-      "_sha256": "164db1e29b32d843f498153e7d506f2a4a9b1cd6df5f32dd2057d3ffbc55fc46",
+      "_size_kb": 47.8,
+      "_lines": 1085,
+      "_sha256": "c107e1abc0ec75e03a157f5830e83090f9061b0b0ab4f96512a25f647b4ec664",
       "_install_filename": "ai_migration_agent.py",
       "_url": "https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py",
       "install_command": "curl -fsSL https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py -o ~/.brainstem/src/rapp_brainstem/agents/ai_migration_agent.py",

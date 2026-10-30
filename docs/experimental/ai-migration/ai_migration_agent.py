@@ -228,24 +228,27 @@ _SECRET_VALUE_PATTERNS = [
     re.compile(r"eyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}"),
     re.compile(r"(?i)bearer\s+[A-Za-z0-9._\-~+/]{12,}=*"),
 ]
-# A setting name that may hold a key. Any name containing a key word is looked
-# at (DBPASSWORD, OPENAI_APIKEY, accessToken, api_key); _redact_assignment then
-# decides, so "Author:" and "Primary key: customer_id" stay ordinary text.
+# A "name: value" or "name = value" setting, with the name and value bare or
+# quoted, as in prose, .env, YAML, TOML and JSON ("clientSecret": "...").
+# Only names that contain a key word are looked at, so an ordinary setting never
+# swallows the next one; _redact_assignment then decides by the name's last word.
 _ASSIGNMENT = re.compile(
-    r"(?i)\b([A-Z0-9_\-]*(?:key|token|secret|password|passwd|pwd|passphrase|credential|auth|connection[_\-]?string|conn[_\-]?str)"
-    r"[A-Z0-9_\-]*)"
-    r"(\s*[:=]\s*[\"']?)([^\s\"',}]{4,})"
+    r"(?i)\b([A-Z0-9_.\-]*(?:key|token|secret|password|passwd|pwd|passphrase|credential|auth|connection[_\-]?string|conn[_\-]?str)"
+    r"[A-Z0-9_.\-]*)"
+    r"([\"']?\s*[:=]\s*)"
+    r"(\"[^\"\n]+\"|'[^'\n]+'|[^\s\"',}]{4,})"
 )
-# Words that always mean a key wherever they sit in the name, joined or not,
-# whatever the value looks like. Checked with _ and - removed, ignoring case.
-_STRONG_SECRET_PART = re.compile(
-    r"(?i)(token|secret|password|passwd|pwd|passphrase|credential|apikey|accesskey|privatekey|authkey"
-    r"|signingkey|encryptionkey|connectionstring|connstr)"
-)
-# "key" and "auth" alone count only as a whole part of the name (MYAPP_AUTH,
-# primaryKey), never inside a word ("Author", "keyboard"). A whole-part "auth"
-# is a key; a bare "key" ("Primary key: customer_id") is redacted only when the
-# value looks generated: letters and digits together, or very long.
+# A name is a secret when its last word is the secret itself (clientSecret,
+# DB_PASSWORD, accesstoken, OPENAI_APIKEY, connection_string), never when a key
+# word is only inside or before another word (max_tokens, Tokenizer, Secretary,
+# auth_method, author_id, Monkey). The last word, and the last two run together,
+# are checked for these endings.
+_SECRET_ENDINGS = ("token", "secret", "password", "passwd", "pwd", "passphrase", "credential",
+                   "apikey", "accesskey", "privatekey", "authkey", "signingkey", "encryptionkey",
+                   "connectionstring", "connstr")
+# A last word of exactly "auth" (MYAPP_AUTH, auth:) is a secret, except in OAuth,
+# which names a sign-in method. A last word of exactly "key" (primaryKey,
+# SEARCH_KEY) is redacted only when the value looks generated.
 _NAME_PART = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+")
 _LONG_RANDOM = re.compile(r"\b(?=[A-Za-z0-9_\-+=]*\d)(?=[A-Za-z0-9_\-+=]*[A-Za-z])[A-Za-z0-9_\-+=]{32,}\b")
 _SECRET_FLAG = re.compile(r"(?i)^--?[a-z0-9_\-]*(key|token|secret|password|auth|credential)[a-z0-9_\-]*$")
@@ -263,14 +266,32 @@ def redact_text(text):
     return text
 
 
+def _name_words(name):
+    return [part.lower() for chunk in re.split(r"[_.\-]+", name) for part in _NAME_PART.findall(chunk)]
+
+
+def _is_secret_setting(name, value):
+    words = _name_words(name)
+    if not words:
+        return False
+    last = words[-1]
+    last_two = "".join(words[-2:])
+    if last.endswith(_SECRET_ENDINGS) or last_two.endswith(_SECRET_ENDINGS):
+        return True
+    if last == "auth":
+        return last_two != "oauth"
+    if last == "key":
+        bare = value.strip("\"'")
+        return bool((re.search(r"\d", bare) and re.search(r"[A-Za-z]", bare) and len(bare) >= 8) or len(bare) >= 24)
+    return False
+
+
 def _redact_assignment(match):
     name, sep, value = match.group(1), match.group(2), match.group(3)
-    looks_generated = (re.search(r"\d", value) and re.search(r"[A-Za-z]", value) and len(value) >= 8) or len(value) >= 24
-    joined = re.sub(r"[_\-]", "", name)
-    parts = [part.lower() for chunk in re.split(r"[_\-]+", name) for part in _NAME_PART.findall(chunk)]
-    if _STRONG_SECRET_PART.search(joined) or "auth" in parts or looks_generated:
-        return name + sep + REDACTED
-    return match.group(0)
+    if not _is_secret_setting(name, value):
+        return match.group(0)
+    quote = value[0] if value[0] in "\"'" and len(value) > 1 and value[-1] == value[0] else ""
+    return name + sep + quote + REDACTED + quote
 
 
 def _is_secret_name(name):
