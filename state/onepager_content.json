@@ -2153,10 +2153,10 @@
     },
     "60. Field Permit to Work Agent one-pager.pptx": {
       "source_file": "60. Field Permit to Work Agent one-pager.pptx",
-      "source_sha256": "3076ab782f5880e99777e400ea172d54276c5427ead5585de96d47d6aa325817",
+      "source_sha256": "9106e2285ae1894a4e49f082a36754545a4d5831332353cafd03912d176f4edb",
       "slide_count": 1,
       "title": "Field Permit to Work Agent",
-      "executive_summary": "Keeps every field permit safe and on time: drafts risk assessments, checks isolation against the live network, and tracks sign-offs and close-out.",
+      "executive_summary": "Keeps every field permit safe and on time: checks work requests, drafts risk assessments, confirms isolation before crews accept, and keeps a signed record through close-out.",
       "industries": [
         "Energy and Utilities"
       ],
@@ -2185,10 +2185,10 @@
       "agent_actions": {
         "intro": "The Field Permit to Work Agent prepares and checks every step:",
         "items": [
-          "Shows every permit waiting today with its stage, risk and blocker",
+          "Checks each work request before a permit is raised",
           "Drafts the risk assessment with hazards, controls and PPE",
-          "Checks the isolation plan against the live switching state",
-          "Tracks sign-offs so permits are ready for the planned start"
+          "Confirms the isolation with the control room before the crew accepts",
+          "Reconciles close-out and rebuilds the signed audit trail"
         ]
       },
       "business_outcomes": {
@@ -2196,7 +2196,7 @@
         "items": [
           "Every crew starts on a confirmed isolation",
           "Sign-offs are visible against each planned start",
-          "Close-out reconciles people and tools before clearance"
+          "Close-out and the permit record are complete and signed"
         ]
       },
       "opportunity_statements": [
