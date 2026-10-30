@@ -2,8 +2,8 @@
   "schema": "aibast-rapp-guide-content-contract/1.0",
   "version": 1,
   "source": "docs/rapp-guide.html",
-  "trusted_source_commit": "b487a584d3d83a8c50b0837593176ceb4a9da76e",
-  "trusted_source_blob_oid": "f5b3925b2bcd7bc5404b94b4c322bc432feee6eb",
+  "trusted_source_commit": "cac06c6a1028a1742f0800afbedc85f272716a41",
+  "trusted_source_blob_oid": "722afab6b04b5924108c1e4511af55e17ed49bea",
   "normalization": "Remove script, style, template, and comments; join rendered text with spaces; collapse Unicode whitespace.",
   "content_section_ids": [
     "overview",
@@ -111,7 +111,7 @@
     },
     {
       "id": "tools",
-      "normalized_visible_text_sha256": "014aff60734b383fd2e858ec3d5923f338bf44ee50688a8bdd243cacc251bc28"
+      "normalized_visible_text_sha256": "7c2006c349c8696082a598a28b5b709917efeca3785861e4baf3db964f5f41d5"
     }
   ],
   "sidebar_links": [
@@ -258,7 +258,7 @@
       "persistent_completion_key": "quiz-completed"
     }
   ],
-  "copy_button_count": 8,
+  "copy_button_count": 9,
   "copy_button_mappings": [
     {
       "button_label": "Copy",
@@ -315,6 +315,13 @@
       "target_tag": "pre",
       "target_tag_ordinal": 50,
       "target_normalized_text_sha256": "ccfea2144ad1997981ae67fa98a6e722b0225899b145bbb57c979e4c4af8e55c"
+    },
+    {
+      "button_label": "Copy",
+      "target_id": null,
+      "target_tag": "pre",
+      "target_tag_ordinal": 51,
+      "target_normalized_text_sha256": "ce81a06dcad15515caa16f034aada64172a54166b3e2966c80084d39bb6e78a8"
     }
   ],
   "fallback_toggle_mappings": [
