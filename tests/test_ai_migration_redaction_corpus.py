@@ -1,7 +1,7 @@
 """One cumulative corpus for the AI Migration key matchers.
 
 Every case comes from a reviewed report or an earlier test: the redaction rounds
-before PR #362, #362 itself, #366 and the round after it. The corpus only grows.
+before PR #362, #362 itself, #366, #370 and the round after it. The corpus only grows.
 Never delete a case to make a change pass; if two cases truly conflict, stop and
 ask. Every value here is a synthetic placeholder, and a failure names the case
 number and the setting name only, never the value.
@@ -52,6 +52,20 @@ REDACT_TEXT_CORPUS = [
     # Plain prose and links around the matcher.
     ("See https://docs.example.com/guide for setup.", ()),
     ("Note: keep answers short.", ()),
+    # Round 6 controls: count and limit settings beside the new any-word rule.
+    ("max_token: 4096", ()),
+    ("MAX_TOKENS_PER_REQUEST=8000", ()),
+    ("token_budget: 2000", ()),
+    ("token_limit=128000", ()),
+    ("thinking_token_budget: 1024", ()),
+    ("PASSWORD_MIN_LENGTH: 12", ()),
+    ("TOKEN_EXPIRY_SECONDS=3600", ()),
+    ("secret_rotation_days: 90", ()),
+    ("Tokenizer_name: tiktoken", ()),
+    ("author_name: Jane", ()),
+    ("OAuth_provider: entra", ()),
+    ("auth_type: oauth", ()),
+    ("ACCESS_TOKEN_TTL: 3600", ()),
 
     # ── Secrets that must vanish ──
     # Original redaction test.
@@ -113,6 +127,35 @@ REDACT_TEXT_CORPUS = [
      ("CREDENTIAL-FILE-CONTENT-NEVER-READ-42",)),
     # A quoted value with spaces is hidden whole, not just its first word.
     ('password: "fake pass phrase"', ("fake", "pass phrase")),
+    # Round 6: the secret word is not the last word of the name (SECRET_KEY is
+    # the standard web-framework setting); any value shape must still be hidden.
+    ("SECRET_KEY=changemeplease", ("changemeplease",)),
+    ("JWT_SECRET_KEY: fakejwtsigningvalue", ("fakejwtsigningvalue",)),
+    ("STRIPE_SECRET_KEY: fakestripevalue", ("fakestripevalue",)),
+    ("API_SECRET_KEY=placeholdervalue", ("placeholdervalue",)),
+    ("SECRET_KEY_BASE=placeholdervalue", ("placeholdervalue",)),
+    ("DB_PASSWORD_PROD=placeholderpass", ("placeholderpass",)),
+    ("PASSWORD_1=placeholderpass", ("placeholderpass",)),
+    ("Password1: placeholderpass", ("placeholderpass",)),
+    ("API_TOKEN_V2=fakeTokenValue", ("fakeTokenValue",)),
+    ("GITHUB_TOKEN_CLASSIC=placeholdervalue", ("placeholdervalue",)),
+    ("client_secret_value=fakevalue", ("fakevalue",)),
+    ("API_KEY_PROD=placeholdervalue", ("placeholdervalue",)),
+    ("APIKEY_PROD: placeholdervalue", ("placeholdervalue",)),
+    ("ACCESS_KEY_ID_PROD=placeholdervalue", ("placeholdervalue",)),
+    ("PRIVATE_KEY_PEM: placeholdervalue", ("placeholdervalue",)),
+    ("CONNECTION_STRING_PROD=fakeconnectionvalue", ("fakeconnectionvalue",)),
+    ("DB_PASSWD_STAGING=placeholderpass", ("placeholderpass",)),
+    ("db_pwd_old: placeholderpass", ("placeholderpass",)),
+    ("secretKey: fakesecretvalue", ("fakesecretvalue",)),
+    ('{"secretKeyBase": "placeholdervalue"}', ("placeholdervalue",)),
+    ("ACCESS_TOKEN_DEV=placeholdervalue", ("placeholdervalue",)),
+    # A count word elsewhere in the name does not excuse a real token value.
+    ("ACCESS_TOKEN_TTL=fakeaccessvalue", ("fakeaccessvalue",)),
+    ("INPUT_TOKEN=placeholdervalue", ("placeholdervalue",)),
+    ("SESSION_SECRET_MAX=placeholdervalue", ("placeholdervalue",)),
+    ("Deploy with:\nSECRET_KEY=changemeplease\nJWT_SECRET_KEY: fakejwtsigningvalue\nDB_PASSWORD_PROD=placeholderpass",
+     ("changemeplease", "fakejwtsigningvalue", "placeholderpass")),
 ]
 
 # Text that must survive next to a hidden value.
@@ -121,6 +164,8 @@ KEPT_NEXT_TO_SECRETS = [
      ('"clientId": "sample-app"', "Use this config:")),
     ("Call with max_tokens: 4096 and api_key: abcd1234efgh5678", ("max_tokens: 4096",)),
     ("note: DB_PASSWORD=placeholderpass", ("note:",)),
+    ("Use max_tokens: 4096 with SECRET_KEY=changemeplease and auth_method: oauth",
+     ("max_tokens: 4096", "auth_method: oauth")),
 ]
 
 # (file name, is a key file). Round 3 report plus the earlier tests.
@@ -188,8 +233,8 @@ def test_server_args_corpus(index):
 
 def test_corpus_has_not_shrunk():
     # The corpus only grows. Raise these floors when you add cases; never lower them.
-    assert len(REDACT_TEXT_CORPUS) >= 70
-    assert len(KEPT_NEXT_TO_SECRETS) >= 3
+    assert len(REDACT_TEXT_CORPUS) >= 108
+    assert len(KEPT_NEXT_TO_SECRETS) >= 4
     assert len(SECRET_NAME_CORPUS) >= 25
     assert len(SERVER_ARGS_CORPUS) >= 3
 
