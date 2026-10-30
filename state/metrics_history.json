@@ -346,6 +346,10 @@
   "2026-10-28": {
    "count": 215,
    "uniques": 59
+  },
+  "2026-10-29": {
+   "count": 256,
+   "uniques": 52
   }
  },
  "installer_assets": {
@@ -363,15 +367,15 @@
   }
  },
  "last_known": {
-  "at": "2026-10-30T09:31:54Z",
-  "clone_uniques_14d": 736,
-  "clones_14d": 4777,
+  "at": "2026-10-30T13:21:15Z",
+  "clone_uniques_14d": 744,
+  "clones_14d": 4874,
   "paths": [
    {
-    "count": 28,
+    "count": 34,
     "path": "/microsoft/aibast-agents-library",
     "title": "Overview",
-    "uniques": 22
+    "uniques": 27
    },
    {
     "count": 8,
@@ -411,15 +415,15 @@
    },
    {
     "count": 2,
-    "path": "/microsoft/aibast-agents-library/actions",
-    "title": "/actions",
+    "path": "/microsoft/aibast-agents-library/tree/main",
+    "title": "/tree/main",
     "uniques": 2
    },
    {
     "count": 2,
-    "path": "/microsoft/aibast-agents-library/tree/main",
-    "title": "/tree/main",
-    "uniques": 2
+    "path": "/microsoft/aibast-agents-library/blob/main/front-page.html",
+    "title": "/blob/main/front-page.html",
+    "uniques": 1
    },
    {
     "count": 2,
@@ -428,12 +432,17 @@
     "uniques": 1
    }
   ],
-  "paths_at": "2026-10-30T09:31:54Z",
+  "paths_at": "2026-10-30T13:21:15Z",
   "referrers": [
    {
     "count": 14,
     "referrer": "github.com",
     "uniques": 9
+   },
+   {
+    "count": 6,
+    "referrer": "aocr.org",
+    "uniques": 6
    },
    {
     "count": 4,
@@ -444,20 +453,10 @@
     "count": 3,
     "referrer": "Google",
     "uniques": 3
-   },
-   {
-    "count": 3,
-    "referrer": "aocr.org",
-    "uniques": 3
-   },
-   {
-    "count": 1,
-    "referrer": "microsoft.github.io",
-    "uniques": 1
    }
   ],
-  "view_uniques_14d": 43,
-  "views_14d": 130
+  "view_uniques_14d": 47,
+  "views_14d": 134
  },
  "snapshots": [
   {
@@ -2109,6 +2108,17 @@
    "installer_release_downloads_all_time": 224,
    "view_uniques_all_time": 297,
    "views_all_time": 1208
+  },
+  {
+   "at": "2026-10-30T13:20:57Z",
+   "cdn_all_time": 519,
+   "clone_uniques_all_time": 2742,
+   "clones_all_time": 21609,
+   "days_tracked": 86,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 224,
+   "view_uniques_all_time": 304,
+   "views_all_time": 1219
   }
  ],
  "solution_bundle_assets": {
@@ -2737,6 +2747,10 @@
   "2026-10-28": {
    "count": 11,
    "uniques": 10
+  },
+  "2026-10-29": {
+   "count": 11,
+   "uniques": 7
   }
  }
 }

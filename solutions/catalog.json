@@ -8198,6 +8198,7 @@
         "Surfaces the largest settlement breaks before the cutoff."
       ],
       "search_terms": [
+        "Compliance Analyst",
         "Head of Payments Operations",
         "Microsoft Copilot Studio",
         "Microsoft Dataverse",
@@ -8208,6 +8209,9 @@
         "Payments Repair Analyst",
         "Power Automate",
         "Reconciliation Analyst",
+        "Treasury Analyst",
+        "correspondent_limits",
+        "customer_verification",
         "daily_kpi_brief",
         "exception repair",
         "payment_status",
@@ -8217,6 +8221,7 @@
         "release queue",
         "release_risk_review",
         "repair_plan",
+        "sanctions_review_queue",
         "settlement reconciliation",
         "straight-through processing",
         "validate_payment"
@@ -8258,6 +8263,21 @@
           "label": "Head of Payments Operations: Daily payments KPI brief",
           "prompt": "Give me yesterday's payments KPI brief by rail.",
           "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-daily-kpi-brief"
+        },
+        {
+          "label": "Compliance Analyst: Sanctions review queue",
+          "prompt": "Which sanctions alerts should I review first, and what do I compare?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-sanctions-review-queue"
+        },
+        {
+          "label": "Treasury Analyst: Correspondent limits and nostro funding",
+          "prompt": "Are we close to any correspondent limits today, and do any nostro accounts need funding?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-correspondent-limits"
+        },
+        {
+          "label": "Payments Analyst: Customer verification draft",
+          "prompt": "PAY-3130 to Coho Winery was flagged. How should we verify it with the customer?",
+          "demo_url": "solutions/_shared/m365-copilot-demo.html?scenario=payments-operations-customer-verification"
         }
       ],
       "architecture": {
@@ -8304,6 +8324,21 @@
             "operation": "daily_kpi_brief",
             "name": "Daily payments KPI brief",
             "purpose": "Use when leadership asks for volume, exceptions, and straight-through rate by rail plus today's open items."
+          },
+          {
+            "operation": "sanctions_review_queue",
+            "name": "Sanctions review queue",
+            "purpose": "Use when a compliance analyst asks which sanctions alerts to review first and what to compare; flags come from the screening service and the analyst decides."
+          },
+          {
+            "operation": "correspondent_limits",
+            "name": "Correspondent limits and nostro funding",
+            "purpose": "Use when someone asks about correspondent limit use, projected nostro balances, or a funding request for treasury."
+          },
+          {
+            "operation": "customer_verification",
+            "name": "Customer verification draft",
+            "purpose": "Use when someone asks how to verify a flagged payment with the customer through the contact on file; the analyst decides release or hold."
           }
         ],
         "easy_mode": [
@@ -8314,7 +8349,7 @@
           "Push the Draft agent, replay every locked persona case, and stop before publish for explicit approval."
         ],
         "local_install_prompt": "Install Payments Operations Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/payments-operations/deployment.json, verify the expected tool and smoke case, and preserve the synthetic read-only boundary. Do not ask me to open a terminal. Do not connect customer systems or execute external actions.",
-        "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Payments Operations Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/payments-operations/deployment.json. Upload the two synthetic knowledge files and 7 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
+        "copilot_studio_prompt": "Using the Microsoft Copilot Studio plugin, initialize a Draft agent for Payments Operations Agent from https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/solutions/payments-operations/deployment.json. Upload the two synthetic knowledge files and 10 skills, replay every locked case, and Stop before publish. Do not bind production connections without explicit customer approval.",
         "required_connections": [
           "Use only approved, least-privilege production connections; the packaged demonstration uses synthetic knowledge files.",
           "Approved payments hub (read-only)",
