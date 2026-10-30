@@ -419,3 +419,31 @@ def test_each_ring_serves_its_own_install_command():
         assert "microsoft.github.io/aibast-agents-library/docs/experimental" not in staged
     with pytest.raises(pages.BuildError):
         pages.render_pages_base(PurePosixPath("docs/rapp-guide.html"), "no address", "fork", "aibast-agents-library")
+
+
+def test_scan_plan_apply_label_setups_by_folder_and_carry_the_naming_rule(env):
+    """A chat model must have nothing to rename: neutral labels plus an explicit rule."""
+    outputs = {
+        "scan": env["agent"].perform(action="scan", **env["common"]),
+        "plan": env["agent"].perform(action="plan", **env["common"]),
+        "apply (dry run)": env["agent"].perform(action="apply", **env["common"]),
+        "apply": env["agent"].perform(action="apply", dry_run=False, **env["common"]),
+    }
+    for label, text in outputs.items():
+        match = BANNED_NAMES.search(text)
+        assert match is None, f"{label} names {match.group(0)!r}"
+        assert MODULE.NAMING_RULE in text, label
+    scan = outputs["scan"]
+    assert "Setup in ~/.claude (an AI coding tool):" in scan
+    assert "Setup in ~/.gemini (an AI coding tool):" in scan
+    assert "Setup in ~/.codex and ~/.agents (an AI coding tool):" in scan
+    assert "(a hosted AI assistant export):" in scan
+    assert "Found in" not in scan
+    for label, text in outputs.items():
+        assert text.startswith(MODULE.REPLY_RULE), label
+    assert env["agent"].perform(action="compare").startswith(MODULE.REPLY_RULE)
+    description = MODULE.AIMigrationAgent().metadata["description"]
+    assert MODULE.NAMING_RULE in description
+    assert BANNED_NAMES.search(description) is None
+    for spec in MODULE.DETECTION.values():
+        assert BANNED_NAMES.search(spec["label"]) is None
