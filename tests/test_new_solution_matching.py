@@ -177,3 +177,88 @@ def test_manual_name_never_ends_on_a_joining_word():
         fitted = fit_name(name)
         assert len(fitted) <= 30
         assert fitted.split()[-2].lower() not in {"and", "of", "the", "for", "&"}
+
+
+# -- follow-ups: word forms, published clarifications, loose ids ------------------
+
+@pytest.mark.parametrize("question, topic", [
+    ("How are bids weighted?", "Evaluation"),
+    ("How is the RFQ weighted between price and lead time?", "Evaluation"),
+    ("Can the units be delivered in two batches?", "Delivery lots"),
+    ("Could two deliveries work instead of three?", "Delivery lots"),
+    ("What load loss tolerance applies?", "Specification"),
+    ("Has the RFQ closed yet?", "Closing date"),
+])
+def test_supplier_question_word_forms_answer_from_the_pack(question, topic):
+    answer = PROCUREMENT.ProcurementSupplierCollaborationAgent().perform(
+        operation="supplier_query", question=question
+    )
+    assert f"- **{topic}:**" in answer
+    assert "Not answered by the published RFQ pack" not in answer
+
+
+@pytest.mark.parametrize("keyword, text", [
+    ("close", "will you disclose the budget"),
+    ("rating", "operating temperature limits"),
+    ("lot", "is there a pilot unit"),
+    ("deliver", "who delivers liverpool"),
+])
+def test_supplier_keyword_word_forms_stay_whole_words(keyword, text):
+    if keyword == "deliver":
+        assert PROCUREMENT._keyword_hit(keyword, text)
+        assert not PROCUREMENT._keyword_hit("deliver", "liverpool")
+    else:
+        assert not PROCUREMENT._keyword_hit(keyword, text)
+
+
+@pytest.mark.parametrize("question", [
+    "Is a sealed tank design acceptable?",
+    "Do you accept sealed tanks?",
+])
+def test_supplier_question_already_clarified_reuses_the_published_answer(question):
+    answer = PROCUREMENT.ProcurementSupplierCollaborationAgent().perform(
+        operation="supplier_query", question=question
+    )
+    assert "Not answered by the published RFQ pack" not in answer
+    assert "CL-2" not in answer
+    assert "Already answered in published clarification CL-1" in answer
+    assert "Yes, if it meets ES-DT-04" in answer
+
+
+@pytest.mark.parametrize("words", ["issue HB-2038", "HB2038", "hb 2038", "issue HB-2038 please",
+                                   "the bed alarm, HB 2038"])
+def test_huddle_id_found_anywhere_with_optional_hyphen(words):
+    assert picked(HUDDLE._resolve_issue(words, "HB-2041")) == "HB-2038"
+
+
+@pytest.mark.parametrize("words, expected", [
+    ("nurse-call system", "HB-2033"),
+    ("the call-light outage", "HB-2033"),
+    ("HB 2041", "HB-2041"),
+    ("issue HB-2041 please", "HB-2041"),
+])
+def test_huddle_hyphenated_keywords_and_loose_ids(words, expected):
+    assert picked(HUDDLE._resolve_issue(words, "HB-2038")) == expected
+
+
+def test_huddle_closure_check_accepts_an_id_inside_a_sentence():
+    answer = HUDDLE.TieredHuddleBoardAgent().perform(operation="closure_check", issue="issue HB-2038")
+    assert answer.startswith("# Closure Check - HB-2038")
+
+
+@pytest.mark.parametrize("words", ["tx 0417", "tx0417", "asset TX 0417 please"])
+def test_asset_id_with_space_or_no_hyphen(words):
+    assert picked(GRID._resolve(words, "SG-1123", GRID._assets(), "id")) == "TX-0417"
+
+
+@pytest.mark.parametrize("words, expected", [
+    ("req 7712", "REQ-7712"), ("req7712", "REQ-7712"), ("requisition REQ 7710 please", "REQ-7710"),
+])
+def test_requisition_id_with_space_or_no_hyphen(words, expected):
+    answer = PROCUREMENT.ProcurementSupplierCollaborationAgent().perform(operation="sourcing_plan", requisition=words)
+    assert f"**Shortlist shown for:** {expected}" in answer
+
+
+@pytest.mark.parametrize("words", ["rfq 3301", "rfq3301", "the RFQ 3301 bids"])
+def test_rfq_id_with_space_or_no_hyphen(words):
+    assert picked(PROCUREMENT._find(words, None, PROCUREMENT._rfqs(), "id")) == "RFQ-3301"

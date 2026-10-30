@@ -82,7 +82,7 @@ RFQS = [
           "answer": "Delivery is 24 units in three lots of 8 to Central Stores. Lot dates are set at award from each "
                     "bidder's quoted lead time. A different lot plan may be offered only as a variant bid under "
                     "section 5.3, alongside a compliant bid."},
-         {"topic": "Specification", "keywords": ["spec", "specification", "vector", "dyn11", "losses", "rating"],
+         {"topic": "Specification", "keywords": ["spec", "specification", "vector", "dyn11", "loss", "rating"],
           "answer": "500 kVA, 11/0.433 kV, vector group Dyn11, losses as set in specification ES-DT-04 (no "
                     "tolerance on load losses)."},
          {"topic": "Quality documents", "keywords": ["iso", "certificate", "type test", "quality", "documents"],
@@ -97,7 +97,8 @@ RFQS = [
      ],
      "clarifications": [
          {"id": "CL-1", "question": "Is a sealed tank design acceptable?",
-          "answer": "Yes, if it meets ES-DT-04; published to all bidders."},
+          "answer": "Yes, if it meets ES-DT-04; published to all bidders.",
+          "keywords": ["sealed tank", "sealed"]},
      ]},
 ]
 
@@ -216,10 +217,32 @@ def _route(req):
     return "Three written quotes", "no framework covers it and it is below the tender threshold"
 
 
+def _keyword_pattern(keyword):
+    """Whole words, a hyphen or space between words optional, and the common endings on the last word.
+
+    'close' must not hit 'disclose' and 'rating' must not hit 'operating' (the match starts on a word boundary),
+    while 'weight' meets 'weighted', 'deliver' meets 'delivered', 'delivery' meets 'deliveries', 'loss' meets
+    'losses' and 'nurse call' meets 'nurse-call'.
+    """
+    parts = [p for p in re.split(r"[\s-]+", keyword.strip().lower()) if p]
+    last = parts[-1]
+    if len(last) > 2 and last.endswith("y") and last[-2] not in "aeiou":
+        tail = re.escape(last[:-1]) + r"(?:y|ies|ied)"
+    else:
+        tail = re.escape(last) + r"(?:s|es|d|ed|ing)?"
+    return r"\b" + r"[\s-]*".join([re.escape(p) for p in parts[:-1]] + [tail]) + r"\b"
+
+
 def _keyword_hit(keyword, text):
-    """Whole-word match, with an optional plural: 'close' must not hit 'disclose', 'rating' must not hit
-    'operating'."""
-    return re.search(r"\b" + re.escape(keyword) + r"(?:s|es)?\b", text) is not None
+    """Whole-word match on the keyword or a common word form of it (see _keyword_pattern)."""
+    return re.search(_keyword_pattern(keyword), text) is not None
+
+
+def _id_named(item_id, text):
+    """True when the id appears anywhere in the text, with its hyphen, a space or nothing: 'REQ-7712', 'req 7712'
+    and 'req7712' all name REQ-7712."""
+    parts = [re.escape(p) for p in str(item_id).lower().split("-") if p]
+    return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
 
 
 def _find(value, default, items, key):
@@ -234,6 +257,9 @@ def _find(value, default, items, key):
     for item in items:
         if q == item[key].lower():
             return item
+    named = [item for item in items if _id_named(item[key], q)]
+    if named:
+        return named[0] if len(named) == 1 else named
     scores = []
     for item in items:
         score = sum(len(k.split()) for k in item.get("keywords", []) if _keyword_hit(k, q))
@@ -389,6 +415,9 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         question = (kwargs.get("question") or DEFAULT_QUESTION).strip()
         q = question.lower()
         hits = [p for p in rfq["pack"] if any(_keyword_hit(k, q) for k in p["keywords"])]
+        asked_before = [c for c in rfq["clarifications"]
+                        if q.rstrip("?. ") == c["question"].lower().rstrip("?. ")
+                        or any(_keyword_hit(k, q) for k in c.get("keywords", []))]
         lines = [f"# Supplier Question - {rfq['id']}", "",
                  f"**RFQ:** {rfq['id']} ({rfq['route']}), closes {_date(rfq['closes_in_days'])} "
                  f"(in {rfq['closes_in_days']} days)",
@@ -398,7 +427,14 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
             lines += [f"- **{p['topic']}:** {p['answer']}" for p in hits]
             lines += ["", "Because the answer is already in the published pack, it can go to this supplier without "
                           "changing the terms for other bidders."]
-        else:
+        if asked_before:
+            if hits:
+                lines += [""]
+            lines += [f"## Already answered in published clarification {', '.join(c['id'] for c in asked_before)}"]
+            lines += [f"- **{c['id']}:** {c['question']} {c['answer']}" for c in asked_before]
+            lines += ["", "This answer has already been published to all bidders, so the same reply can go to this "
+                          "supplier. No new clarification is needed."]
+        if not hits and not asked_before:
             lines += ["**Not answered by the published RFQ pack.** Draft for the buyer: log it as a new "
                       f"clarification (CL-{len(rfq['clarifications']) + 1}) and publish the answer to all "
                       f"{len(rfq['invited'])} invited bidders, so every bidder works from the same information."]

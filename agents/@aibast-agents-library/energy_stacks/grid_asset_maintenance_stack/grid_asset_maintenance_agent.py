@@ -266,6 +266,13 @@ def _record_words(item, key):
     return primary, set().union(*(_words(f) for f in describing)) - primary
 
 
+def _id_named(item_id, text):
+    """True when the id appears anywhere in the text, with its hyphen, a space or nothing: 'TX-0417', 'asset tx 0417'
+    and 'tx0417' all name TX-0417."""
+    parts = [re.escape(p) for p in str(item_id).lower().split("-") if p]
+    return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
+
+
 def _resolve(value, default, items, key):
     """Id or words from the record; empty -> the default; no match -> None; a tie -> the tied records (a list).
 
@@ -281,6 +288,9 @@ def _resolve(value, default, items, key):
     for item in items:
         if q == item[key].lower():
             return item
+    named = [item for item in items if _id_named(item[key], q)]
+    if named:
+        return named[0] if len(named) == 1 else named
     asked = _words(q)
     vocab = [(item, *_record_words(item, key)) for item in items]
     scores = []
