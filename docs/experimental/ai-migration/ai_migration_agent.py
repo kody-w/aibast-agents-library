@@ -231,24 +231,43 @@ _SECRET_VALUE_PATTERNS = [
 # A "name: value" or "name = value" setting, with the name and value bare or
 # quoted, as in prose, .env, YAML, TOML and JSON ("clientSecret": "...").
 # Only names that contain a key word are looked at, so an ordinary setting never
-# swallows the next one; _redact_assignment then decides by the name's last word.
+# swallows the next one; _is_secret_setting then decides by the name's words.
 _ASSIGNMENT = re.compile(
     r"(?i)\b([A-Z0-9_.\-]*(?:key|token|secret|password|passwd|pwd|passphrase|credential|auth|connection[_\-]?string|conn[_\-]?str)"
     r"[A-Z0-9_.\-]*)"
     r"([\"']?\s*[:=]\s*)"
     r"(\"[^\"\n]+\"|'[^'\n]+'|[^\s\"',}]{4,})"
 )
-# A name is a secret when its last word is the secret itself (clientSecret,
-# DB_PASSWORD, accesstoken, OPENAI_APIKEY, connection_string), never when a key
-# word is only inside or before another word (max_tokens, Tokenizer, Secretary,
-# auth_method, author_id, Monkey). The last word, and the last two run together,
-# are checked for these endings.
+# A name is split into words (DB_PASSWORD_PROD -> db, password, prod;
+# clientSecret -> client, secret; OAuth -> o, auth) and judged by every word,
+# not only the last one, so SECRET_KEY, JWT_SECRET_KEY, API_TOKEN_V2 and
+# DB_PASSWORD_PROD are secrets. A key word only inside a longer word (Tokenizer,
+# Secretary, author_id, Monkey, keyboard) is not a word of its own and never
+# counts. A secret when:
+#   - a word is a secret word (password, secret, token, ...), or a run-together
+#     word ends in one (DBPASSWORD, accesstoken, OPENAI_APIKEY);
+#   - two neighbouring words make one (api key, access key, connection string);
+#   - the last word is exactly "auth" (MYAPP_AUTH, auth:), but not in OAuth;
+#   - a word is exactly "key" (SEARCH_KEY, primaryKey) and the value looks generated.
+# Not a secret: "tokens" (a count), a token word next to a count word
+# (max_token, token_budget, thinking_token_budget), and a known count or limit
+# setting with a number for a value (PASSWORD_MIN_LENGTH: 12, TOKEN_EXPIRY_SECONDS=3600).
+_SECRET_WORDS = ("token", "secret", "secrets", "password", "passwd", "pwd", "passphrase",
+                 "credential", "credentials")
 _SECRET_ENDINGS = ("token", "secret", "password", "passwd", "pwd", "passphrase", "credential",
                    "apikey", "accesskey", "privatekey", "authkey", "signingkey", "encryptionkey",
                    "connectionstring", "connstr")
-# A last word of exactly "auth" (MYAPP_AUTH, auth:) is a secret, except in OAuth,
-# which names a sign-in method. A last word of exactly "key" (primaryKey,
-# SEARCH_KEY) is redacted only when the value looks generated.
+_SECRET_PAIRS = {("api", "key"), ("access", "key"), ("private", "key"), ("auth", "key"),
+                 ("signing", "key"), ("encryption", "key"), ("connection", "string"), ("conn", "str")}
+_COUNT_WORDS = {"max", "min", "maximum", "minimum", "budget", "thinking", "limit", "limits", "count",
+                "num", "number", "total", "prompt", "completion", "output", "input", "context",
+                "reasoning", "per", "usage", "used", "remaining", "length", "len", "size", "ttl",
+                "expiry", "expires", "expiration", "timeout", "lifetime", "age", "days", "hours",
+                "minutes", "seconds", "secs", "ms", "retries", "attempts", "rotation", "interval"}
+# Words that make a neighbouring "token" a count (max_token, token_budget).
+_TOKEN_COUNT_NEIGHBOURS = {"max", "min", "maximum", "minimum", "budget", "thinking", "limit", "limits",
+                           "count", "num", "total", "per", "usage", "used", "remaining", "reasoning"}
+_COUNT_VALUE = re.compile(r"^\d+(?:\.\d+)?\s*(?:ms|s|m|h|d|sec|secs|seconds|minutes|hours|days)?$", re.IGNORECASE)
 _NAME_PART = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+")
 _LONG_RANDOM = re.compile(r"\b(?=[A-Za-z0-9_\-+=]*\d)(?=[A-Za-z0-9_\-+=]*[A-Za-z])[A-Za-z0-9_\-+=]{32,}\b")
 _SECRET_FLAG = re.compile(r"(?i)^--?[a-z0-9_\-]*(key|token|secret|password|auth|credential)[a-z0-9_\-]*$")
@@ -270,19 +289,31 @@ def _name_words(name):
     return [part.lower() for chunk in re.split(r"[_.\-]+", name) for part in _NAME_PART.findall(chunk)]
 
 
+def _looks_generated(value):
+    return bool((re.search(r"\d", value) and re.search(r"[A-Za-z]", value) and len(value) >= 8)
+                or len(value) >= 24)
+
+
 def _is_secret_setting(name, value):
     words = _name_words(name)
     if not words:
         return False
-    last = words[-1]
-    last_two = "".join(words[-2:])
-    if last.endswith(_SECRET_ENDINGS) or last_two.endswith(_SECRET_ENDINGS):
+    bare = value.strip("\"'").strip()
+    counted = any(word in _COUNT_WORDS for word in words)
+    if counted and _COUNT_VALUE.match(bare):
+        return False
+    for index, word in enumerate(words):
+        if word == "token" and {words[index - 1] if index else "",
+                                words[index + 1] if index + 1 < len(words) else ""} & _TOKEN_COUNT_NEIGHBOURS:
+            continue
+        if word in _SECRET_WORDS or (word != "tokens" and word.endswith(_SECRET_ENDINGS)):
+            return True
+        if index + 1 < len(words) and (word, words[index + 1]) in _SECRET_PAIRS:
+            return True
+    if words[-1] == "auth" and words[-2:] != ["o", "auth"]:
         return True
-    if last == "auth":
-        return last_two != "oauth"
-    if last == "key":
-        bare = value.strip("\"'")
-        return bool((re.search(r"\d", bare) and re.search(r"[A-Za-z]", bare) and len(bare) >= 8) or len(bare) >= 24)
+    if "key" in words:
+        return _looks_generated(bare)
     return False
 
 
