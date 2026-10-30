@@ -58,7 +58,7 @@
       "_file": "docs/experimental/ai-review/ai_review_walkthrough_agent.py",
       "_size_kb": 42.2,
       "_lines": 876,
-      "_sha256": "8d9843c282ef95ec35fa8c91115674be5f3f916426e4c00fff14b521ea84ebd7",
+      "_sha256": "ed5769a45fea454c09ea46d23099cee1f8f8e0fc14c2aff343477588ed8d1330",
       "_install_filename": "ai_review_walkthrough_agent.py",
       "_url": "https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-review/ai_review_walkthrough_agent.py",
       "install_command": "curl -fsSL https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-review/ai_review_walkthrough_agent.py -o ~/.brainstem/src/rapp_brainstem/agents/ai_review_walkthrough_agent.py",

@@ -845,7 +845,7 @@ class AIReviewWalkthroughAgent(BasicAgent):
         packet = "\n".join(out)
 
         def first(stage_id, qid, limit=300):
-            val = str(answers.get(stage_id, {}).get(qid, "") or "").strip()
+            val = "; ".join(_items(answers.get(stage_id, {}).get(qid, "")))
             if not val:
                 return "_Not answered._"
             return val if len(val) <= limit else val[:limit].rstrip() + "..."

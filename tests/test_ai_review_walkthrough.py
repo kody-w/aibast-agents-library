@@ -268,6 +268,8 @@ def test_export_writes_the_packet_and_summary(agent):
     assert "**Decision:** go with conditions" in summary
     assert "Stages complete: 12 of 12" in summary
     assert len(summary.splitlines()) < 40
+    # Multi-line answers stay inside their bullet.
+    assert "**Out of scope:** Legal or consumer-rights advice; Deciding a specific customer's refund;" in summary
 
 
 def test_export_to_a_real_folder(tmp_path, monkeypatch):
