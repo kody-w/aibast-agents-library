@@ -101,16 +101,29 @@ RFQS = [
           "keywords": ["sealed tank", "sealed"]},
      ],
      # Subjects the published pack and its clarifications are silent on. A question that raises one of them is a
-     # new clarification for every bidder, even when it also contains a word the pack does cover ('payment due
-     # after delivery' is about payment, not the closing date or the delivery lots).
-     "not_covered": [
-         {"subject": "payment terms", "keywords": ["payment", "pay", "paid", "invoice", "invoicing", "retention",
-                                                    "advance payment", "deposit"]},
-         {"subject": "access to the tender documents", "keywords": ["download", "access", "portal login", "log in",
-                                                                     "login", "password"]},
-         {"subject": "risk, insurance and liability", "keywords": ["risk", "transit", "insurance", "insured",
-                                                                    "liability", "liable", "title", "incoterm",
-                                                                    "incoterms", "damage", "damaged"]},
+    # new clarification for every bidder, even when it also contains a word the pack does cover ('payment due
+    # after delivery' is about payment, not the closing date or the delivery lots). Keywords are words or phrases
+    # that only that subject uses: a common word on its own ('pay attention', 'the risk of half marks', 'access to
+    # our certificate', 'the title of the specification') says nothing about the subject and must not turn a
+    # question the pack answers into a new clarification.
+    "not_covered": [
+        {"subject": "payment terms", "keywords": ["payment", "payment terms", "invoice", "invoicing", "retention",
+                                                   "advance payment", "deposit", "pay us", "pay you", "pay on",
+                                                   "pay within", "pay after", "pay in advance", "paid on",
+                                                   "paid within", "paid after", "get paid", "be paid",
+                                                   "pay the supplier", "pay suppliers"]},
+        {"subject": "access to the tender documents", "keywords": [
+            "portal access", "access the portal", "access to the portal", "access the tender",
+            "access to the tender", "access the documents", "access the rfq", "access to the rfq",
+            "portal login", "log in", "login", "password", "where do i download", "where can i download",
+            "how do i download", "how can i download", "download link", "cannot download", "can't download",
+            "unable to download"]},
+        {"subject": "risk, insurance and liability", "keywords": [
+            "insurance", "insured", "liability", "liable", "incoterm", "incoterms", "in transit", "transit risk",
+            "risk of loss", "risk passes", "risk pass", "risk transfer", "transfer of risk", "carries the risk",
+            "carry the risk", "bears the risk", "bear the risk", "title transfer", "title pass", "transfer of title",
+            "passing of title", "title to the goods", "damage in transit", "damaged on delivery",
+            "damaged during delivery"]},
          {"subject": "splitting the award between suppliers", "keywords": [
              "two suppliers", "multiple suppliers", "several suppliers", "more than one supplier",
              "between suppliers", "split award", "dual award", "joint bid", "consortium", "subcontract"]},
