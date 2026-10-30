@@ -1,13 +1,13 @@
 {
   "schema": "aibast-academy/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-30T08:54:48.686175+00:00",
+  "generated_at": "2026-10-30T09:29:17.208252+00:00",
   "title": "Microsoft AI Academy",
   "description": "A hands-on catalog for exploring experimental AIBAST agents through scenario quests, guided builds, evidence reviews, and portable Microsoft implementation patterns.",
   "disclaimer": "Microsoft AI Academy is an experimental AIBAST learning experience. It is not an official Microsoft credential, certification, training program, or replacement for Microsoft Learn. Activities use synthetic data and self-reported milestones unless a course states otherwise.",
   "summary": {
     "courses": 72,
-    "skills": 512,
+    "skills": 516,
     "paths": 6,
     "industries": 13,
     "points_per_course": 150
@@ -2347,7 +2347,7 @@
       "slug": "field-permit-to-work",
       "agent": "@aibast-agents-library/field-permit-to-work",
       "title": "Field Permit to Work Agent",
-      "description": "Give permit coordinators and authorized persons a drafted risk assessment, an isolation check against the live switching state, visible sign-off timing, crew acknowledgements and close-out reconciliation, while every safety decision stays with authorized people.",
+      "description": "Give permit coordinators and authorized persons a drafted risk assessment, an isolation check against the live switching state, visible sign-off timing, crew acknowledgements, control room isolation confirmation, on-site acceptance checks, close-out reconciliation and archived audit trails, while every safety decision stays with authorized people.",
       "category": "energy",
       "industry": "Energy",
       "journey_stage": "Protect",
@@ -2355,7 +2355,8 @@
         "Authorized Person",
         "Crew Lead",
         "Operations Manager",
-        "Permit Coordinator"
+        "Permit Coordinator",
+        "Safety Auditor"
       ],
       "platforms": [
         "Microsoft Copilot Studio",
@@ -2371,7 +2372,7 @@
         "work-management"
       ],
       "outcomes": [
-        "Close-out reconciles people and tools before clearance",
+        "Close-out and the permit record are complete and signed",
         "Every crew starts on a confirmed isolation",
         "Sign-offs are visible against each planned start"
       ],
@@ -2382,9 +2383,21 @@
       "added_at": "2026-10-08T01:53:29-04:00",
       "has_demo_video": true,
       "has_onepager": true,
-      "demo_cases": 7,
-      "manual_steps": 26,
+      "demo_cases": 11,
+      "manual_steps": 34,
       "skills": [
+        {
+          "name": "acceptance-readiness",
+          "title": "Permit acceptance readiness",
+          "description": "Use when a crew lead asks whether the crew can accept the permit on site yet.",
+          "path": "solutions/field-permit-to-work/manual/skills/aibast_acceptance-readiness_10/SKILL.md"
+        },
+        {
+          "name": "audit-trail",
+          "title": "Archived permit audit trail",
+          "description": "Use when someone asks for the audit trail or chain of custody of an archived permit.",
+          "path": "solutions/field-permit-to-work/manual/skills/aibast_audit-trail_11/SKILL.md"
+        },
         {
           "name": "authorization-route",
           "title": "Sign-off route and timing",
@@ -2410,6 +2423,12 @@
           "path": "solutions/field-permit-to-work/manual/skills/aibast_isolation-check_03/SKILL.md"
         },
         {
+          "name": "isolation-confirmation",
+          "title": "Control room isolation confirmation",
+          "description": "Use when someone asks whether the control room has confirmed the isolation and wants the permit update and crew notice drafted.",
+          "path": "solutions/field-permit-to-work/manual/skills/aibast_isolation-confirmation_09/SKILL.md"
+        },
+        {
           "name": "permit-queue",
           "title": "Daily permit queue",
           "description": "Use when someone asks which permits are waiting today and what is blocking them.",
@@ -2426,9 +2445,15 @@
           "title": "Permit safety roll-up",
           "description": "Use when a manager asks how permit safety is performing this month.",
           "path": "solutions/field-permit-to-work/manual/skills/aibast_safety-kpis_07/SKILL.md"
+        },
+        {
+          "name": "work-request-check",
+          "title": "Work request check",
+          "description": "Use when someone asks whether a new work request is complete enough to raise a permit.",
+          "path": "solutions/field-permit-to-work/manual/skills/aibast_work-request-check_08/SKILL.md"
         }
       ],
-      "skill_count": 7,
+      "skill_count": 11,
       "primary_path": "operations-supply-chain",
       "path_ids": [
         "operations-supply-chain"
