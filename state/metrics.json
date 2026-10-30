@@ -1,6 +1,6 @@
 {
  "schema": "aibast-metrics/1.0",
- "generated_at": "2026-10-30T05:23:23Z",
+ "generated_at": "2026-10-30T05:36:19Z",
  "repo": {
   "stars": 8,
   "forks": 9,
@@ -8,10 +8,10 @@
   "open_issues": 17,
   "size_kb": 5457597,
   "created_at": "2025-10-17T16:17:53Z",
-  "pushed_at": "2026-10-30T05:12:52Z",
+  "pushed_at": "2026-10-30T05:21:35Z",
   "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
   "homepage": null,
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "carried_forward": true,
   "owner": "microsoft",
   "name": "aibast-agents-library",
@@ -736,7 +736,7 @@
   "clones_14d": 4777,
   "views_14d": 130,
   "live": false,
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "unavailable_reason": "Offline mode made zero network calls; traffic figures are carried forward from the original as_of timestamp.",
   "carried_forward": true
  },
@@ -1028,7 +1028,7 @@
     "kind": "agent"
    }
   ],
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "carried_forward": true
  },
  "releases": {
@@ -2162,7 +2162,7 @@
     "assets": []
    }
   ],
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "carried_forward": true
  },
  "leaderboards": {
@@ -4715,7 +4715,7 @@
  ],
  "agent_discussion_coverage": {
   "status": "partial",
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "pages": 2,
   "discussions_scanned": 144,
   "diagnostics": {
@@ -4742,7 +4742,7 @@
  },
  "agent_upvote_coverage": {
   "status": "partial",
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
@@ -4759,7 +4759,7 @@
  },
  "agent_acquisition_coverage": {
   "status": "partial",
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
@@ -4777,7 +4777,7 @@
  "file_metrics": {
   "schema": "aibast-file-metrics/1.0",
   "source_status": "complete",
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "carried_forward": true,
   "totals": {
    "files": 10000,
@@ -86251,7 +86251,7 @@
    "mixed_windows": true,
    "views": {
     "status": "live popular-path response",
-    "as_of": "2026-10-30T05:21:20Z",
+    "as_of": "2026-10-30T05:27:36Z",
     "censored": true,
     "diagnostics": {
      "duplicate_rows": 0,
@@ -86265,7 +86265,7 @@
    },
    "downloads": {
     "status": "complete paginated jsDelivr file response",
-    "as_of": "2026-10-30T05:21:20Z",
+    "as_of": "2026-10-30T05:27:36Z",
     "pages": 1,
     "pagination": "complete",
     "diagnostics": {
@@ -86278,7 +86278,7 @@
    },
    "feedback": {
     "status": "workshop-feedback label + body marker union",
-    "as_of": "2026-10-30T05:21:20Z",
+    "as_of": "2026-10-30T05:27:36Z",
     "issues_scanned": 0,
     "pages": 3,
     "diagnostics": {
@@ -86290,7 +86290,7 @@
    },
    "agent_upvotes": {
     "status": "partial",
-    "as_of": "2026-10-30T05:21:20Z",
+    "as_of": "2026-10-30T05:27:36Z",
     "carried_forward": true,
     "scope": "Canonical primary-agent upvotes carried separately from workshop usage events."
    },
@@ -86328,7 +86328,7 @@
     "url": "https://microsoft.github.io/aibast-agents-library/registry.json"
    }
   ],
-  "as_of": "2026-10-30T05:21:20Z",
+  "as_of": "2026-10-30T05:27:36Z",
   "carried_forward": true
  },
  "achievements": {
@@ -88744,7 +88744,7 @@
  "ecosystem": {
   "schema": "aibast-ecosystem-metrics/1.0",
   "status": "available",
-  "as_of": "2026-10-30T05:23:23Z",
+  "as_of": "2026-10-30T05:36:19Z",
   "sources": {
    "aibast": {
     "status": "available",
