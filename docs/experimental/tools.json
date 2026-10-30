@@ -1,0 +1,80 @@
+{
+  "schema": "rapp-registry/1.0",
+  "version": "1.0.0",
+  "note": "Experimental tools. Entries use the library registry's agent entry shape (rapp-agent/1.0, a RAR registry entry) plus a kind: agent, rapplication or web-tool. Kept separate from registry.json, so nothing here enters the library catalog.",
+  "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk.",
+  "tools": [
+    {
+      "schema": "rapp-agent/1.0",
+      "kind": "agent",
+      "name": "@aibast-agents-library/ai-migration",
+      "version": "1.0.0",
+      "display_name": "AI Migration",
+      "description": "Bring your instructions, skills, tools and memory from another AI assistant or AI coding tool into your own Brainstem, as plain files on your device.",
+      "author": "AIBAST",
+      "tags": [
+        "experimental",
+        "migration",
+        "local-first",
+        "setup"
+      ],
+      "category": "experimental",
+      "quality_tier": "experimental",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "docs/experimental/ai-migration/ai_migration_agent.py",
+      "_size_kb": 42.1,
+      "_lines": 959,
+      "_sha256": "abd6c4d307924f74d959c33b24ef832644d17ae2745ba71917c667042ef67020",
+      "_install_filename": "ai_migration_agent.py",
+      "_url": "https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py",
+      "install_command": "curl -fsSL https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py -o ~/.brainstem/src/rapp_brainstem/agents/ai_migration_agent.py",
+      "guide_url": "docs/experimental/ai-migration/index.html",
+      "remove": "Delete ai_migration_agent.py from your Brainstem's agents folder.",
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "kind": "web-tool",
+      "name": "@aibast-agents-library/project-tracker",
+      "version": "1.0.0",
+      "display_name": "Project Tracker",
+      "description": "Track projects, agent implementations and timelines in your browser, with export.",
+      "author": "AIBAST",
+      "tags": [
+        "experimental",
+        "browser-only"
+      ],
+      "category": "experimental",
+      "quality_tier": "experimental",
+      "requires_env": [],
+      "dependencies": [],
+      "_file": "tools/localfirst_project_tracker_tool.html",
+      "note": "Browser-only for now: a single HTML file that keeps its data in browser storage. Not yet a Brainstem agent.",
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "kind": "web-tool",
+      "name": "@aibast-agents-library/chat-animation-studio",
+      "version": "1.0.0",
+      "display_name": "Chat Animation Studio",
+      "description": "Create animated chat demonstrations for your agents in your browser.",
+      "author": "AIBAST",
+      "tags": [
+        "experimental",
+        "browser-only"
+      ],
+      "category": "experimental",
+      "quality_tier": "experimental",
+      "requires_env": [],
+      "dependencies": [],
+      "_file": "tools/localfirst_chat_animation_studio_tool.html",
+      "note": "Browser-only for now: a single HTML file that keeps its data in browser storage. Not yet a Brainstem agent.",
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+    }
+  ],
+  "count": 3
+}
