@@ -81,6 +81,9 @@ YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}
 YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
 # youtube.com paths that name one video in their second segment.
 YOUTUBE_VIDEO_PATHS = {"shorts", "embed", "live", "v"}
+# Eleven letters long, so it looks like an id, but embed/videoseries?list=...
+# plays a whole playlist. It is never a video id.
+YOUTUBE_NOT_IDS = {"videoseries"}
 ONE_VIDEO_PROBLEM = (
     "The video link must point to one video (a watch, youtu.be or shorts link), "
     "not a playlist or a channel."
@@ -129,7 +132,9 @@ FORBIDDEN_TERMS = (
 
 # Other vendors' AI products. Demo cards describe what was built with
 # Microsoft products, so these names are flagged too. The problem text never
-# repeats them, because the check comment is public.
+# repeats them, because the check comment is public; it names the field instead.
+# Everyday English words are listed only with the vendor word that makes them
+# a product name ("perplexity ai", "google bard").
 OTHER_AI_PRODUCT_TERMS = (
     "chatgpt",
     "openai",
@@ -137,11 +142,12 @@ OTHER_AI_PRODUCT_TERMS = (
     "anthropic",
     "claude",
     "gemini",
-    "bard",
+    "google bard",
     "llama",
     "mistral",
     "grok",
-    "perplexity",
+    # "perplexity" alone is an everyday word.
+    "perplexity ai",
     "deepseek",
     "midjourney",
     "qwen",
@@ -162,10 +168,7 @@ OTHER_AI_PRODUCT_TERMS = (
     "watsonx",
     "ibm watson",
 )
-OTHER_AI_PRODUCTS_PROBLEM = (
-    "Remove the names of AI products from other companies. "
-    "Describe the demo with the Microsoft products it uses."
-)
+OTHER_AI_PRODUCTS_PROBLEM = "Remove the names of AI products from other companies."
 
 # A host a browser URL parser accepts: dot-separated letters, digits and hyphens.
 _HOST_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
@@ -272,18 +275,26 @@ def classify_video_url(url: str) -> str:
     )
 
 
+def _is_video_id(value: str) -> bool:
+    return bool(YOUTUBE_ID_RE.match(value)) and value.lower() not in YOUTUBE_NOT_IDS
+
+
 def is_single_youtube_video(host: str, parts: urllib.parse.SplitResult) -> bool:
-    """True for a link to one video: watch?v=, youtu.be/<id>, shorts/<id>."""
+    """True for a link to one video: watch?v=, youtu.be/<id>, shorts/<id>.
+
+    A list= parameter is allowed only next to a real video id, and
+    embed/videoseries (a whole playlist) is never one video.
+    """
     segments = [s for s in parts.path.split("/") if s]
     if host == "youtu.be":
-        return len(segments) == 1 and bool(YOUTUBE_ID_RE.match(segments[0]))
+        return len(segments) == 1 and _is_video_id(segments[0])
     if segments == ["watch"]:
         ids = urllib.parse.parse_qs(parts.query).get("v", [])
-        return len(ids) == 1 and bool(YOUTUBE_ID_RE.match(ids[0]))
+        return len(ids) == 1 and _is_video_id(ids[0])
     return (
         len(segments) == 2
         and segments[0] in YOUTUBE_VIDEO_PATHS
-        and bool(YOUTUBE_ID_RE.match(segments[1]))
+        and _is_video_id(segments[1])
     )
 
 
@@ -299,11 +310,15 @@ _JOIN_RE = re.compile(
 
 
 def _term_re(term: str) -> re.Pattern:
-    # Words of a term may be joined or split by spaces, hyphens or underscores.
-    # A digit may follow the term (GPT4), a letter may not (so "nda" never
-    # matches "ndash").
-    body = r"[\W_]*".join(re.escape(w) for w in term.split())
-    return re.compile(r"(?<![^\W_])" + body + r"(?![^\W\d_])")
+    # Words of a term may be joined or split by spaces, hyphens or underscores,
+    # never by sentence punctuation ("Amazon. Q4" and "Amazon, Q3" are not
+    # "Amazon Q"). A version digit may follow the term (GPT4), a letter may not
+    # (so "nda" never matches "ndash"). A term that ends in a one-letter word
+    # takes no digit either, so "Amazon Q4" stays a sales quarter.
+    words = term.split()
+    body = r"[\s_-]*".join(re.escape(w) for w in words)
+    tail = r"(?![^\W_]|[\s_-]*\d)" if len(words[-1]) == 1 else r"(?![^\W\d_])"
+    return re.compile(r"(?<![^\W_])" + body + tail)
 
 
 def _compound_terms(word: str, vocabulary: list[str]) -> set[str]:
@@ -322,16 +337,20 @@ def _compound_terms(word: str, vocabulary: list[str]) -> set[str]:
     return found
 
 
-def forbidden_terms_in(text: str, terms: tuple[str, ...] = FORBIDDEN_TERMS) -> list[str]:
+def forbidden_terms_in(
+    text: str, terms: tuple[str, ...] = FORBIDDEN_TERMS, split_joined: bool = True
+) -> list[str]:
     """Return the terms found in text.
 
     The text is folded with NFKC first, so full-width letters match. A term
     still matches with a version number joined on (GPT4), inside a joined
-    word written in capitals (AzureFunctions), and inside a lower-case word
-    built only from listed terms (azureopenai).
+    word written in capitals (AzureFunctions, only when split_joined), and
+    inside a lower-case word built only from listed terms (azureopenai).
     """
     plain = normalise(text)
-    forms = (plain.casefold(), _JOIN_RE.sub(" ", plain).casefold())
+    forms = (plain.casefold(),)
+    if split_joined:
+        forms += (_JOIN_RE.sub(" ", plain).casefold(),)
     vocabulary = sorted(
         {t for t in FORBIDDEN_TERMS + OTHER_AI_PRODUCT_TERMS + tuple(terms) if " " not in t},
         key=len, reverse=True,
@@ -345,8 +364,30 @@ def forbidden_terms_in(text: str, terms: tuple[str, ...] = FORBIDDEN_TERMS) -> l
     ]
 
 
-def other_ai_products_in(text: str) -> bool:
-    return bool(forbidden_terms_in(text, OTHER_AI_PRODUCT_TERMS))
+def other_ai_products_in(text: str, split_joined: bool = True) -> bool:
+    return bool(forbidden_terms_in(text, OTHER_AI_PRODUCT_TERMS, split_joined))
+
+
+def onepager_words(url: str) -> str:
+    """The human-readable part of a one-pager link: its host and path.
+
+    The query and fragment are left out, because they hold opaque ids and
+    share tokens, not words a visitor reads.
+    """
+    try:
+        parts = urllib.parse.urlsplit(url)
+    except ValueError:
+        return ""
+    return " ".join([parts.hostname or "", urllib.parse.unquote(parts.path)])
+
+
+def other_ai_products_problem(fields: list[str]) -> str:
+    """The public problem text. It names the fields, never the product."""
+    where = fields[0] if len(fields) == 1 else ", ".join(fields[:-1]) + " and " + fields[-1]
+    return (
+        f"{OTHER_AI_PRODUCTS_PROBLEM} Found in {where}. "
+        "Describe the demo with the Microsoft products it uses."
+    )
 
 
 def _sentences(text: str) -> int:
@@ -411,23 +452,36 @@ def validate(sections: dict[str, str]) -> tuple[dict, list[str]]:
         else:
             if is_sign_in_only_host(parts.hostname):
                 problems.append(ONEPAGER_SIGN_IN_PROBLEM)
-        # The link shows on the public card, so its words are checked too.
-        onepager_text = urllib.parse.unquote_plus(onepager)
+        # The link shows on the public card, so the words in its host and
+        # path are checked too. Ids are not split at case or digit changes.
+        onepager_text = onepager_words(onepager)
 
     for item in REQUIRED_CONFIRMATIONS:
         if item not in confirmed:
             problems.append(f"Confirm: {item}")
 
     free_text = "\n".join([title, description, team])
-    checked_text = "\n".join([free_text, onepager_text])
-    terms = forbidden_terms_in(checked_text)
+    # Each field is checked on its own, so words never join across fields.
+    checked = [
+        ("the title", title, True),
+        ("the description", description, True),
+        ("the team name", team, True),
+        ("the one-pager link", onepager_text, False),
+    ]
+    terms = set()
+    for _label, text, split_joined in checked:
+        terms.update(forbidden_terms_in(text, split_joined=split_joined))
     if terms:
         problems.append(
             "Remove these words, which cannot appear on the public page: "
             + ", ".join(sorted(terms)) + "."
         )
-    if other_ai_products_in(checked_text):
-        problems.append(OTHER_AI_PRODUCTS_PROBLEM)
+    vendor_fields = [
+        label for label, text, split_joined in checked
+        if other_ai_products_in(text, split_joined)
+    ]
+    if vendor_fields:
+        problems.append(other_ai_products_problem(vendor_fields))
     if EMAIL_RE.search(free_text) or HANDLE_RE.search(free_text):
         problems.append(
             "Remove email addresses and @handles. Credit a team or channel, not a person."
