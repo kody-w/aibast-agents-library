@@ -86,7 +86,10 @@ def test_advertised_solutions_expose_showroom_fields():
     reg = load_registry()
     advertised = [a for a in reg["agents"] if a.get("_solution")]
     assert advertised
-    assert reg["stats"]["advertised_solutions"] == len(advertised)
+    catalog = json.loads(
+        (REPO_ROOT / "solutions" / "catalog.json").read_text(encoding="utf-8")
+    )["solutions"]
+    assert reg["stats"]["advertised_solutions"] == len(catalog)
     assert reg["stats"]["demo_proven_agents"] > 0
     assert reg["stats"]["solution_onepagers"] > 0
     assert reg["stats"]["solution_demo_videos"] > 0
