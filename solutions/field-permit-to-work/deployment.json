@@ -135,10 +135,10 @@
     "publish_requires_confirmation": true,
     "validated_manual": {
       "display_name": "Field Permit to Work Manual",
-      "bot_id": "2c2a92a5-f17f-4444-8f90-1daf32df0fdf",
+      "bot_id": "5badbf8b-37e5-4c28-9147-399da6c0a7d8",
       "environment_name": "kodyv8",
       "environment_id": "ee67a404-325c-e726-a18a-886fe708ca0b",
-      "skills": 7,
+      "skills": 11,
       "knowledge_files": 2
     },
     "validated_pilot": {
@@ -151,9 +151,9 @@
     },
     "export_agent": {
       "display_name": "Field Permit to Work Manual",
-      "schema_name": "cr2bf_fieldpermittoworkmanual_ck1tZD",
+      "schema_name": "cr2bf_fieldpermittoworkmanual_RlQfgs",
       "solution_unique_name": "aibast_FieldPermitToWorkManualBuild",
-      "bot_id": "2c2a92a5-f17f-4444-8f90-1daf32df0fdf",
+      "bot_id": "5badbf8b-37e5-4c28-9147-399da6c0a7d8",
       "environment_name": "kodyv8",
       "environment_id": "ee67a404-325c-e726-a18a-886fe708ca0b",
       "status": "Draft",
