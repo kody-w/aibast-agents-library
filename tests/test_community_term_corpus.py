@@ -18,7 +18,13 @@ The rules the cases pin down:
     space after it ("RAPP/Factory", "Vertex.AI", "Salesforce·Einstein").
   * A punctuation mark followed by whitespace is a sentence break, so names
     never join across it ("Amazon. Q4", "Amazon, Q3").
+  * Only a joining mark that sits between two word characters joins words
+    ("RAPP/Factory", "RAPP-Factory"). An opening bracket, a quote, a comma
+    or a dash used as punctuation is a break ("perplexity (AI", "perplexity—AI").
   * A possessive joins ("Google’s Bard").
+  * A name made of two words is a name however it is spaced ("OpenAI",
+    "Open AI", "open-ai"), and a joined link word is read both split at
+    capitals and whole ("OpenAI.pdf", "OpenAIDemo.pdf").
   * A one-letter last word takes no digit ("Amazon Q4" is a sales quarter).
   * Everyday words pass unless the vendor word is next to them
     ("perplexity", "bard", "bedrock").
@@ -169,6 +175,40 @@ CORPUS = [
     ("probe", "onepager", "https://example.com/docs/Amazon.Q4.pdf", PASS),
     ("probe", "onepager", "https://example.com/files/Huddle%20Board%20One%20Pager.pdf", PASS),
     ("probe", "onepager", "https://example.com/files/q/amazon/report.pdf", PASS),
+    # ---------------------------------------------- round 6: CamelCase names in a link
+    ("round 6", "onepager", "https://example.com/OpenAI.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/AgentForce.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/WatsonX.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/MidJourney.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/DialogFlow.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/files/AgentSpace.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/files/OpenAIDemo.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/DeepSeekDemo.pdf", _set(V)),
+    ("round 6", "onepager", "https://example.com/openai.pdf", _set(V)),
+    # ---------------------------------------------- round 6: a bracket or a dash is a break
+    ("round 6", "description", "Planners face perplexity (AI helps later). The agent explains.", PASS),
+    ("round 6", "description", "Planners face perplexity—AI helps. The agent explains.", PASS),
+    ("round 6", "description", "Our bedrock (agents) handle it. The agent explains.", PASS),
+    ("round 6", "description", "The duet (AI and a nurse) triage. The agent drafts.", PASS),
+    # ---------------------------------------------- round 6: names written as two words
+    ("round 6", "description", "Built on Open AI models first. The agent drafts replies.", _set(V)),
+    ("round 6", "title", "Open AI Swap", _set(V)),
+    ("round 6", "description", "It started on Deep Seek. The agent drafts replies.", _set(V)),
+    ("round 6", "description", "Moved off Sage Maker. The agent drafts.", _set(V)),
+    ("round 6", "description", "Replaces Agent Force. The agent drafts.", _set(V)),
+    ("round 6", "description", "Replaces Dialog Flow. The agent drafts.", _set(V)),
+    ("round 6", "description", "Moved off Watson X. The agent drafts.", _set(V)),
+    ("round 6", "description", "Built on Chat GPT. The agent drafts.", _set(V)),
+    ("round 6", "description", "Built on OpenAI models first. The agent drafts replies.", _set(V)),
+    # ---------------------------------------------- redesign probes (round 6 fix)
+    ("probe 6", "description", "Uses OpenAI-style prompts. The agent drafts.", _set(V)),
+    ("probe 6", "description", "Moved off SageMaker. The agent drafts.", _set(V)),
+    ("probe 6", "onepager", "https://example.com/files/open-ai-demo.pdf", _set(V)),
+    ("probe 6", "onepager", "https://example.com/Agent_Force.pdf", _set(V)),
+    ("probe 6", "onepager", "https://example.com/files/WatsonXDemo.pdf", _set(V)),
+    ("probe 6", "description", "Keep the plan open. AI helps the planner. The agent drafts.", PASS),
+    ("probe 6", "description", "Planners face perplexity (AI helps) and Amazon (Q4) sales. The agent helps.", PASS),
+    ("probe 6", "description", "Stores sell on Amazon Q 4 days a week. The agent helps.", PASS),
 ]
 
 
