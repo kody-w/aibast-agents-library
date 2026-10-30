@@ -129,6 +129,12 @@ def test_rapp_guide_states_the_real_solution_counts():
     assert shape == [(str(single_file), str(SOLUTIONS))]
     assert _numbers(r"library of (\d+) published patterns", guide) == [SOLUTIONS]
     assert _numbers(r"<td>(\d+) published solutions", guide) == [SOLUTIONS]
+    # The Speed Barriers row states the same split, not "each a single-file agent".
+    assert "each a single-file agent" not in guide
+    row = re.findall(
+        r"<td>(\d+) published solutions, (\d+) of them single-file agents", guide
+    )
+    assert row == [(str(SOLUTIONS), str(single_file))]
     assert _numbers(r"every published workshop, (\d+) of them today", guide) == [SOLUTIONS]
     shipped = re.findall(
         r"(\d+) solutions, (\d+) published one-pagers, (\d+) filmed demos", guide

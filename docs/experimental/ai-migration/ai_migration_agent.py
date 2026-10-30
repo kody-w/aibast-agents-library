@@ -4,7 +4,8 @@ tool into your own Brainstem.
 
 Experimental and not an officially supported Microsoft product or service.
 Provided as is under the repository's MIT license, with no support or
-warranty. Use at your own risk.
+warranty. Use at your own risk. Trademark use follows the repository's
+trademark notice.
 
 What it does, in order:
   scan     find setups on this device (or under a folder you name) and report
