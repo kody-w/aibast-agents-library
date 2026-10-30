@@ -303,21 +303,39 @@ def is_sign_in_only_host(host: str) -> bool:
     return any(host == h or host.endswith("." + h) for h in SIGN_IN_ONLY_HOSTS)
 
 
+# ------------------------------------------------------------- word matching
+# One set of rules for every field, so a fix for one case cannot quietly
+# break another. tests/test_community_term_corpus.py holds every case.
+#
+# 1. Fold the text (NFKC, drop invisible characters, casefold).
+# 2. The words of a listed name may be joined by nothing ("vertexai"),
+#    spaces, underscores, or punctuation with no space after it
+#    ("RAPP/Factory", "Vertex.AI", "Salesforce·Einstein"). A possessive
+#    joins too ("Google's Bard").
+# 3. A punctuation mark followed by whitespace is a sentence break, and words
+#    never join across it ("Amazon. Q4", "Amazon, Q3").
+# 4. A name must start and end on a word boundary. A version digit may follow
+#    it (GPT4), a letter may not (so "nda" never matches "ndash"). A name
+#    whose last word is one letter takes no digit, so "Amazon Q4" stays a
+#    sales quarter.
+# 5. Text fields are also read with joined words split at capitals and digits
+#    ("AzureOpenAI" -> "Azure Open AI"), and a lower-case word built only from
+#    listed names ("azureopenai") counts as those names.
+
 # Spaces out joined words: "AzureOpenAI" -> "Azure Open AI", "GPT4o" -> "GPT 4o".
 _JOIN_RE = re.compile(
     r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=[0-9])"
 )
+# What may sit between two words of one name: whitespace, underscores, and
+# punctuation that is not followed by whitespace (rule 2 and 3).
+_GAP = r"(?:[\s_]|[^\w\s](?!\s)){0,3}"
+_POSSESSIVE = r"(?:['’]s)?"
 
 
 def _term_re(term: str) -> re.Pattern:
-    # Words of a term may be joined or split by spaces, hyphens or underscores,
-    # never by sentence punctuation ("Amazon. Q4" and "Amazon, Q3" are not
-    # "Amazon Q"). A version digit may follow the term (GPT4), a letter may not
-    # (so "nda" never matches "ndash"). A term that ends in a one-letter word
-    # takes no digit either, so "Amazon Q4" stays a sales quarter.
     words = term.split()
-    body = r"[\s_-]*".join(re.escape(w) for w in words)
-    tail = r"(?![^\W_]|[\s_-]*\d)" if len(words[-1]) == 1 else r"(?![^\W\d_])"
+    body = (_POSSESSIVE + _GAP).join(re.escape(w) for w in words)
+    tail = r"(?![^\W_]|" + _GAP + r"\d)" if len(words[-1]) == 1 else r"(?![^\W\d_])"
     return re.compile(r"(?<![^\W_])" + body + tail)
 
 
@@ -340,12 +358,10 @@ def _compound_terms(word: str, vocabulary: list[str]) -> set[str]:
 def forbidden_terms_in(
     text: str, terms: tuple[str, ...] = FORBIDDEN_TERMS, split_joined: bool = True
 ) -> list[str]:
-    """Return the terms found in text.
+    """Return the terms found in text, by the rules above.
 
-    The text is folded with NFKC first, so full-width letters match. A term
-    still matches with a version number joined on (GPT4), inside a joined
-    word written in capitals (AzureFunctions, only when split_joined), and
-    inside a lower-case word built only from listed terms (azureopenai).
+    split_joined=False skips rule 5's capital splitting, for text that was
+    already split where it is safe to (see onepager_words).
     """
     plain = normalise(text)
     forms = (plain.casefold(),)
@@ -368,17 +384,36 @@ def other_ai_products_in(text: str, split_joined: bool = True) -> bool:
     return bool(forbidden_terms_in(text, OTHER_AI_PRODUCT_TERMS, split_joined))
 
 
-def onepager_words(url: str) -> str:
-    """The human-readable part of a one-pager link: its host and path.
+# A run of letters and digits in a link. One with a digit followed by a letter
+# ("AbNDA9xQ", "1aGPT3kz") is an opaque id, so it is never split at capitals.
+_LINK_TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
+_OPAQUE_RE = re.compile(r"[0-9][A-Za-z]")
 
-    The query and fragment are left out, because they hold opaque ids and
-    share tokens, not words a visitor reads.
+
+def _readable(token: re.Match) -> str:
+    word = token.group(0)
+    return word if _OPAQUE_RE.search(word) else _JOIN_RE.sub(" ", word)
+
+
+def onepager_words(url: str) -> str:
+    """The human-readable part of a one-pager link, ready for
+    forbidden_terms_in(..., split_joined=False).
+
+    The host is read as written and also label by label from the right, the
+    way a domain is owned ("bard.google.com" is Google's Bard). Path words
+    are split at capitals ("AzureFunctionsDemo.pdf"), except opaque ids. The
+    query and fragment are left out: they hold ids and share tokens, not words
+    a visitor reads. The three parts are joined with sentence breaks, so words
+    never join across them.
     """
     try:
         parts = urllib.parse.urlsplit(url)
+        host = (parts.hostname or "").rstrip(".")
     except ValueError:
         return ""
-    return " ".join([parts.hostname or "", urllib.parse.unquote(parts.path)])
+    path = _LINK_TOKEN_RE.sub(_readable, urllib.parse.unquote(parts.path))
+    reversed_host = ".".join(reversed(host.split(".")))
+    return ". ".join([host, path, reversed_host])
 
 
 def other_ai_products_problem(fields: list[str]) -> str:
