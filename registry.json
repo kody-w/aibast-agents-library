@@ -1,7 +1,7 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-30T00:51:35.623963+00:00",
+  "generated_at": "2026-10-30T00:55:10.018289+00:00",
   "stats": {
     "total_agents": 93,
     "publishers": 1,
@@ -5758,6 +5758,7 @@
       "_stack": "procurement_supplier_collaboration",
       "_stack_vertical": "energy",
       "_synthetic_data": true,
+      "_added_at": "2026-10-29T17:55:05-07:00",
       "_solution": {
         "advertised_name": "Procurement and Supplier Collaboration Agent",
         "sharepoint_list_name": "Procurement and Supplier Collaboration Agent",
