@@ -218,6 +218,7 @@ _SECRET_NAME = re.compile(
     re.IGNORECASE,
 )
 _PRIVATE_KEY_BLOCK = re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----")
+# Known value shapes. None of them ever reaches past the end of its line.
 _SECRET_VALUE_PATTERNS = [
     re.compile(r"sk-[A-Za-z0-9_\-]{16,}"),
     re.compile(r"gh[pousr]_[A-Za-z0-9]{20,}"),
@@ -226,47 +227,68 @@ _SECRET_VALUE_PATTERNS = [
     re.compile(r"xox[abprs]-[A-Za-z0-9\-]{10,}"),
     re.compile(r"AKIA[0-9A-Z]{16}"),
     re.compile(r"eyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}"),
-    re.compile(r"(?i)bearer\s+[A-Za-z0-9._\-~+/]{12,}=*"),
+    re.compile(r"(?i)bearer[ \t]+[A-Za-z0-9._\-~+/]{12,}=*"),
 ]
-# A "name: value" or "name = value" setting, with the name and value bare or
-# quoted, as in prose, .env, YAML, TOML and JSON ("clientSecret": "...").
-# Only names that contain a key word are looked at, so an ordinary setting never
-# swallows the next one; _is_secret_setting then decides by the name's words.
+# A setting name that contains a key word. Only these are looked at, so an
+# ordinary setting never swallows the next one; _is_secret_setting decides.
+_NAME = (r"[A-Z0-9_.\-]*(?:key|token|secret|password|passwd|pwd|passphrase|credential|auth"
+         r"|connection[_\-]?string|conn[_\-]?str)[A-Z0-9_.\-]*")
+# "name: value" or "name = value" on one line, bare or quoted, as in prose,
+# .env, YAML, TOML and JSON ("clientSecret": "..."). The separator never
+# crosses a line break, so an empty setting never takes the next line's name.
 _ASSIGNMENT = re.compile(
-    r"(?i)\b([A-Z0-9_.\-]*(?:key|token|secret|password|passwd|pwd|passphrase|credential|auth|connection[_\-]?string|conn[_\-]?str)"
-    r"[A-Z0-9_.\-]*)"
-    r"([\"']?\s*[:=]\s*)"
+    r"(?i)\b(" + _NAME + r")"
+    r"([\"']?[ \t]*[:=][ \t]*)"
     r"(\"[^\"\n]+\"|'[^'\n]+'|[^\s\"',}]{4,})"
 )
-# A name is split into words (DB_PASSWORD_PROD -> db, password, prod;
-# clientSecret -> client, secret; OAuth -> o, auth) and judged by every word,
-# not only the last one, so SECRET_KEY, JWT_SECRET_KEY, API_TOKEN_V2 and
-# DB_PASSWORD_PROD are secrets. A key word only inside a longer word (Tokenizer,
-# Secretary, author_id, Monkey, keyboard) is not a word of its own and never
-# counts. A secret when:
-#   - a word is a secret word (password, secret, token, ...), or a run-together
-#     word ends in one (DBPASSWORD, accesstoken, OPENAI_APIKEY);
-#   - two neighbouring words make one (api key, access key, connection string);
-#   - the last word is exactly "auth" (MYAPP_AUTH, auth:), but not in OAuth;
-#   - a word is exactly "key" (SEARCH_KEY, primaryKey) and the value looks generated.
-# Not a secret: "tokens" (a count), a token word next to a count word
-# (max_token, token_budget, thinking_token_budget), and a known count or limit
-# setting with a number for a value (PASSWORD_MIN_LENGTH: 12, TOKEN_EXPIRY_SECONDS=3600).
+# A YAML setting whose value sits on the next, more deeply indented lines
+# ("password:\n  value" or "password: |\n  value").
+_NEXT_LINE_VALUE = re.compile(
+    r"(?im)^([ \t]*)([\"']?)(" + _NAME + r")\2([ \t]*:[ \t]*)([|>][-+0-9]*)?([ \t]*\n)"
+    r"((?:\1[ \t]+\S[^\n]*(?:\n|\Z))+)"
+)
+_MAPPING_LINE = re.compile(r"^[ \t]*[\"']?[^\s:\"']+[\"']?[ \t]*:(?:[ \t]|$)")
+
+# How a setting name is judged. The name is split into words (DB_PASSWORD_PROD
+# -> db, password, prod; clientSecret -> client, secret; OAuth -> o, auth). A
+# key word only inside a longer word (Tokenizer, Secretary, author_id, Monkey,
+# keyboard) is not a word of its own and never counts. The rules, in order:
+#
+# 1. A count or limit setting keeps a number, judged by the WHOLE name: its
+#    last word is the count (PASSWORD_MIN_LENGTH: 12, TOKEN_EXPIRY_SECONDS=3600,
+#    ACCESS_TOKEN_TTL: 3600, token_limit=128000), or the name is a count of
+#    tokens (max_token: 4096). A count word elsewhere (INPUT_PASSWORD,
+#    CONTEXT_API_KEY, USAGE_API_TOKEN) excuses nothing. When the name holds a
+#    password or secret word, a bare limit word is not enough (PASSWORD_MAX,
+#    SECRET_LIMIT): the last word has to be a measure (length, days, seconds).
+# 2. A setting that describes a secret keeps its value: its last word says what
+#    the value is (token_type, token_endpoint, KEY_VAULT_URL, credentials_path,
+#    secret_name, api_key_env, primary_key_column). The value shapes above and
+#    long random strings are still hidden there.
+# 3. Otherwise it is a secret when a word is a secret word (password, secret,
+#    token, ...) or a run-together word ends in one (DBPASSWORD, accesstoken,
+#    OPENAI_APIKEY); when two neighbouring words make one (api key, access key,
+#    connection string); when the last word is exactly "auth" (MYAPP_AUTH) but
+#    not OAuth; or when a word is exactly "key" (SEARCH_KEY) and the value
+#    looks generated. "tokens" is a count, never a secret.
+# Redaction fails closed: when in doubt, the value is hidden.
 _SECRET_WORDS = ("token", "secret", "secrets", "password", "passwd", "pwd", "passphrase",
                  "credential", "credentials")
 _SECRET_ENDINGS = ("token", "secret", "password", "passwd", "pwd", "passphrase", "credential",
                    "apikey", "accesskey", "privatekey", "authkey", "signingkey", "encryptionkey",
                    "connectionstring", "connstr")
+_STRICT_ENDINGS = ("secret", "secrets", "password", "passwd", "pwd", "passphrase", "credential",
+                   "credentials")
 _SECRET_PAIRS = {("api", "key"), ("access", "key"), ("private", "key"), ("auth", "key"),
                  ("signing", "key"), ("encryption", "key"), ("connection", "string"), ("conn", "str")}
-_COUNT_WORDS = {"max", "min", "maximum", "minimum", "budget", "thinking", "limit", "limits", "count",
-                "num", "number", "total", "prompt", "completion", "output", "input", "context",
-                "reasoning", "per", "usage", "used", "remaining", "length", "len", "size", "ttl",
-                "expiry", "expires", "expiration", "timeout", "lifetime", "age", "days", "hours",
-                "minutes", "seconds", "secs", "ms", "retries", "attempts", "rotation", "interval"}
-# Words that make a neighbouring "token" a count (max_token, token_budget).
-_TOKEN_COUNT_NEIGHBOURS = {"max", "min", "maximum", "minimum", "budget", "thinking", "limit", "limits",
-                           "count", "num", "total", "per", "usage", "used", "remaining", "reasoning"}
+_MEASURE_WORDS = {"length", "len", "count", "size", "ttl", "expiry", "expires", "expiration", "timeout",
+                  "lifetime", "age", "days", "hours", "minutes", "mins", "seconds", "secs", "sec", "ms",
+                  "retries", "attempts", "interval"}
+_LIMIT_WORDS = {"max", "min", "maximum", "minimum", "limit", "limits", "budget"}
+_TOKEN_COUNT_PREFIX = {"max", "min", "maximum", "minimum", "num", "total", "thinking", "reasoning"}
+_DESCRIBING_WORDS = {"type", "kind", "method", "mode", "format", "scheme", "endpoint", "url", "uri",
+                     "host", "name", "path", "file", "dir", "env", "var", "policy", "store", "provider",
+                     "manager", "column", "field", "scope", "scopes"}
 _COUNT_VALUE = re.compile(r"^\d+(?:\.\d+)?\s*(?:ms|s|m|h|d|sec|secs|seconds|minutes|hours|days)?$", re.IGNORECASE)
 _NAME_PART = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+")
 _LONG_RANDOM = re.compile(r"\b(?=[A-Za-z0-9_\-+=]*\d)(?=[A-Za-z0-9_\-+=]*[A-Za-z])[A-Za-z0-9_\-+=]{32,}\b")
@@ -280,6 +302,7 @@ def redact_text(text):
         return text
     for pattern in _SECRET_VALUE_PATTERNS:
         text = pattern.sub(REDACTED, text)
+    text = _NEXT_LINE_VALUE.sub(_redact_next_line_value, text)
     text = _ASSIGNMENT.sub(_redact_assignment, text)
     text = _LONG_RANDOM.sub(REDACTED, text)
     return text
@@ -294,18 +317,28 @@ def _looks_generated(value):
                 or len(value) >= 24)
 
 
+def _is_count_setting(words, value):
+    if not _COUNT_VALUE.match(value):
+        return False
+    strict = any(word.endswith(_STRICT_ENDINGS) for word in words)
+    last = words[-1]
+    if last in _MEASURE_WORDS:
+        return True
+    if last in _LIMIT_WORDS:
+        return not strict
+    return (last == "token" and len(words) >= 2 and words[-2] in _TOKEN_COUNT_PREFIX and not strict)
+
+
 def _is_secret_setting(name, value):
     words = _name_words(name)
     if not words:
         return False
     bare = value.strip("\"'").strip()
-    counted = any(word in _COUNT_WORDS for word in words)
-    if counted and _COUNT_VALUE.match(bare):
+    if _is_count_setting(words, bare):
+        return False
+    if words[-1] in _DESCRIBING_WORDS:
         return False
     for index, word in enumerate(words):
-        if word == "token" and {words[index - 1] if index else "",
-                                words[index + 1] if index + 1 < len(words) else ""} & _TOKEN_COUNT_NEIGHBOURS:
-            continue
         if word in _SECRET_WORDS or (word != "tokens" and word.endswith(_SECRET_ENDINGS)):
             return True
         if index + 1 < len(words) and (word, words[index + 1]) in _SECRET_PAIRS:
@@ -323,6 +356,22 @@ def _redact_assignment(match):
         return match.group(0)
     quote = value[0] if value[0] in "\"'" and len(value) > 1 and value[-1] == value[0] else ""
     return name + sep + quote + REDACTED + quote
+
+
+def _redact_next_line_value(match):
+    head = match.group(0)[:match.start(7) - match.start(0)]
+    lines = match.group(7).splitlines(keepends=True)
+    taken = []
+    for line in lines:
+        # A plain value stops at a nested setting; a block (| or >) takes every line.
+        if not match.group(5) and _MAPPING_LINE.match(line):
+            break
+        taken.append(line)
+    if not taken or not _is_secret_setting(match.group(3), " ".join(line.strip() for line in taken)):
+        return match.group(0)
+    hidden = "".join(line[:len(line) - len(line.lstrip(" \t"))] + REDACTED + ("\n" if line.endswith("\n") else "")
+                     for line in taken)
+    return head + hidden + "".join(lines[len(taken):])
 
 
 def _is_secret_name(name):
