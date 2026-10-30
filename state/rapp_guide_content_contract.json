@@ -2,8 +2,8 @@
   "schema": "aibast-rapp-guide-content-contract/1.0",
   "version": 1,
   "source": "docs/rapp-guide.html",
-  "trusted_source_commit": "dc7cab364c2f8889254c62d10dda45d2bd4f1f1f",
-  "trusted_source_blob_oid": "ff3eef246ef1f597a216971f269df471bb60a5a4",
+  "trusted_source_commit": "cac06c6a1028a1742f0800afbedc85f272716a41",
+  "trusted_source_blob_oid": "722afab6b04b5924108c1e4511af55e17ed49bea",
   "normalization": "Remove script, style, template, and comments; join rendered text with spaces; collapse Unicode whitespace.",
   "content_section_ids": [
     "overview",
@@ -59,7 +59,7 @@
     },
     {
       "id": "step5",
-      "normalized_visible_text_sha256": "f1baaddd55fcf8d736e2f12c5e0388bbc1c81c127e2bd276eb8891d52a2d45d0"
+      "normalized_visible_text_sha256": "7c8dd47040c004be1a4efc0c986863985d500bb5bb728bce867ea4a34c33774b"
     },
     {
       "id": "step6",
@@ -107,11 +107,11 @@
     },
     {
       "id": "roadmap",
-      "normalized_visible_text_sha256": "e68f0c89703219c08189249a9bac4445e67a820131a2e4721604cdf3c5ff6c67"
+      "normalized_visible_text_sha256": "b7acb84b5b077523a9ab12d4eb435db073ed16b97996ec175073e2441cb9c835"
     },
     {
       "id": "tools",
-      "normalized_visible_text_sha256": "014aff60734b383fd2e858ec3d5923f338bf44ee50688a8bdd243cacc251bc28"
+      "normalized_visible_text_sha256": "7c2006c349c8696082a598a28b5b709917efeca3785861e4baf3db964f5f41d5"
     }
   ],
   "sidebar_links": [
@@ -258,7 +258,7 @@
       "persistent_completion_key": "quiz-completed"
     }
   ],
-  "copy_button_count": 8,
+  "copy_button_count": 9,
   "copy_button_mappings": [
     {
       "button_label": "Copy",
@@ -315,6 +315,13 @@
       "target_tag": "pre",
       "target_tag_ordinal": 50,
       "target_normalized_text_sha256": "ccfea2144ad1997981ae67fa98a6e722b0225899b145bbb57c979e4c4af8e55c"
+    },
+    {
+      "button_label": "Copy",
+      "target_id": null,
+      "target_tag": "pre",
+      "target_tag_ordinal": 51,
+      "target_normalized_text_sha256": "ce81a06dcad15515caa16f034aada64172a54166b3e2966c80084d39bb6e78a8"
     }
   ],
   "fallback_toggle_mappings": [

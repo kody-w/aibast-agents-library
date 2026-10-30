@@ -9,6 +9,11 @@
 #          does not allow GitHub Actions to create pull requests, it comments
 #          the branch name so a maintainer can open it.
 #
+# Both jobs first create the four "demo: ..." labels if they are missing, so
+# the workflow works on any copy of the repository. GitHub drops form labels
+# that do not exist yet, so a new repository also needs the labels created
+# once before the first submission (see docs/RELEASE-PROCESS.md).
+#
 # Issue text never reaches a shell command line: it is written to a file from
 # an environment variable and read by tools/demo_submission.py.
 
@@ -35,6 +40,16 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Make sure the demo labels exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh label create "demo: submitted" --color 0E8A16 --description "Demo submission waiting for its automatic checks" --force >/dev/null
+          gh label create "demo: ready for review" --color 1D76DB --description "Demo passed the automatic checks; a maintainer reviews it next" --force >/dev/null
+          gh label create "demo: needs changes" --color D93F0B --description "Demo needs changes before review" --force >/dev/null
+          gh label create "demo: approved" --color 5319E7 --description "A maintainer approved the demo; adds it to the Community agents page" --force >/dev/null
+
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
@@ -46,10 +61,12 @@ jobs:
       - name: Check the submission
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
+          NUMBER: ${{ github.event.issue.number }}
         run: |
           printf '%s' "$ISSUE_BODY" > "$RUNNER_TEMP/body.md"
           python tools/demo_submission.py check \
             --body-file "$RUNNER_TEMP/body.md" \
+            --issue "$NUMBER" \
             --result "$RUNNER_TEMP/result.json" \
             --comment "$RUNNER_TEMP/comment.md"
 
@@ -76,6 +93,16 @@ jobs:
       issues: write
       pull-requests: write
     steps:
+      - name: Make sure the demo labels exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh label create "demo: submitted" --color 0E8A16 --description "Demo submission waiting for its automatic checks" --force >/dev/null
+          gh label create "demo: ready for review" --color 1D76DB --description "Demo passed the automatic checks; a maintainer reviews it next" --force >/dev/null
+          gh label create "demo: needs changes" --color D93F0B --description "Demo needs changes before review" --force >/dev/null
+          gh label create "demo: approved" --color 5319E7 --description "A maintainer approved the demo; adds it to the Community agents page" --force >/dev/null
+
       - name: Confirm the approver can write to this repository
         id: approver
         env:

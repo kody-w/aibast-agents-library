@@ -6,7 +6,7 @@ Colleagues submit a finished demo through the GitHub issue form
 `.github/workflows/demo-submission.yml` passes the issue body to this script
 as a file (never through the shell) and acts on the JSON result.
 
-    check  --body-file F --result R --comment C [--offline]
+    check  --body-file F --result R --comment C [--issue N] [--manifest M] [--offline]
     apply  --body-file F --issue N --manifest community_tools.json --result R [--offline]
 
 Approved demos become `kind: "demo"` entries in community_tools.json, the
@@ -74,7 +74,8 @@ REQUIRED_CONFIRMATIONS = (
 )
 
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}
-STREAM_HOST_SUFFIXES = ("microsoftstream.com",)
+# Microsoft Stream videos live on SharePoint and need a sign-in, so they cannot
+# play on a public page. Only public YouTube links are accepted.
 
 # Words that must never reach the public page. Matched case-insensitively on
 # word boundaries across every free-text field.
@@ -94,6 +95,7 @@ HANDLE_RE = re.compile(r"(?<![\w.])@[A-Za-z0-9][\w-]*")
 NO_RESPONSE = {"", "_no response_", "none"}
 
 MANIFEST_SCHEMA = "aibast-community-tools/1.0"
+DEFAULT_MANIFEST = Path(__file__).resolve().parents[1] / "community_tools.json"
 
 
 class SubmissionError(Exception):
@@ -139,7 +141,7 @@ def slugify(text: str) -> str:
 
 # ------------------------------------------------------------------ validate
 def classify_video_url(url: str) -> str:
-    """Return 'youtube' or 'stream', or raise SubmissionError."""
+    """Return 'youtube', or raise SubmissionError."""
     try:
         parts = urllib.parse.urlsplit(url)
     except ValueError as exc:
@@ -151,11 +153,9 @@ def classify_video_url(url: str) -> str:
     host = (parts.hostname or "").lower()
     if host in YOUTUBE_HOSTS:
         return "youtube"
-    if any(host == s or host.endswith("." + s) for s in STREAM_HOST_SUFFIXES):
-        return "stream"
     raise SubmissionError(
-        "The video must be hosted on YouTube or Microsoft Stream "
-        f"(got {host or 'no host'})."
+        f"The video must be a public YouTube link (got {host or 'no host'}). "
+        "Microsoft Stream videos need a sign-in, so they cannot play on the public page."
     )
 
 
@@ -188,6 +188,11 @@ def validate(sections: dict[str, str]) -> tuple[dict, list[str]]:
         problems.append("Add a demo title.")
     elif len(title) > 80:
         problems.append("Keep the demo title to 80 characters or fewer.")
+    elif not slugify(title):
+        problems.append(
+            "Use at least one English letter or number in the demo title, "
+            "so the demo can have its own web address."
+        )
 
     video_kind = None
     if not video:
@@ -261,38 +266,52 @@ def _fetch_json(url: str, timeout: float = 15):
         return json.loads(response.read().decode("utf-8"))
 
 
-def resolve_video(url: str, kind: str, fetch=_fetch_json, opener=None) -> dict:
+def widescreen_thumbnail(thumb: str) -> str:
+    """Prefer YouTube's 16:9 thumbnail over the 4:3 one with black bars."""
+    parts = urllib.parse.urlsplit(thumb)
+    if (parts.hostname or "").lower() == "i.ytimg.com" and parts.path.endswith("/hqdefault.jpg"):
+        path = parts.path[: -len("hqdefault.jpg")] + "mqdefault.jpg"
+        return urllib.parse.urlunsplit((parts.scheme, parts.netloc, path, "", ""))
+    return thumb
+
+
+def resolve_video(url: str, kind: str, fetch=_fetch_json) -> dict:
     """Confirm the video is publicly reachable. Returns oEmbed facts."""
-    if kind == "youtube":
-        oembed = "https://www.youtube.com/oembed?format=json&url=" + urllib.parse.quote(url, safe="")
-        try:
-            data = fetch(oembed)
-        except (urllib.error.URLError, ValueError, TimeoutError) as exc:
-            raise SubmissionError(
-                "The YouTube video could not be found or is not public."
-            ) from exc
-        thumb = data.get("thumbnail_url", "")
-        result = {"title": data.get("title", "")}
-        if isinstance(thumb, str) and thumb.startswith("https://"):
-            result["thumbnail"] = thumb
-        return result
-    open_url = opener or (lambda u: urllib.request.urlopen(  # noqa: S310
-        urllib.request.Request(u, headers={"User-Agent": "aibast-demo-check"}), timeout=15
-    ))
+    if kind != "youtube":
+        raise SubmissionError("The video must be a public YouTube link.")
+    oembed = "https://www.youtube.com/oembed?format=json&url=" + urllib.parse.quote(url, safe="")
     try:
-        with open_url(url) as response:
-            final = response.geturl()
+        data = fetch(oembed)
     except (urllib.error.URLError, ValueError, TimeoutError) as exc:
-        raise SubmissionError("The Stream video could not be opened.") from exc
-    host = (urllib.parse.urlsplit(final).hostname or "").lower()
-    if "login" in host:
         raise SubmissionError(
-            "The Stream video asks viewers to sign in. Share a public link."
-        )
-    return {}
+            "The YouTube video could not be found or is not public."
+        ) from exc
+    thumb = data.get("thumbnail_url", "")
+    result = {"title": data.get("title", "")}
+    if isinstance(thumb, str) and thumb.startswith("https://"):
+        result["thumbnail"] = widescreen_thumbnail(thumb)
+    return result
 
 
 # ------------------------------------------------------------------- manifest
+def id_problems(manifest: dict, entry_id: str, issue: int | None) -> list[str]:
+    """Problems with using entry_id for the demo from this issue.
+
+    An id may be reused only by the issue that first claimed it, so a new
+    submission can never replace another team's demo or take its credit.
+    """
+    if not entry_id:
+        return []
+    for existing in manifest.get("tools") or []:
+        if not isinstance(existing, dict) or existing.get("id") != entry_id:
+            continue
+        if existing.get("kind") != "demo":
+            return ["This title is already used by a related resource. Choose a different title."]
+        if issue is None or existing.get("submission_issue") != int(issue):
+            return ["This title is already used by another demo. Choose a different title."]
+    return []
+
+
 def apply_entry(manifest: dict, entry: dict, issue: int, today: str) -> dict:
     """Add or replace a demo entry in the community manifest."""
     if manifest.get("schema") != MANIFEST_SCHEMA:
@@ -304,14 +323,10 @@ def apply_entry(manifest: dict, entry: dict, issue: int, today: str) -> dict:
     clean["submission_issue"] = int(issue)
     if not clean.get("id"):
         raise SubmissionError("The demo needs a title to build its id.")
+    clash = id_problems(manifest, clean["id"], clean["submission_issue"])
+    if clash:
+        raise SubmissionError(clash[0])
     for existing in tools:
-        if (
-            existing.get("id") == clean["id"]
-            and existing.get("kind") != "demo"
-        ):
-            raise SubmissionError(
-                f"The id {clean['id']} is already used by a related resource."
-            )
         if (
             existing.get("kind") == "demo"
             and existing.get("submission_issue") == clean["submission_issue"]
@@ -326,7 +341,13 @@ def apply_entry(manifest: dict, entry: dict, issue: int, today: str) -> dict:
     for t in kept:
         t.pop("_drop", None)
     previous = next(
-        (t for t in tools if t.get("kind") == "demo" and t.get("id") == clean["id"]), None
+        (
+            t for t in tools
+            if t.get("kind") == "demo"
+            and t.get("id") == clean["id"]
+            and t.get("submission_issue") == clean["submission_issue"]
+        ),
+        None,
     )
     if previous and previous.get("graduated_to"):
         clean["graduated_to"] = previous["graduated_to"]
@@ -342,8 +363,8 @@ def comment_for(problems: list[str]) -> str:
         return (
             "Thank you. This demo passed the automatic checks and is ready for "
             "review by a library maintainer.\n\n"
-            "Checked: required confirmations, a public video link on an allowed "
-            "host, and wording that is safe for the public page."
+            "Checked: required confirmations, a public YouTube video link, a "
+            "title no other demo uses, and wording that is safe for the public page."
         )
     lines = [
         "Thank you. This demo needs a few changes before review. Edit the "
@@ -354,8 +375,11 @@ def comment_for(problems: list[str]) -> str:
     return "\n".join(lines)
 
 
-def run_check(body: str, offline: bool, fetch=_fetch_json) -> tuple[dict, list[str]]:
+def run_check(body: str, offline: bool, fetch=_fetch_json,
+              manifest: dict | None = None, issue: int | None = None) -> tuple[dict, list[str]]:
     entry, problems = validate(parse_issue_form(body))
+    if manifest is not None:
+        problems += id_problems(manifest, entry.get("id", ""), issue)
     if not problems and not offline:
         try:
             facts = resolve_video(entry["url"], entry["_video_kind"], fetch=fetch)
@@ -373,6 +397,8 @@ def main(argv: list[str] | None = None) -> int:
     check.add_argument("--body-file", required=True, type=Path)
     check.add_argument("--result", required=True, type=Path)
     check.add_argument("--comment", required=True, type=Path)
+    check.add_argument("--issue", type=int)
+    check.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     check.add_argument("--offline", action="store_true")
     apply_cmd = sub.add_parser("apply")
     apply_cmd.add_argument("--body-file", required=True, type=Path)
@@ -383,14 +409,14 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     body = args.body_file.read_text(encoding="utf-8")
-    entry, problems = run_check(body, args.offline)
+    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    entry, problems = run_check(body, args.offline, manifest=manifest, issue=args.issue)
     result = {"ok": not problems, "problems": problems, "id": entry.get("id", ""),
               "name": entry.get("name", "")}
 
     if args.command == "check":
         args.comment.write_text(comment_for(problems) + "\n", encoding="utf-8")
     elif not problems:
-        manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
         try:
             apply_entry(manifest, entry, args.issue, date.today().isoformat())
         except SubmissionError as exc:

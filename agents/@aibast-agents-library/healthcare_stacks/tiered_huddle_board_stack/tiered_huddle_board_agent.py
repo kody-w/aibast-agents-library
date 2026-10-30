@@ -12,6 +12,7 @@ a draft for an authorized person to confirm.
 
 import sys
 import os
+import re
 from datetime import datetime, timedelta
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates"))
 from basic_agent import BasicAgent
@@ -59,7 +60,7 @@ ISSUES = [
      "title": "Night shift short one registered nurse tonight",
      "status": "In progress", "owner": "Elena Brooks", "originator": "Elena Brooks",
      "waiting_on": "Lena Ford", "hours_in_tier": 3, "hours_open": 3,
-     "keywords": ["night shift", "short", "staffing", "rn"],
+     "keywords": ["night shift", "short", "staffing", "rn", "registered nurse"],
      "unit_tried": "Offered the open shift to the unit float list.",
      "impact": "Ratio rises to 1:6 on nights if the shift stays open."},
     {"id": "HB-2038", "tier": "unit", "unit": "4 West Med-Surg", "category": "Safety",
@@ -68,7 +69,7 @@ ISSUES = [
      "waiting_on": "Jordan Pike", "hours_in_tier": 18, "hours_open": 18,
      "keywords": ["bed alarm", "bed exit", "412", "alarm"],
      "mitigation": "Biomedical engineering replaced the sensor pad; the fall-risk patient stays in room 409 "
-                   "until the alarm holds for a full shift.",
+                   "until the alarm holds for 24 hours (two full shifts).",
      "hold_hours_required": 24, "hold_hours_done": 16,
      "unit_tried": "Moved the fall-risk patient to room 409.",
      "impact": "A fall-risk patient cannot use room 412 until the alarm is proven."},
@@ -78,7 +79,7 @@ ISSUES = [
      "waiting_on": "Amir Sadeghi", "hours_in_tier": 14, "hours_open": 21,
      "keywords": ["call light", "nurse call", "2 north"],
      "mitigation": "The vendor reset the room controllers; hourly rounding stays in place until the system holds "
-                   "for a full shift.",
+                   "for a full 12-hour shift.",
      "hold_hours_required": 12, "hold_hours_done": 12,
      "unit_tried": "Started hourly rounding on the four rooms.",
      "impact": "Four rooms depend on hourly rounding instead of call lights."},
@@ -100,7 +101,7 @@ ISSUES = [
      "title": "Five admitted patients boarding in the emergency department for more than 6 hours",
      "status": "Decision needed", "owner": "Victor Hale", "originator": "Sofia Grant",
      "waiting_on": "Leadership huddle", "hours_in_tier": 52, "hours_open": 70,
-     "keywords": ["boarding", "emergency", "ed", "surge"],
+     "keywords": ["boarding", "boarder", "emergency", "emergency department", "ed", "surge"],
      "escalation_reason": "Opening the six-bed surge unit on 5 South needs house-wide staffing and overtime that "
                           "exceed hospital operations authority.",
      "decision": "Approve opening the six-bed surge unit on 5 South for 72 hours with agency staffing.",
@@ -211,18 +212,36 @@ def _clock(issue):
     return f"{left} h left"
 
 
+def _keyword_hit(keyword, text):
+    """Whole-word match, with an optional plural: 'ed' must not hit 'fixed', 'iv' must not hit 'five'."""
+    return re.search(r"\b" + re.escape(keyword) + r"(?:s|es)?\b", text) is not None
+
+
 def _resolve_issue(value, default):
-    """Issue id or words from its title; empty -> the default issue; no match -> None."""
+    """Issue id or words from its title; empty -> the default issue; no match -> None; a tie -> the tied issues.
+
+    Keywords match whole words only. Each issue scores the words in the keywords it matches, so a specific phrase
+    such as 'emergency department' outweighs a single shared word; when two issues score the same, the caller asks
+    which one was meant instead of guessing.
+    """
     if not value:
         return next(i for i in _issues() if i["id"] == default)
     q = str(value).lower().strip()
     for issue in _issues():
         if q == issue["id"].lower():
             return issue
+    scores = []
     for issue in _issues():
-        if any(k in q for k in issue["keywords"]) or q in issue["title"].lower():
-            return issue
-    return None
+        score = sum(len(k.split()) for k in issue["keywords"] if _keyword_hit(k, q))
+        if q in issue["title"].lower():
+            score += 100
+        if score:
+            scores.append((score, issue))
+    if not scores:
+        return None
+    best = max(score for score, _ in scores)
+    tied = [issue for score, issue in scores if score == best]
+    return tied[0] if len(tied) == 1 else tied
 
 
 def _open(issues):
@@ -338,6 +357,8 @@ class TieredHuddleBoardAgent(BasicAgent):
         issue = _resolve_issue(kwargs.get("issue"), "HB-2041")
         if issue is None:
             return self._unknown(kwargs.get("issue"))
+        if isinstance(issue, list):
+            return self._ambiguous(kwargs.get("issue"), issue)
         current = _tier(issue["tier"])
         target = _next_tier(issue["tier"])
         if _is_closed(issue):
@@ -378,6 +399,8 @@ class TieredHuddleBoardAgent(BasicAgent):
         issue = _resolve_issue(kwargs.get("issue"), "HB-2038")
         if issue is None:
             return self._unknown(kwargs.get("issue"))
+        if isinstance(issue, list):
+            return self._ambiguous(kwargs.get("issue"), issue)
         lines = [f"# Closure Check - {issue['id']}", "", f"**Issue:** {issue['title']} ({issue['unit']})",
                  f"**Raised by:** {issue['originator']} | **Owner:** {issue['owner']} | **Status:** {issue['status']}",
                  ""]
@@ -430,6 +453,11 @@ class TieredHuddleBoardAgent(BasicAgent):
                                   for i in watch)]
         lines += ["", "> Recommendation only: leadership records each decision on the board. " + BOUNDARY[2:]]
         return "\n".join(lines)
+
+    def _ambiguous(self, value, issues) -> str:
+        return (f"# Which issue did you mean?\n\n`{value}` matches more than one item on the board equally well, so "
+                "none was picked. Name one of these by its id:\n\n"
+                + "\n".join(f"- {i['id']}: {i['title']} ({i['unit']})" for i in issues) + f"\n\n{BOUNDARY}")
 
     def _unknown(self, value) -> str:
         return (f"# Unknown Issue\n\nNo item on the synthetic board matches `{value}`; no substitute issue was used. "
