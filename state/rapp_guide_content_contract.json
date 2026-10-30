@@ -2,8 +2,8 @@
   "schema": "aibast-rapp-guide-content-contract/1.0",
   "version": 1,
   "source": "docs/rapp-guide.html",
-  "trusted_source_commit": "ea739d7a3a82f23b84de79cbd20c76c60a7e2a75",
-  "trusted_source_blob_oid": "a7750e5f2b9f0fa615561fdb445a1a6bffd4e4d1",
+  "trusted_source_commit": "5852836c10d9a43eef6b8f1c807010ad509b665a",
+  "trusted_source_blob_oid": "361b82f5b5ef9fffed3eb87ec19cbe5a33586542",
   "normalization": "Remove script, style, template, and comments; join rendered text with spaces; collapse Unicode whitespace.",
   "content_section_ids": [
     "overview",
@@ -107,7 +107,7 @@
     },
     {
       "id": "roadmap",
-      "normalized_visible_text_sha256": "29286169f031ea32a462646350d750b866f3193a909c5f3e00221663bfb42c16"
+      "normalized_visible_text_sha256": "ea6abd68d38d25b3426f8d31da867a8ca1ff2cdffb4d28a83e77bb94db9a6139"
     },
     {
       "id": "tools",
