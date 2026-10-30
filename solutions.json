@@ -1,6 +1,6 @@
 {
  "schema": "aibast-solutions/1.0",
- "count": 74,
+ "count": 75,
  "note": "Approved industry-solution catalog as advertised on the AIBAST SharePoint Agents Library. The repo aligns to this; it is not derived from the repo.",
  "solutions": [
   {
@@ -3268,6 +3268,52 @@
    "source": "AIBAST Agents Library \u2014 catalog template",
    "advertised_display": "Predictive Asset Maintenance Intelligence Agent",
    "sharepoint_list_name": "Predictive Asset Maintenance Intelligence Agent",
+   "is_primary": true
+  },
+  {
+   "slot": 73,
+   "advertised_name": "Procurement and Supplier Collaboration Agent",
+   "canonical_name": "Procurement and Supplier Collaboration Agent",
+   "repo_agent": "@aibast-agents-library/procurement-supplier-collaboration",
+   "executive_summary": "Help a utility buy critical network materials faster: recommend the procurement route and supplier shortlist for every requisition, answer supplier questions from the RFQ pack, score bids on price, lead time, quality and sustainability, flag late deliveries, and hold invoices that fail the three-way match, while every award and payment stays with an authorized person.",
+   "industries": [
+    "Energy and Utilities"
+   ],
+   "personas": [
+    "Category Manager",
+    "Buyer",
+    "Accounts Payable Lead"
+   ],
+   "featured_tools": [
+    "Microsoft Copilot Studio",
+    "Microsoft Dataverse",
+    "Power Apps",
+    "Power Automate"
+   ],
+   "customer_scenario": [
+    "Procurement routes were chosen differently by every buyer.",
+    "Supplier questions during tenders sat unanswered in email.",
+    "Bid evaluations were hard to explain to the award panel.",
+    "Late shipments and invoice mismatches surfaced too late."
+   ],
+   "outcomes": [
+    "Every requisition gets a consistent route and an eligible supplier shortlist.",
+    "Suppliers get fair, consistent answers, and bids are scored and explained the same way every time.",
+    "Late deliveries are chased before crews wait, and only matched invoices go for payment approval."
+   ],
+   "capabilities": [
+    "Sourcing plan",
+    "Supplier question",
+    "Bid evaluation",
+    "Delivery tracking",
+    "Three-way match"
+   ],
+   "onepager": "73. Procurement and Supplier Collaboration Agent one-pager.pptx",
+   "demo_video": null,
+   "promise_coverage": 100,
+   "source": "AIBAST Agents Library \u2014 catalog template",
+   "advertised_display": "Procurement and Supplier Collaboration Agent",
+   "sharepoint_list_name": "Procurement and Supplier Collaboration Agent",
    "is_primary": true
   }
  ]

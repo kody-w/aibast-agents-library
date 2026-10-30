@@ -1,6 +1,6 @@
 {
   "schema": "aibast-copilot-studio-solution-exports/1.0",
-  "generated_at": "2026-10-29T22:41:49.072274+00:00",
+  "generated_at": "2026-10-30T00:51:14.956805+00:00",
   "environment": {
     "name": "kodyv8",
     "url": "https://org7dfbd855.crm.dynamics.com/"
@@ -8,11 +8,11 @@
   "managed": false,
   "published": false,
   "summary": {
-    "total": 71,
-    "exported": 71,
+    "total": 72,
+    "exported": 72,
     "missing": 0,
-    "with_deployment_settings": 71,
-    "unpublished": 71
+    "with_deployment_settings": 72,
+    "unpublished": 72
   },
   "solutions": [
     {
@@ -1184,6 +1184,30 @@
       "bot_schema_name": "aibast_ProcurementPilot",
       "source_environment": "kodyv8",
       "exported_at": "2026-10-08T08:05:57.240865+00:00",
+      "import_caveats": [
+        "Import as an unmanaged solution for manual review.",
+        "Map connection references and environment variables before enabling integrations.",
+        "The exported agent remains unpublished unless the target administrator explicitly publishes it."
+      ],
+      "settings_error": null
+    },
+    {
+      "slug": "procurement-supplier-collaboration",
+      "solution_unique_name": "aibast_ProcurementAndManualBuild",
+      "status": "exported",
+      "zip": "solutions/procurement-supplier-collaboration/exports/procurement-supplier-collaboration-copilot-studio-solution.zip",
+      "deployment_settings": "solutions/procurement-supplier-collaboration/exports/procurement-supplier-collaboration-deployment-settings.json",
+      "metadata": "solutions/procurement-supplier-collaboration/exports/procurement-supplier-collaboration-solution-export.json",
+      "published": false,
+      "managed": false,
+      "error": null,
+      "sha256": "b73fec84c31734c4315713b8d6d5dd1062cbb7fb280e12da7052e7d618624779",
+      "bytes": 51498,
+      "agent_display_name": "Procurement and Manual",
+      "agent_id": null,
+      "bot_schema_name": "cr2bf_procurementandmanual_o9rQuM",
+      "source_environment": "kodyv8",
+      "exported_at": "2026-10-30T00:51:14.956805+00:00",
       "import_caveats": [
         "Import as an unmanaged solution for manual review.",
         "Map connection references and environment variables before enabling integrations.",

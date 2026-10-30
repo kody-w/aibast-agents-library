@@ -1,13 +1,13 @@
 {
   "schema": "aibast-academy/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-10-29T22:46:16.392349+00:00",
+  "generated_at": "2026-10-30T00:55:10.018289+00:00",
   "title": "Microsoft AI Academy",
   "description": "A hands-on catalog for exploring experimental AIBAST agents through scenario quests, guided builds, evidence reviews, and portable Microsoft implementation patterns.",
   "disclaimer": "Microsoft AI Academy is an experimental AIBAST learning experience. It is not an official Microsoft credential, certification, training program, or replacement for Microsoft Learn. Activities use synthetic data and self-reported milestones unless a course states otherwise.",
   "summary": {
-    "courses": 71,
-    "skills": 507,
+    "courses": 72,
+    "skills": 512,
     "paths": 6,
     "industries": 13,
     "points_per_course": 150
@@ -158,11 +158,12 @@
         "order-entry-validation",
         "order-status-communication",
         "permit-license-management",
+        "procurement-supplier-collaboration",
         "product-line-optimization",
         "supplier-risk-monitoring",
         "warranty-registration"
       ],
-      "course_count": 16
+      "course_count": 17
     },
     {
       "id": "regulated-public-services",
@@ -4764,6 +4765,87 @@
       "primary_path": "cross-industry-ai",
       "path_ids": [
         "cross-industry-ai"
+      ]
+    },
+    {
+      "slug": "procurement-supplier-collaboration",
+      "agent": "@aibast-agents-library/procurement-supplier-collaboration",
+      "title": "Procurement and Supplier Collaboration Agent",
+      "description": "Give category managers, buyers, expediters and accounts payable one conversational view of source-to-pay for network materials: the right procurement route and supplier shortlist, supplier questions answered from the RFQ pack, bids scored and explained, late deliveries flagged, and invoices matched before payment.",
+      "category": "energy",
+      "industry": "Energy",
+      "journey_stage": "Optimize",
+      "personas": [
+        "Accounts Payable Lead",
+        "Buyer",
+        "Category Manager"
+      ],
+      "platforms": [
+        "Microsoft Copilot Studio",
+        "Microsoft Dataverse",
+        "Power Apps",
+        "Power Automate"
+      ],
+      "tags": [
+        "bid-evaluation",
+        "energy",
+        "procurement",
+        "sourcing",
+        "supplier-collaboration",
+        "three-way-match",
+        "utilities"
+      ],
+      "outcomes": [
+        "Gave the award panel a clear recommendation",
+        "Paid only invoices that matched the order",
+        "Shortened the cycle for routine orders",
+        "Treated every bidder the same way"
+      ],
+      "quest_url": "solutions/procurement-supplier-collaboration/quest.html",
+      "field_guide_url": "solutions/procurement-supplier-collaboration/field-guide.html",
+      "manual_url": "solutions/procurement-supplier-collaboration/manual-tutorial.html",
+      "evidence_url": "solutions/procurement-supplier-collaboration/evidence-report.html",
+      "added_at": "2026-10-29T17:55:05-07:00",
+      "has_demo_video": false,
+      "has_onepager": true,
+      "demo_cases": 5,
+      "manual_steps": 20,
+      "skills": [
+        {
+          "name": "bid-evaluation",
+          "title": "Bid evaluation",
+          "description": "Use when someone asks how the bids score on price, lead time, quality and sustainability, or which supplier the award panel should pick.",
+          "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_bid-evaluation_03/SKILL.md"
+        },
+        {
+          "name": "delivery-tracking",
+          "title": "Delivery tracking",
+          "description": "Use when an expediter or buyer asks which purchase orders are unacknowledged or have delivery problems against the committed date.",
+          "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_delivery-tracking_04/SKILL.md"
+        },
+        {
+          "name": "invoice-match",
+          "title": "Three-way match",
+          "description": "Use when accounts payable asks which invoices pass the three-way match for payment approval and which must be held.",
+          "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_invoice-match_05/SKILL.md"
+        },
+        {
+          "name": "sourcing-plan",
+          "title": "Sourcing plan",
+          "description": "Use when a category manager or buyer asks which requisitions are open, how each should be bought (framework direct award, mini-competition or open tender), or which suppliers to invite.",
+          "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_sourcing-plan_01/SKILL.md"
+        },
+        {
+          "name": "supplier-query",
+          "title": "Supplier question",
+          "description": "Use when a buyer asks what to tell a supplier who has a question about an open RFQ; returns a draft reply from the published pack that is never sent.",
+          "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_supplier-query_02/SKILL.md"
+        }
+      ],
+      "skill_count": 5,
+      "primary_path": "operations-supply-chain",
+      "path_ids": [
+        "operations-supply-chain"
       ]
     },
     {

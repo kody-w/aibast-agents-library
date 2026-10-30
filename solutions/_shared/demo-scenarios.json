@@ -6,8 +6,8 @@
     "solutions/*/evals/transcripts.json"
   ],
   "summary": {
-    "scenarios": 382,
-    "recorded": 372,
+    "scenarios": 387,
+    "recorded": 377,
     "not_recorded": 10
   },
   "agents": {
@@ -513,6 +513,16 @@
         "procurement-agent-vendor-comparison",
         "procurement-agent-approval-routing",
         "procurement-agent-spend-analysis"
+      ]
+    },
+    "@aibast-agents-library/procurement-supplier-collaboration": {
+      "name": "Procurement and Supplier Collaboration Agent",
+      "scenarios": [
+        "procurement-supplier-collaboration-sourcing-plan",
+        "procurement-supplier-collaboration-supplier-query",
+        "procurement-supplier-collaboration-bid-evaluation",
+        "procurement-supplier-collaboration-delivery-tracking",
+        "procurement-supplier-collaboration-invoice-match"
       ]
     },
     "@aibast-agents-library/procurement-support": {
@@ -2827,6 +2837,46 @@
       "prompt": "Give me a neutral comparison of the approved cloud vendors; do not pick a winner.",
       "folder": "procurement-agent",
       "case_id": "PROC-02",
+      "recorded": true
+    },
+    "procurement-supplier-collaboration-bid-evaluation": {
+      "agent_id": "@aibast-agents-library/procurement-supplier-collaboration",
+      "title": "Category Manager: Bid evaluation",
+      "prompt": "The transformer bids are in. How do they score, and who should the award panel pick?",
+      "folder": "procurement-supplier-collaboration",
+      "case_id": "PSC-03",
+      "recorded": true
+    },
+    "procurement-supplier-collaboration-delivery-tracking": {
+      "agent_id": "@aibast-agents-library/procurement-supplier-collaboration",
+      "title": "Expediter: Delivery tracking",
+      "prompt": "Which of our open orders have delivery problems I need to chase today?",
+      "folder": "procurement-supplier-collaboration",
+      "case_id": "PSC-04",
+      "recorded": true
+    },
+    "procurement-supplier-collaboration-invoice-match": {
+      "agent_id": "@aibast-agents-library/procurement-supplier-collaboration",
+      "title": "Accounts Payable Lead: Three-way match",
+      "prompt": "Which supplier invoices can go for payment approval today, and which ones need to be held?",
+      "folder": "procurement-supplier-collaboration",
+      "case_id": "PSC-05",
+      "recorded": true
+    },
+    "procurement-supplier-collaboration-sourcing-plan": {
+      "agent_id": "@aibast-agents-library/procurement-supplier-collaboration",
+      "title": "Category Manager: Sourcing plan",
+      "prompt": "What requisitions are waiting, how should we buy each one, and who should we invite for the transformer order?",
+      "folder": "procurement-supplier-collaboration",
+      "case_id": "PSC-01",
+      "recorded": true
+    },
+    "procurement-supplier-collaboration-supplier-query": {
+      "agent_id": "@aibast-agents-library/procurement-supplier-collaboration",
+      "title": "Buyer: Supplier question",
+      "prompt": "A bidder on the transformer RFQ asks if they can deliver all 24 units in two lots instead of three. What should I tell them?",
+      "folder": "procurement-supplier-collaboration",
+      "case_id": "PSC-02",
       "recorded": true
     },
     "procurement-support-consolidation-analysis": {

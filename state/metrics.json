@@ -1,6 +1,6 @@
 {
  "schema": "aibast-metrics/1.0",
- "generated_at": "2026-10-29T22:46:18Z",
+ "generated_at": "2026-10-30T00:55:10Z",
  "repo": {
   "stars": 8,
   "forks": 9,
@@ -11,7 +11,7 @@
   "pushed_at": "2026-10-29T06:56:32Z",
   "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
   "homepage": null,
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "carried_forward": false,
   "owner": "microsoft",
   "name": "aibast-agents-library",
@@ -38,13 +38,13 @@
   "days_tracked": 85,
   "tracking_since": "2026-07-26",
   "global_agent_distribution_fetch_events": 689,
-  "agents": 92,
-  "stacks": 72,
+  "agents": 93,
+  "stacks": 73,
   "verticals": 13,
   "publishers": 1,
   "categories": 13,
-  "total_lines": 49699,
-  "total_kb": 2503.8
+  "total_lines": 50191,
+  "total_kb": 2532.2
  },
  "daily": [
   {
@@ -736,7 +736,7 @@
   "clones_14d": 4777,
   "views_14d": 130,
   "live": true,
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "unavailable_reason": null,
   "carried_forward": false
  },
@@ -1028,7 +1028,7 @@
     "kind": "agent"
    }
   ],
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "carried_forward": false
  },
  "releases": {
@@ -2162,7 +2162,7 @@
     "assets": []
    }
   ],
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "carried_forward": false
  },
  "leaderboards": {
@@ -2855,6 +2855,26 @@
   ],
   "newest": [
    {
+    "name": "@aibast-agents-library/procurement-supplier-collaboration",
+    "display_name": "Procurement and Supplier Collaboration Agent",
+    "publisher": "@aibast-agents-library",
+    "category": "energy",
+    "tier": "verified",
+    "downloads": 0,
+    "upvotes": null,
+    "acquisitions": null,
+    "upvote_discussion_url": null,
+    "acquisition_discussion_url": null,
+    "lines": 492,
+    "size_kb": 28.4,
+    "added_at": "2026-10-29T17:55:05-07:00",
+    "file": "agents/@aibast-agents-library/energy_stacks/procurement_supplier_collaboration_stack/procurement_supplier_collaboration_agent.py",
+    "description": "Run a utility's source-to-pay cycle for network materials from a synthetic snapshot: requisitions from the maintenance plan, capital projects and stock replenishment with the recommended route (framework direct award, mini-competition or open tender) and eligible supplier shortlist, answers to supplier questions from the published RFQ pack, weighted bid scoring with a ranked recommendation, purchase order acknowledgement and ASN delivery deviations, and the three-way match of purchase order, goods receipt and invoice. The agent never awards, orders, messages a supplier or approves a payment; an authorized person approves every step through future authenticated tools.",
+    "stack": "procurement_supplier_collaboration",
+    "vertical": "energy",
+    "catalog_kind": "solution"
+   },
+   {
     "name": "@aibast-agents-library/grid-asset-maintenance",
     "display_name": "Predictive Asset Maintenance Intelligence Agent",
     "publisher": "@aibast-agents-library",
@@ -3133,26 +3153,6 @@
     "stack": "order_entry_validation",
     "vertical": "manufacturing",
     "catalog_kind": "solution"
-   },
-   {
-    "name": "@aibast-agents-library/warranty-registration",
-    "display_name": "Warranty and Registration Agent",
-    "publisher": "@aibast-agents-library",
-    "category": "manufacturing",
-    "tier": "verified",
-    "downloads": 2,
-    "upvotes": null,
-    "acquisitions": null,
-    "upvote_discussion_url": null,
-    "acquisition_discussion_url": null,
-    "lines": 472,
-    "size_kb": 23.0,
-    "added_at": "2026-10-08T01:53:29-04:00",
-    "file": "agents/@aibast-agents-library/manufacturing_stacks/warranty_registration_stack/warranty_registration_agent.py",
-    "description": "Give equipment dealers one place to check warranty coverage, pre-check claims, validate serials and prepare product registrations, so covered repairs move faster and no unit misses its registration window.",
-    "stack": "warranty_registration",
-    "vertical": "manufacturing",
-    "catalog_kind": "solution"
    }
   ],
   "stacks": [
@@ -3352,9 +3352,9 @@
    },
    {
     "name": "energy",
-    "agents": 8,
+    "agents": 9,
     "downloads": 65,
-    "lines": 3538
+    "lines": 4030
    },
    {
     "name": "manufacturing",
@@ -3432,9 +3432,9 @@
    },
    {
     "name": "energy",
-    "agents": 8,
+    "agents": 9,
     "downloads": 65,
-    "stacks": 8
+    "stacks": 9
    },
    {
     "name": "manufacturing",
@@ -3498,7 +3498,7 @@
    }
   ],
   "tiers": {
-   "verified": 90,
+   "verified": 91,
    "pilot": 1
   }
  },
@@ -4349,6 +4349,19 @@
    "catalog_kind": "solution"
   },
   {
+   "name": "@aibast-agents-library/procurement-supplier-collaboration",
+   "display_name": "Procurement and Supplier Collaboration Agent",
+   "downloads": 0,
+   "upvotes": null,
+   "acquisitions": null,
+   "upvote_discussion_url": null,
+   "acquisition_discussion_url": null,
+   "file": "agents/@aibast-agents-library/energy_stacks/procurement_supplier_collaboration_stack/procurement_supplier_collaboration_agent.py",
+   "category": "energy",
+   "stack": "procurement_supplier_collaboration",
+   "catalog_kind": "solution"
+  },
+  {
    "name": "@aibast-agents-library/procurement-support",
    "display_name": "Discount Finder Agent",
    "downloads": 7,
@@ -4702,7 +4715,7 @@
  ],
  "agent_discussion_coverage": {
   "status": "partial",
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "pages": 2,
   "discussions_scanned": 144,
   "diagnostics": {
@@ -4718,22 +4731,22 @@
    "upvote": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 20
+    "missing_discussions": 21
    },
    "acquisition": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 20
+    "missing_discussions": 21
    }
   }
  },
  "agent_upvote_coverage": {
   "status": "partial",
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 20,
+  "missing_discussions": 21,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -4746,11 +4759,11 @@
  },
  "agent_acquisition_coverage": {
   "status": "partial",
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 20,
+  "missing_discussions": 21,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -4764,26 +4777,26 @@
  "file_metrics": {
   "schema": "aibast-file-metrics/1.0",
   "source_status": "complete",
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "carried_forward": false,
   "totals": {
-   "files": 9890,
-   "observed_files": 9890,
+   "files": 9996,
+   "observed_files": 9996,
    "downloads": 263,
    "by_kind": {
     "agent": {
-     "files": 92,
-     "observed_files": 92,
+     "files": 93,
+     "observed_files": 93,
      "downloads": 134
     },
     "skill": {
-     "files": 513,
-     "observed_files": 513,
+     "files": 518,
+     "observed_files": 518,
      "downloads": 99
     },
     "workshop": {
-     "files": 8502,
-     "observed_files": 8502,
+     "files": 8600,
+     "observed_files": 8600,
      "downloads": 0
     },
     "source_bundle": {
@@ -4812,8 +4825,8 @@
      "downloads": 3
     },
     "asset": {
-     "files": 361,
-     "observed_files": 361,
+     "files": 363,
+     "observed_files": 363,
      "downloads": 0
     }
    }
@@ -5386,6 +5399,14 @@
     "workshop_slug": "permit-license-management",
     "downloads": 3,
     "status": "observed"
+   },
+   {
+    "path": "agents/@aibast-agents-library/energy_stacks/procurement_supplier_collaboration_stack/procurement_supplier_collaboration_agent.py",
+    "kind": "agent",
+    "agent_name": "@aibast-agents-library/procurement-supplier-collaboration",
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
    },
    {
     "path": "agents/@aibast-agents-library/energy_stacks/regulatory_reporting_stack/regulatory_reporting_agent.py",
@@ -59764,6 +59785,830 @@
     "status": "observed_zero"
    },
    {
+    "path": "solutions/procurement-supplier-collaboration/EASY-MODE-COPILOT-CHAT.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/EASY-MODE-PERSONLESS.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/FIELD-GUIDE.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/agent.sync.yaml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/behaviors/aibast_bid-evaluation.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/behaviors/aibast_delivery-tracking.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/behaviors/aibast_invoice-match.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/behaviors/aibast_sourcing-plan.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/behaviors/aibast_supplier-query.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/capabilities/knowledge/files/aibast_procurement-supplier-collaboration-rules-and-guardrails.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/capabilities/knowledge/files/aibast_procurement-supplier-collaboration-rules-and-guardrails.md.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/capabilities/knowledge/files/aibast_procurement-supplier-collaboration-synthetic-records.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/capabilities/knowledge/files/aibast_procurement-supplier-collaboration-synthetic-records.md.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/copilot-studio/settings.mcs.yml",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/deployment.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evals/copilot-studio-preview-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evals/dataverse-draft-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evals/manual-build-evidence.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evals/onepager-map.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evals/source-audit.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evals/transcripts.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evals/visual-checkpoints.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/evidence-report.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/export-manifest.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/exports/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/exports/procurement-supplier-collaboration-copilot-studio-solution.zip",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/exports/procurement-supplier-collaboration-deployment-settings.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/exports/procurement-supplier-collaboration-solution-export.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/field-guide.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual-tutorial.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/GLOBAL-INSTRUCTIONS.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/knowledge/aibast_procurement-supplier-collaboration-rules-and-guardrails.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/knowledge/aibast_procurement-supplier-collaboration-synthetic-records.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_bid-evaluation_03/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_delivery-tracking_04/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_invoice-match_05/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_sourcing-plan_01/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/manual/skills/aibast_supplier-query_02/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/quest.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/01-review-build.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/02-psc-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/03-psc-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/04-psc-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/05-psc-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/06-psc-05.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/07-confirm-draft.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/annotated/01-review-build.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/annotated/02-psc-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/annotated/03-psc-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/annotated/04-psc-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/annotated/05-psc-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/annotated/06-psc-05.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/annotated/07-confirm-draft.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/browserfilm.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/copilot-assisted-contact-sheet.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/assisted/copilot-assisted-walkthrough.gif",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/01-create-blank-agent.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/02-name-agent.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/03-enter-instructions.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/04-save-instructions.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/05-remove-web-search.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/06-add-aibast-procurement-supplier-collaboration-rules-and-guardrails.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/07-add-aibast-procurement-supplier-collaboration-synthetic-records.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/08-add-aibast-bid-evaluation-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/09-add-aibast-delivery-tracking-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/10-add-aibast-invoice-match-05.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/11-add-aibast-sourcing-plan-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/12-add-aibast-supplier-query-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/13-review-inventory.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/14-open-preview.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/15-psc-01.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/16-psc-02.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/17-psc-03.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/18-psc-04.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/19-psc-05.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/20-confirm-draft.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/README.md",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/01-create-blank-agent.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/02-name-agent.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/03-enter-instructions.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/04-save-instructions.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/05-remove-web-search.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/06-add-aibast-procurement-supplier-collaboration-rules-and-guardrails.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/07-add-aibast-procurement-supplier-collaboration-synthetic-records.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/08-add-aibast-bid-evaluation-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/09-add-aibast-delivery-tracking-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/10-add-aibast-invoice-match-05.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/11-add-aibast-sourcing-plan-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/12-add-aibast-supplier-query-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/13-review-inventory.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/14-open-preview.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/15-psc-01.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/16-psc-02.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/17-psc-03.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/18-psc-04.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/19-psc-05.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/annotated/20-confirm-draft.png",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/browserfilm.json",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/manual-build-contact-sheet.jpg",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/procurement-supplier-collaboration/screenshots/manual/manual-build-walkthrough.gif",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": "procurement-supplier-collaboration",
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "solutions/procurement-support/EASY-MODE-COPILOT-CHAT.md",
     "kind": "workshop",
     "agent_name": null,
@@ -81876,6 +82721,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "state/architecture_level2_sources/procurement-supplier-collaboration.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "state/architecture_level2_sources/procurement-support.json",
     "kind": "asset",
     "agent_name": null,
@@ -82565,6 +83418,14 @@
    },
    {
     "path": "tests/demo_cases/procurement-agent.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/demo_cases/procurement-supplier-collaboration.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -83951,7 +84812,7 @@
  },
  "workshops": {
   "totals": {
-   "workshops": 71,
+   "workshops": 72,
    "usage_events": 368,
    "views_14d": 4,
    "view_uniques_14d": 2,
@@ -83970,7 +84831,7 @@
   },
   "by_source": {
    "catalog": {
-    "solutions": 53,
+    "solutions": 54,
     "usage_events": 312,
     "file_downloads": 204,
     "bundle_downloads": 104
@@ -85314,6 +86175,25 @@
     "usage_events": 0
    },
    {
+    "catalog_key": "@aibast-agents-library/procurement-supplier-collaboration",
+    "agent_name": "@aibast-agents-library/procurement-supplier-collaboration",
+    "slug": "procurement-supplier-collaboration",
+    "display_name": "Procurement and Supplier Collaboration Agent",
+    "quest_url": "solutions/procurement-supplier-collaboration/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 0,
+    "bundle_downloads": 0,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 0
+   },
+   {
     "catalog_key": "@aibast-agents-library/tiered-huddle-board",
     "agent_name": "@aibast-agents-library/tiered-huddle-board",
     "slug": "tiered-huddle-board",
@@ -85339,7 +86219,7 @@
    "mixed_windows": true,
    "views": {
     "status": "live popular-path response",
-    "as_of": "2026-10-29T22:46:18Z",
+    "as_of": "2026-10-30T00:55:10Z",
     "censored": true,
     "diagnostics": {
      "duplicate_rows": 0,
@@ -85353,7 +86233,7 @@
    },
    "downloads": {
     "status": "complete paginated jsDelivr file response",
-    "as_of": "2026-10-29T22:46:18Z",
+    "as_of": "2026-10-30T00:55:10Z",
     "pages": 1,
     "pagination": "complete",
     "diagnostics": {
@@ -85366,7 +86246,7 @@
    },
    "feedback": {
     "status": "workshop-feedback label + body marker union",
-    "as_of": "2026-10-29T22:46:18Z",
+    "as_of": "2026-10-30T00:55:10Z",
     "issues_scanned": 0,
     "pages": 3,
     "diagnostics": {
@@ -85378,7 +86258,7 @@
    },
    "agent_upvotes": {
     "status": "partial",
-    "as_of": "2026-10-29T22:46:18Z",
+    "as_of": "2026-10-30T00:55:10Z",
     "scope": "Native upvotes on each primary agent's canonical rating Discussion. This preference signal is separate from usage_events and acquisition Discussions."
    }
   },
@@ -85414,13 +86294,13 @@
     "url": "https://microsoft.github.io/aibast-agents-library/registry.json"
    }
   ],
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "carried_forward": false
  },
  "achievements": {
   "schema": "aibast-achievements/2.0",
   "status": "available",
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "carried_forward": false,
   "caveat": "Verified achievement points are server-scored from opt-in public GitHub progress claims. Each explicitly claimed achievement has a fixed value: started 5, local-proof 15, draft-builder 20, preview-proven 25, workshop-completed 35, and hard-mode-completed 50, for at most 150 points per workshop. Re-syncing unions achievement IDs without duplicating points. Profiles are public by explicit submission consent. GitHub verification confirms authenticated issue authorship and canonical claim format only; achievement completion remains self-reported and is not independently proven. Verified public achievements remain separate from local self-paced state, repository stars, agent upvotes, downloads, and workshop usage events.",
   "totals": {
@@ -86513,6 +87393,28 @@
     "achievement_completion_rate": 0.0
    },
    {
+    "slug": "procurement-supplier-collaboration",
+    "display_name": "Procurement and Supplier Collaboration Agent",
+    "agent_name": "@aibast-agents-library/procurement-supplier-collaboration",
+    "participants": 0,
+    "points": 0,
+    "achievements": 0,
+    "starts": 0,
+    "workshop_completions": 0,
+    "hard_completions": 0,
+    "achievement_counts": {
+     "started": 0,
+     "local-proof": 0,
+     "draft-builder": 0,
+     "preview-proven": 0,
+     "workshop-completed": 0,
+     "hard-mode-completed": 0
+    },
+    "completion_rate": 0.0,
+    "hard_completion_rate": 0.0,
+    "achievement_completion_rate": 0.0
+   },
+   {
     "slug": "product-feedback-synthesizer",
     "display_name": "Product Feedback Synthesizer Agent",
     "agent_name": "@aibast-agents-library/product-feedback-synthesizer",
@@ -87093,7 +87995,7 @@
  "workshop_certification": {
   "schema": "aibast-workshop-certification/1.0",
   "status": "available",
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "carried_forward": false,
   "totals": {
    "cohort_submissions": 0,
@@ -87588,6 +88490,16 @@
     "qualified_profiles": 0
    },
    {
+    "slug": "procurement-supplier-collaboration",
+    "display_name": "Procurement and Supplier Collaboration Agent",
+    "agent_name": "@aibast-agents-library/procurement-supplier-collaboration",
+    "cohort_submissions": 0,
+    "verified_cohorts": 0,
+    "attendees_reported": 0,
+    "qualification_submissions": 0,
+    "qualified_profiles": 0
+   },
+   {
     "slug": "product-feedback-synthesizer",
     "display_name": "Product Feedback Synthesizer Agent",
     "agent_name": "@aibast-agents-library/product-feedback-synthesizer",
@@ -87838,7 +88750,7 @@
  "ecosystem": {
   "schema": "aibast-ecosystem-metrics/1.0",
   "status": "available",
-  "as_of": "2026-10-29T22:46:18Z",
+  "as_of": "2026-10-30T00:55:10Z",
   "sources": {
    "aibast": {
     "status": "available",
@@ -87852,8 +88764,8 @@
   "totals": {
    "aibast_direct_agent_fetches": 689,
    "combined_agent_distribution_fetch_events": 689,
-   "distribution_entries": 92,
-   "logical_agents": 92,
+   "distribution_entries": 93,
+   "logical_agents": 93,
    "overlap_agents": 0
   },
   "agents": [
@@ -88760,6 +89672,16 @@
    {
     "logical_name": "@aibast-agents-library/grid-asset-maintenance",
     "display_name": "Predictive Asset Maintenance Intelligence Agent",
+    "publisher": "@aibast-agents-library",
+    "channels": [
+     "aibast"
+    ],
+    "aibast_direct_agent_fetches": 0,
+    "combined_distribution_fetch_events": 0
+   },
+   {
+    "logical_name": "@aibast-agents-library/procurement-supplier-collaboration",
+    "display_name": "Procurement and Supplier Collaboration Agent",
     "publisher": "@aibast-agents-library",
     "channels": [
      "aibast"
