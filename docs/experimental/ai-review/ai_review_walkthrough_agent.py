@@ -19,7 +19,8 @@ own review.
 
 Experimental and not an officially supported Microsoft product or service.
 Provided as is under the repository's MIT license, with no support or
-warranty. Use at your own risk.
+warranty. Use at your own risk. Trademark use follows the repository's
+trademark notice.
 
 Stdlib only. Single file. Drop it into a Brainstem's agents/ folder.
 """
@@ -66,7 +67,8 @@ __manifest__ = {
 NOTICE = (
     "Experimental and not an officially supported Microsoft product or service. "
     "Provided as is under the repository's MIT license, with no support or "
-    "warranty. Use at your own risk."
+    "warranty. Use at your own risk. Trademark use follows the repository's "
+    "trademark notice."
 )
 FRAMING = "Built from Microsoft's public responsible AI guidance. Educational only."
 DISCLAIMER = (

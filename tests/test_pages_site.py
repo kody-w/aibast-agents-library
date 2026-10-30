@@ -921,6 +921,27 @@ class FeedbackBlockTests(unittest.TestCase):
         self.assertIn("@media (max-width:520px)", block)
         self.assertTrue(all(ord(ch) < 0x2000 for ch in block), "no emoji or pictographs")
 
+    def test_block_clears_the_fixed_consent_banner_while_it_is_shown(self):
+        # The analytics consent banner is fixed to the bottom of the window. On
+        # a phone it is about 130px tall and would sit on top of Yes, No and
+        # "Tell us more" at the end of the page, so while the banner is in the
+        # page the block keeps room below itself to scroll clear of it.
+        from tools.clarity_tag import CONSENT_STORAGE_KEY
+
+        self.assertEqual(pages.FEEDBACK_CONSENT_BANNER_ID, CONSENT_STORAGE_KEY)
+        block = pages.render_feedback_block("docs/rapp-guide.html")
+        rules = re.findall(
+            r"body:has\(>#"
+            + re.escape(CONSENT_STORAGE_KEY)
+            + r"\) \.library-feedback\{margin-bottom:(\d+)px\}",
+            block,
+        )
+        self.assertEqual(len(rules), 2, block)
+        wide, narrow = (int(value) for value in rules)
+        self.assertGreaterEqual(wide, 140)
+        self.assertGreaterEqual(narrow, 220)
+        self.assertNotIn("<script", block.lower())
+
 
 class PagesWorkflowTests(unittest.TestCase):
     @classmethod

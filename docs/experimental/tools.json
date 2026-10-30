@@ -2,7 +2,7 @@
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
   "note": "Experimental tools. Entries use the library registry's agent entry shape (rapp-agent/1.0, a RAR registry entry) plus a kind: agent, rapplication or web-tool. Kept separate from registry.json, so nothing here enters the library catalog.",
-  "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk.",
+  "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk. Trademark use follows the repository's trademark notice.",
   "tools": [
     {
       "schema": "rapp-agent/1.0",
@@ -25,15 +25,15 @@
         "@rapp/basic-agent"
       ],
       "_file": "docs/experimental/ai-migration/ai_migration_agent.py",
-      "_size_kb": 42.9,
-      "_lines": 978,
-      "_sha256": "0294b4c18a9cb7cce6b897fd89ebfbca55425a05840319627fd3b2e74e9f7deb",
+      "_size_kb": 43.0,
+      "_lines": 979,
+      "_sha256": "8fa5868fcfff0f8f012bf50d282add9207529d329285326756f36b3593208f09",
       "_install_filename": "ai_migration_agent.py",
       "_url": "https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py",
       "install_command": "curl -fsSL https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py -o ~/.brainstem/src/rapp_brainstem/agents/ai_migration_agent.py",
       "guide_url": "docs/experimental/ai-migration/index.html",
       "remove": "Delete ai_migration_agent.py from your Brainstem's agents folder.",
-      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk. Trademark use follows the repository's trademark notice."
     },
     {
       "schema": "rapp-agent/1.0",
@@ -56,15 +56,15 @@
         "@rapp/basic-agent"
       ],
       "_file": "docs/experimental/ai-review/ai_review_walkthrough_agent.py",
-      "_size_kb": 42.2,
-      "_lines": 876,
-      "_sha256": "ed5769a45fea454c09ea46d23099cee1f8f8e0fc14c2aff343477588ed8d1330",
+      "_size_kb": 42.3,
+      "_lines": 878,
+      "_sha256": "1fb08e09a694cda1b926eabf11a9ebbbce38a5cde85a76995d4967c4d02e334f",
       "_install_filename": "ai_review_walkthrough_agent.py",
       "_url": "https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-review/ai_review_walkthrough_agent.py",
       "install_command": "curl -fsSL https://microsoft.github.io/aibast-agents-library/docs/experimental/ai-review/ai_review_walkthrough_agent.py -o ~/.brainstem/src/rapp_brainstem/agents/ai_review_walkthrough_agent.py",
       "guide_url": "docs/experimental/ai-review/index.html",
       "remove": "Delete ai_review_walkthrough_agent.py from your Brainstem's agents folder.",
-      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk. Trademark use follows the repository's trademark notice."
     },
     {
       "schema": "rapp-agent/1.0",
@@ -84,7 +84,7 @@
       "dependencies": [],
       "_file": "tools/localfirst_project_tracker_tool.html",
       "note": "Browser-only for now: a single HTML file that keeps its data in browser storage. Not yet a Brainstem agent.",
-      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk. Trademark use follows the repository's trademark notice."
     },
     {
       "schema": "rapp-agent/1.0",
@@ -104,7 +104,7 @@
       "dependencies": [],
       "_file": "tools/localfirst_chat_animation_studio_tool.html",
       "note": "Browser-only for now: a single HTML file that keeps its data in browser storage. Not yet a Brainstem agent.",
-      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk."
+      "disclaimer": "Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk. Trademark use follows the repository's trademark notice."
     }
   ],
   "count": 4

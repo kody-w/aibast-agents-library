@@ -168,6 +168,8 @@ html[data-theme="dark"] {
   h2 { font-size: var(--cp-text-xl); margin: 2.25rem 0 0.75rem; }
   p { max-width: var(--cp-measure); }
   a { color: var(--cp-link); }
+  .notice p { margin: 0; }
+  .notice p + p { margin-top: 0.5rem; }
   .notice { background: var(--cp-surface); border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-warning); border-radius: 8px; padding: 0.75rem 1rem; font-size: var(--cp-text-sm); }
   .panel { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 10px; padding: 1rem 1.25rem; }
   .cmd { display: flex; gap: 0.5rem; align-items: stretch; flex-wrap: wrap; }
@@ -230,7 +232,7 @@ html[data-theme="dark"] {
   <h1>AI Review Walkthrough</h1>
   <p>Walk through a responsible AI review of your own AI agent or app, one stage at a time, right in your Brainstem chat. Each stage explains why it matters, asks a few plain questions, and shows a worked example from an invented sample agent. At the end you export a review packet and a one-page summary.</p>
   <p><strong>Built from Microsoft's public responsible AI guidance. Educational only.</strong> It is a generic review any team could run. Your answers stay on your device; the agent sends nothing anywhere.</p>
-  <p class="notice">Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's MIT license, with no support or warranty. Use at your own risk.<br>Educational. Not legal advice, and not a substitute for your organization's own review.</p>
+  <div class="notice"><p id="notice">Experimental and not an officially supported Microsoft product or service. Provided as is under the repository's <a href="../../../LICENSE">MIT license</a>, with no support or warranty. Use at your own risk. Trademark use follows the <a href="https://github.com/microsoft/aibast-agents-library#attribution" rel="noopener" target="_blank">repository's trademark notice</a>.</p><p>Educational. Not legal advice, and not a substitute for your organization's own review.</p></div>
 
   <h2>Install into Brainstem</h2>
   <div class="panel">
@@ -282,7 +284,7 @@ html[data-theme="dark"] {
   </ul>
 
   <footer>
-    <p><a href="../../rapp-guide.html#tools">Experimental tools</a> · <a href="../../installer.html">Installer</a> · <a href="../../../index.html">Agent Library</a> · <a href="../../../LICENSE">License</a></p>
+    <p><a href="../../rapp-guide.html#tools">Experimental tools</a> · <a href="../../installer.html">Installer</a> · <a href="../../../index.html">Agent Library</a> · <a href="../../../LICENSE">License</a> · <a href="https://github.com/microsoft/aibast-agents-library#attribution" rel="noopener" target="_blank">Trademarks</a></p>
   </footer>
 </main>
 <script>

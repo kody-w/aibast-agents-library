@@ -410,13 +410,19 @@ def test_each_ring_serves_its_own_install_command():
     from pathlib import PurePosixPath
     from scripts import build_pages_site as pages
 
+    staged_url = "https://example-owner.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py"
     for relative in sorted(pages.RING_PAGES_URL_PATHS):
         text = (ROOT / relative).read_text(encoding="utf-8")
         path = PurePosixPath(relative)
         assert pages.render_pages_base(path, text, "microsoft", "aibast-agents-library") == text
         staged = pages.render_pages_base(path, text, "Example-Owner", "aibast-agents-library")
-        assert "https://example-owner.github.io/aibast-agents-library/docs/experimental/ai-migration/ai_migration_agent.py" in staged
-        assert "microsoft.github.io/aibast-agents-library/docs/experimental" not in staged
+        assert "microsoft.github.io/aibast-agents-library/docs/experimental" not in staged, relative
+    # Every page that carries this tool's install command serves its own ring's copy.
+    for relative in ("docs/rapp-guide.html", "docs/experimental/tools.json", "docs/experimental/ai-migration/index.html"):
+        assert relative in pages.RING_PAGES_URL_PATHS, relative
+        text = (ROOT / relative).read_text(encoding="utf-8")
+        staged = pages.render_pages_base(PurePosixPath(relative), text, "Example-Owner", "aibast-agents-library")
+        assert staged_url in staged, relative
     with pytest.raises(pages.BuildError):
         pages.render_pages_base(PurePosixPath("docs/rapp-guide.html"), "no address", "fork", "aibast-agents-library")
 

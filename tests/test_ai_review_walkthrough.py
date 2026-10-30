@@ -26,7 +26,8 @@ TOOL_ID = "ai-review-walkthrough"
 NOTICE = (
     "Experimental and not an officially supported Microsoft product or service. "
     "Provided as is under the repository's MIT license, with no support or "
-    "warranty. Use at your own risk."
+    "warranty. Use at your own risk. Trademark use follows the repository's "
+    "trademark notice."
 )
 DISCLAIMER = "Educational. Not legal advice, and not a substitute for your organization's own review."
 
@@ -287,7 +288,8 @@ def test_notice_text_is_present_on_agent_and_page():
     doc = MOD.__doc__.replace("\n", " ")
     assert " ".join(NOTICE.split()) in " ".join(doc.split())
     assert MOD.NOTICE == NOTICE
-    page = " ".join(PAGE_PATH.read_text(encoding="utf-8").split())
+    page = " ".join(re.sub(r"<[^>]+>", " ", PAGE_PATH.read_text(encoding="utf-8")).split())
+    page = re.sub(r" ([.,])", r"\1", page)
     assert NOTICE in page and DISCLAIMER in page
     assert "Built from Microsoft's public responsible AI guidance. Educational only." in page
     assert "Built from Microsoft's public responsible AI guidance. Educational only." in agent_src
@@ -396,10 +398,30 @@ def test_pages_build_ships_the_agent_and_page_and_each_ring_installs_its_own_cop
     ):
         assert pages.classify_source_path(PurePosixPath(relative)) == pages.INCLUDE, relative
     staged_url = "https://example-owner.github.io/aibast-agents-library/docs/experimental/ai-review/ai_review_walkthrough_agent.py"
-    for relative in ("docs/rapp-guide.html", "docs/experimental/tools.json"):
+    for relative in (
+        "docs/rapp-guide.html",
+        "docs/experimental/tools.json",
+        "docs/experimental/ai-review/index.html",
+    ):
+        # Rewritten while the artifact is built, so the command is right even
+        # when it is read without JavaScript or copied as plain text.
+        assert relative in pages.RING_PAGES_URL_PATHS, relative
         text = (ROOT / relative).read_text(encoding="utf-8")
         staged = pages.render_pages_base(PurePosixPath(relative), text, "Example-Owner", "aibast-agents-library")
         assert staged_url in staged, relative
+        assert "microsoft.github.io/aibast-agents-library/docs/experimental" not in staged, relative
     # The page rewrites its own command to the address that serves it.
     page = PAGE_PATH.read_text(encoding="utf-8")
     assert "new URL(file, window.location.href)" in page
+
+
+def test_every_experimental_page_with_a_production_address_is_rendered_per_ring():
+    from scripts import build_pages_site as pages
+
+    canonical = "https://microsoft.github.io/aibast-agents-library/"
+    for path in sorted((ROOT / "docs" / "experimental").rglob("*")):
+        if path.suffix.lower() not in {".html", ".json"}:
+            continue
+        relative = path.relative_to(ROOT).as_posix()
+        if canonical in path.read_text(encoding="utf-8"):
+            assert relative in pages.RING_PAGES_URL_PATHS, relative

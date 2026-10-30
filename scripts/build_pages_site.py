@@ -118,6 +118,7 @@ RING_PAGES_URL_PATHS = frozenset(
         "docs/rapp-guide.html",
         "docs/experimental/tools.json",
         "docs/experimental/ai-migration/index.html",
+        "docs/experimental/ai-review/index.html",
     }
 )
 
@@ -1025,7 +1026,14 @@ FEEDBACK_STYLE = """<style>
 .library-feedback .lf-more{color:var(--cp-link,#0f6cbd);font-size:var(--cp-text-sm,0.875rem)}
 .library-feedback a:focus-visible{outline:2px solid var(--cp-focus,#0b5fa5);outline-offset:2px}
 @media (max-width:520px){.library-feedback{margin-left:var(--cp-space-3,12px);margin-right:var(--cp-space-3,12px)}.library-feedback .lf-more{flex-basis:100%}}
+body:has(>#aibast-clarity-consent) .library-feedback{margin-bottom:160px}
+@media (max-width:520px){body:has(>#aibast-clarity-consent) .library-feedback{margin-bottom:240px}}
 </style>"""
+# The analytics consent banner (tools/clarity_tag.py) is fixed to the bottom
+# of the window until the visitor answers it. While it is in the page, the
+# rules above keep room under the block so Yes, No and "Tell us more" can
+# scroll clear of it; once it is answered the room goes away.
+FEEDBACK_CONSENT_BANNER_ID = "aibast-clarity-consent"
 
 
 def feedback_page_id(path: PurePosixPath) -> str | None:
