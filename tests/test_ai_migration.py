@@ -439,6 +439,9 @@ def test_scan_plan_apply_label_setups_by_folder_and_carry_the_naming_rule(env):
     assert "Setup in ~/.codex and ~/.agents (an AI coding tool):" in scan
     assert "(a hosted AI assistant export):" in scan
     assert "Found in" not in scan
+    for label, text in outputs.items():
+        assert text.startswith(MODULE.REPLY_RULE), label
+    assert env["agent"].perform(action="compare").startswith(MODULE.REPLY_RULE)
     description = MODULE.AIMigrationAgent().metadata["description"]
     assert MODULE.NAMING_RULE in description
     assert BANNED_NAMES.search(description) is None

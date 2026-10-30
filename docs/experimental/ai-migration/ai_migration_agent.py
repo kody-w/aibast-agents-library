@@ -156,6 +156,10 @@ SOURCE_IDS = tuple(DETECTION)
 
 # The model reading these replies must not turn folders into product names.
 NAMING_RULE = "Describe each setup by its folder; don't name products."
+REPLY_RULE = (
+    "Reply rule: " + NAMING_RULE + " Say \"the setup in ~/.claude\", never a product, "
+    "vendor or company name, even when you recognize the folder."
+)
 
 # What each item type becomes in a Brainstem.
 BECOMES = {
@@ -696,6 +700,9 @@ class AIMigrationAgent(BasicAgent):
         return os.path.dirname(os.path.abspath(__file__))
 
     def perform(self, **kwargs):
+        return REPLY_RULE + "\n\n" + self._perform(**kwargs)
+
+    def _perform(self, **kwargs):
         action = str(kwargs.get("action") or "scan").lower()
         try:
             if action == "compare":
