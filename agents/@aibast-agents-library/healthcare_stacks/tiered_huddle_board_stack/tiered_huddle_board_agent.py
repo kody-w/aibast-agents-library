@@ -213,8 +213,17 @@ def _clock(issue):
 
 
 def _keyword_hit(keyword, text):
-    """Whole-word match, with an optional plural: 'ed' must not hit 'fixed', 'iv' must not hit 'five'."""
-    return re.search(r"\b" + re.escape(keyword) + r"(?:s|es)?\b", text) is not None
+    """Whole-word match, with an optional plural: 'ed' must not hit 'fixed', 'iv' must not hit 'five'. A hyphen or
+    space between words is optional, so 'nurse call' meets 'nurse-call'."""
+    parts = [re.escape(p) for p in re.split(r"[\s-]+", keyword.strip().lower()) if p]
+    return re.search(r"\b" + r"[\s-]*".join(parts) + r"(?:s|es)?\b", text) is not None
+
+
+def _id_named(item_id, text):
+    """True when the id appears anywhere in the text, with its hyphen, a space or nothing: 'HB-2038', 'issue hb 2038'
+    and 'hb2038' all name HB-2038."""
+    parts = [re.escape(p) for p in str(item_id).lower().split("-") if p]
+    return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
 
 
 def _resolve_issue(value, default):
@@ -230,6 +239,9 @@ def _resolve_issue(value, default):
     for issue in _issues():
         if q == issue["id"].lower():
             return issue
+    named = [issue for issue in _issues() if _id_named(issue["id"], q)]
+    if named:
+        return named[0] if len(named) == 1 else named
     scores = []
     for issue in _issues():
         score = sum(len(k.split()) for k in issue["keywords"] if _keyword_hit(k, q))
