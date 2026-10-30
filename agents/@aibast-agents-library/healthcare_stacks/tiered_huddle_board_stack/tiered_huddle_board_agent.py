@@ -264,8 +264,10 @@ def _people():
 
 
 def _resolve_viewer(value):
-    """The person asking: a full name, a first or last name, or a name with a title ('Elena', 'Brooks',
-    'Elena Brooks, Nurse Manager'). Returns a name, a list of names on a tie, or None when nobody matches.
+    """The person asking: a full name, a first or last name, a name with a title ('Elena', 'Brooks',
+    'Elena Brooks, Nurse Manager'), or a role on the paging roster on its own ('Charge Nurse, 4 West', 'charge
+    nurse'). Returns a name, a list of names on a tie (a role several people hold, such as Director), or None when
+    nobody matches.
 
     A waiting-on value that is not a person (Case management, Leadership huddle) still matches when it is named in
     full.
@@ -278,7 +280,7 @@ def _resolve_viewer(value):
     for name in _people():
         if name.lower() == low:
             return name
-    asked = set(re.findall(r"[a-z]+", low))
+    asked = set(re.findall(r"[a-z0-9]+", low))
     scores = []
     for name in _people():
         parts = set(re.findall(r"[a-z]+", name.lower()))
@@ -286,10 +288,27 @@ def _resolve_viewer(value):
         if hit:
             scores.append((hit, name))
     if not scores:
+        scores = _role_scores(asked)
+    if not scores:
         return None
     best = max(hit for hit, _ in scores)
     tied = [name for hit, name in scores if hit == best]
     return tied[0] if len(tied) == 1 else tied
+
+
+_ROLE_FILLER = {"i", "im", "m", "am", "the", "a", "an", "of", "on", "for", "and", "this", "is", "me", "it", "s"}
+
+
+def _role_scores(asked):
+    """(Words shared, person) for every person whose paging-roster role shares a word with the request, so a viewer
+    who gives only their role ('Charge Nurse, 4 West', 'Nurse Manager') is found."""
+    words = asked - _ROLE_FILLER
+    roles = {}
+    for lanes in _roster().values():
+        for people in lanes.values():
+            for name, role in people:
+                roles.setdefault(name, set()).update(re.findall(r"[a-z0-9]+", role.lower()))
+    return [(len(parts & words), name) for name, parts in sorted(roles.items()) if parts & words]
 
 
 def _open(issues):
@@ -345,7 +364,7 @@ class TieredHuddleBoardAgent(BasicAgent):
                     "viewer": {
                         "type": "string",
                         "description": "Person asking, for 'waiting on me': a full name, first or last name, "
-                                       "with or without a title. Optional; defaults to Elena Brooks, "
+                                       "with or without a title, or their role on the paging roster. Optional; defaults to Elena Brooks, "
                                        "Nurse Manager of 4 West.",
                     },
                 },
@@ -399,8 +418,9 @@ class TieredHuddleBoardAgent(BasicAgent):
                                  f"{i['title']} | {_clock(i)} | {i['status']} | {i['waiting_on']} |")
         lines += ["", f"## Waiting on {viewer}"]
         if resolved is None:
-            lines.append(f"- `{asked}` is not a name on this board or its paging roster, so this view cannot say "
-                         "what is waiting on them. Ask again with the full name as it appears on the board.")
+            lines.append(f"- `{asked}` is not a name on this board or its paging roster, nor a role on that roster, "
+                         "so this view cannot say what is waiting on them. Ask again with the full name as it "
+                         "appears on the board.")
         elif isinstance(resolved, list):
             lines.append(f"- `{asked}` matches more than one person: {', '.join(resolved)}. Ask again with the "
                          "full name.")

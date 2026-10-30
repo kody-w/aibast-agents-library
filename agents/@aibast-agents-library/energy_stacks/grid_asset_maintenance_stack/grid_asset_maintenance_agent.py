@@ -273,18 +273,41 @@ def _id_named(item_id, text):
     return re.search(r"\b" + r"[\s-]?".join(parts) + r"\b", text) is not None
 
 
+_UNITS = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+          "nine": 9}
+_TEENS = {"ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
+          "seventeen": 17, "eighteen": 18, "nineteen": 19}
+_TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80,
+         "ninety": 90}
+_SPELLED = re.compile(r"\b(?:(" + "|".join(_TENS) + r")(?:[\s-]+(" + "|".join(_UNITS) + r"))?|("
+                      + "|".join(list(_TEENS) + list(_UNITS)) + r"))\b")
+
+
+def _digits(text):
+    """Spelled-out numbers as digits, so a spoken request reads like a typed one: 'panel two' -> 'panel 2',
+    'eleven kV' -> '11 kV', 'thirty-three kV' -> '33 kV', 'RMU twenty two' -> 'RMU 22'."""
+    def number(match):
+        tens, unit, single = match.groups()
+        if single:
+            return str(_TEENS.get(single, _UNITS.get(single)))
+        return str(_TENS[tens] + _UNITS.get(unit or "zero", 0))
+    return _SPELLED.sub(number, str(text).lower())
+
+
 _VOLTAGE = re.compile(r"\b(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?\s*kv\b")
-_DESIGNATOR = re.compile(r"\b(panel|feeder|joint|t|rmu)[\s-]?(\d+)\b")
+# 'transformer 1' and 'transformer number 1' are transformer T1; 'transformer 20 MVA' is a rating, not a number.
+_DESIGNATOR = re.compile(r"\b(panel|feeder|joint|t|rmu|transformer)(?:\s+(?:number|no\.?|#))?[\s-]?(\d+)\b"
+                         r"(?!\s*mva)")
 
 
 def _qualifiers(text):
     """Numbers that tell assets apart: {'kv': {'11', '33'}, 'panel': {'4'}, 't': {'2'}, ...}."""
     found = {}
-    text = str(text).lower()
+    text = _digits(text)
     for match in _VOLTAGE.finditer(text):
         found.setdefault("kv", set()).update(v for v in match.groups() if v)
     for kind, number in _DESIGNATOR.findall(text):
-        found.setdefault(kind, set()).add(str(int(number)))
+        found.setdefault("t" if kind == "transformer" else kind, set()).add(str(int(number)))
     return found
 
 
@@ -318,6 +341,7 @@ def _resolve(value, default, items, key):
     named = [item for item in items if _id_named(item[key], q)]
     if named:
         return named[0] if len(named) == 1 else named
+    q = _digits(q)
     asked = _words(q)
     # A voltage or a panel, feeder, joint or transformer number in the request rules out every record that carries a
     # different one, so 'Ashby Road panel 2' never drafts panel 4's work order and '11 kV line' never picks the
@@ -326,12 +350,19 @@ def _resolve(value, default, items, key):
     ruled_out = [item for item in items if _conflicts(wanted, _record_qualifiers(item, key))]
     items = [item for item in items if item not in ruled_out]
     vocab = [(item, *_record_words(item, key)) for item in items]
+    # A designator the request names ('RMU 22', 'RMU22', 'panel 4') counts as a naming word for every record that
+    # carries it, however the record spells it (SG-1140's keyword is 'rmu-22').
+    designators = {(kind, n) for kind, numbers in wanted.items() if kind != "kv" for n in numbers}
+    carried = {id(item): {(kind, n) for kind, numbers in _record_qualifiers(item, key).items() for n in numbers}
+               for item in items}
     scores = []
     for item, primary, secondary in vocab:
         score = 0.0
         for word in asked & (primary | secondary):
             shared = sum(1 for _, p, s in vocab if word in p or word in s)
             score += (1.0 if word in primary else 0.5) / shared
+        for designator in designators & carried[id(item)]:
+            score += 1.0 / sum(1 for other in items if designator in carried[id(other)])
         if score:
             scores.append((score, item))
     if not scores:
