@@ -86,10 +86,12 @@ RFQS = [
           "answer": "500 kVA, 11/0.433 kV, vector group Dyn11, losses as set in specification ES-DT-04 (no "
                     "tolerance on load losses)."},
          {"topic": "Quality documents", "keywords": ["iso", "certificate", "type test", "quality", "documents"],
+          "anchors": ["iso", "certificate", "type test", "quality"],
           "answer": "Bids must include an ISO 9001 certificate and type test certificates for the offered design. "
                     "A bid missing a type test certificate scores half marks on quality."},
          {"topic": "Evaluation", "keywords": ["evaluate", "evaluated", "evaluation", "weight", "weighting", "score", "scored",
                                                     "scoring", "criteria"],
+          "anchors": ["evaluate", "evaluation", "weight", "weighting", "score", "scoring", "criteria", "marks"],
           "answer": "Price 50%, lead time 20%, quality 20%, sustainability 10%."},
          {"topic": "Closing date", "keywords": ["close", "closing", "deadline", "extension", "due"],
           "answer": "The RFQ closes at 12:00 on the closing day shown in the portal. Extensions apply to all "
@@ -108,9 +110,16 @@ RFQS = [
      # same sentence, in any order and any common word form. A common word on its own ('pay attention', 'the risk
      # of half marks', 'access to our certificate', 'the title of the specification') says nothing about the
      # subject and must not turn a question the pack answers into a new clarification.
+     #
+     # A pair is a weak reading: its words are everyday English. A pack topic's "anchors" are the words that make a
+     # question about how a bid is assessed (its score, weights, marks, certificates, quality). When the question
+     # names an anchor, the everyday reading wins over a pair: 'a risk of a lower score', 'how much weight do you
+     # pay', 'the panel access our certificate through the portal', 'marks lost until the certificate arrives'.
+     # A subject's own keyword is a strong reading and always wins ('Is the warranty scored?' is about warranty).
     "not_covered": [
         {"subject": "payment terms",
-         "keywords": ["payment", "invoice", "invoicing", "retention", "deposit", "upfront"],
+         "keywords": ["payment", "invoice", "invoicing", "retention", "deposit", "upfront", "pay us", "paid us",
+                      "pay the supplier", "be paid", "get paid"],
          "pairs": [[["pay", "paid"],
                     ["us", "supplier", "suppliers", "when", "soon", "after", "within", "before", "advance",
                      "upfront", "on delivery", "on receipt", "day", "week", "month", "net", "terms"]]]},
@@ -280,12 +289,17 @@ def _keyword_hit(keyword, text):
     return re.search(_keyword_pattern(keyword), text) is not None
 
 
-def _raises(subject, text):
+def _raises(subject, text, anchored=False):
     """True when the question raises an off-pack subject: one of its own keywords anywhere, or a subject word and a
     framing word of one of its pairs in the same sentence ('who bears risk during delivery', 'risk passes on
-    delivery', 'where can I download'), never a common word on its own ('the risk of half marks')."""
+    delivery', 'where can I download'), never a common word on its own ('the risk of half marks').
+
+    anchored: the question names a pack anchor (it is about how a bid is assessed), so a pair, the weak everyday
+    reading, does not raise the subject; only the subject's own keywords do."""
     if any(_keyword_hit(k, text) for k in subject.get("keywords", [])):
         return True
+    if anchored:
+        return False
     for sentence in re.split(r"[.?!;]+", text):
         for topic, frame in subject.get("pairs", []):
             if any(_keyword_hit(k, sentence) for k in topic) and any(_keyword_hit(k, sentence) for k in frame):
@@ -476,7 +490,8 @@ class ProcurementSupplierCollaborationAgent(BasicAgent):
         # One incidental pack word does not answer a question about a subject the pack is silent on: the whole
         # question goes to every bidder as a new clarification; related pack text is shown only as context (the
         # published clarifications are listed below in any case).
-        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", []) if _raises(u, q)]
+        anchored = any(_keyword_hit(k, q) for p in rfq["pack"] for k in p.get("anchors", []))
+        uncovered = [] if exact else [u["subject"] for u in rfq.get("not_covered", []) if _raises(u, q, anchored)]
         lines = [f"# Supplier Question - {rfq['id']}", "",
                  f"**RFQ:** {rfq['id']} ({rfq['route']}), closes {_date(rfq['closes_in_days'])} "
                  f"(in {rfq['closes_in_days']} days)",
