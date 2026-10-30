@@ -90,6 +90,34 @@ FORBIDDEN_TERMS = (
     "azure",
 )
 
+# Other vendors' AI products. Demo cards describe what was built with
+# Microsoft products, so these names are flagged too. The problem text never
+# repeats them, because the check comment is public.
+OTHER_AI_PRODUCT_TERMS = (
+    "chatgpt",
+    "openai",
+    "gpt",
+    "anthropic",
+    "claude",
+    "gemini",
+    "bard",
+    "llama",
+    "mistral",
+    "grok",
+    "perplexity",
+    "deepseek",
+    "midjourney",
+)
+OTHER_AI_PRODUCTS_PROBLEM = (
+    "Remove the names of AI products from other companies. "
+    "Describe the demo with the Microsoft products it uses."
+)
+
+# A host a browser URL parser accepts: dot-separated letters, digits and hyphens.
+_HOST_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
+HOST_RE = re.compile(rf"^{_HOST_LABEL}(?:\.{_HOST_LABEL})*\.?$")
+PORT_RE = re.compile(r"^[0-9]{1,5}$")
+
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 HANDLE_RE = re.compile(r"(?<![\w.])@[A-Za-z0-9][\w-]*")
 NO_RESPONSE = {"", "_no response_", "none"}
@@ -140,15 +168,37 @@ def slugify(text: str) -> str:
 
 
 # ------------------------------------------------------------------ validate
+def split_url(url: str) -> tuple[urllib.parse.SplitResult, int | None]:
+    """Split a link the way a browser would accept it, or raise ValueError.
+
+    Python's urlsplit accepts hosts and ports that a browser's URL parser
+    rejects (spaces, an out-of-range or non-numeric port). Such a link would
+    break the public page, so it is refused here.
+    """
+    if not url or any(ch.isspace() or ord(ch) < 0x20 or ch == "\\" for ch in url):
+        raise ValueError("whitespace, control character or backslash")
+    parts = urllib.parse.urlsplit(url)
+    hostport = parts.netloc.rpartition("@")[2]
+    host, colon, port = hostport.rpartition(":") if ":" in hostport else (hostport, "", "")
+    if not HOST_RE.match(host):
+        raise ValueError("invalid host")
+    if colon and port:
+        if not PORT_RE.match(port) or int(port) > 65535:
+            raise ValueError("invalid port")
+    return parts, (int(port) if colon and port else None)
+
+
 def classify_video_url(url: str) -> str:
     """Return 'youtube', or raise SubmissionError."""
     try:
-        parts = urllib.parse.urlsplit(url)
+        parts, port = split_url(url)
     except ValueError as exc:
+        if not url.lower().startswith("https://"):
+            raise SubmissionError("The video link must start with https://.") from exc
         raise SubmissionError("The video link is not a valid URL.") from exc
     if parts.scheme != "https":
         raise SubmissionError("The video link must start with https://.")
-    if parts.username or parts.password or parts.port:
+    if parts.username or parts.password or port is not None:
         raise SubmissionError("The video link must be a plain public https link.")
     host = (parts.hostname or "").lower()
     if host in YOUTUBE_HOSTS:
@@ -159,13 +209,17 @@ def classify_video_url(url: str) -> str:
     )
 
 
-def forbidden_terms_in(text: str) -> list[str]:
+def forbidden_terms_in(text: str, terms: tuple[str, ...] = FORBIDDEN_TERMS) -> list[str]:
     found = []
     lowered = (text or "").lower()
-    for term in FORBIDDEN_TERMS:
+    for term in terms:
         if re.search(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])", lowered):
             found.append(term)
     return found
+
+
+def other_ai_products_in(text: str) -> bool:
+    return bool(forbidden_terms_in(text, OTHER_AI_PRODUCT_TERMS))
 
 
 def _sentences(text: str) -> int:
@@ -221,8 +275,8 @@ def validate(sections: dict[str, str]) -> tuple[dict, list[str]]:
 
     if onepager:
         try:
-            parts = urllib.parse.urlsplit(onepager)
-            if parts.scheme != "https" or not parts.hostname or parts.username:
+            parts, _port = split_url(onepager)
+            if parts.scheme != "https" or not parts.hostname or parts.username or parts.password:
                 raise ValueError
         except ValueError:
             problems.append("The one-pager link must be a public https link.")
@@ -238,6 +292,8 @@ def validate(sections: dict[str, str]) -> tuple[dict, list[str]]:
             "Remove these words, which cannot appear on the public page: "
             + ", ".join(sorted(terms)) + "."
         )
+    if other_ai_products_in(free_text):
+        problems.append(OTHER_AI_PRODUCTS_PROBLEM)
     if EMAIL_RE.search(free_text) or HANDLE_RE.search(free_text):
         problems.append(
             "Remove email addresses and @handles. Credit a team or channel, not a person."
