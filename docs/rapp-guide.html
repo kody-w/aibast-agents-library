@@ -5439,15 +5439,22 @@ az functionapp list --query "[?tags.Stage=='Prototype' &amp;&amp; tags.LastUsed&
 </div>
 <div class="step-section section-spaced tool-authoring-notice">
 <h3>Tool Development</h3>
-<p>Need a custom tool for your workflow? These tools are built as standalone HTML files that can be easily modified or extended. Check the <code>tools/</code> directory in the repository for source code and templates.</p>
+<p>Need a custom tool for your workflow? Tools here come in two shapes. A Brainstem tool is one <code>agent.py</code> file, or a rapplication of a few, that a Brainstem loads from its <code>agents/</code> folder. Their source is in <code>docs/experimental/</code> in the repository, and <a href="experimental/tools.json">tools.json</a> lists them. A browser tool is one HTML file. Its source is in the <code>tools/</code> folder.</p>
 <div class="tool-authoring-notice">
 <h4>Creating Your Own Tools</h4>
-<p>All tools follow a simple pattern:</p>
+<p>A Brainstem tool:</p>
 <ol class="list-indented">
-<li>Single HTML file with embedded CSS and JavaScript</li>
-<li>Local storage for data persistence</li>
-<li>Export/import functionality for data portability</li>
-<li>Responsive design for mobile and desktop use</li>
+<li>One Python file whose name ends in <code>_agent.py</code></li>
+<li>Metadata that tells the model what it does, and a <code>perform</code> method that does it</li>
+<li>Keeps its data in local files on your device</li>
+<li>Install it by saving the file into <code>agents/</code>; remove it by deleting the file</li>
+</ol>
+<p>A browser tool:</p>
+<ol class="list-indented">
+<li>One HTML file with its CSS and JavaScript inside</li>
+<li>Keeps its data in your browser's local storage</li>
+<li>Export and import, so your data can move with you</li>
+<li>Works on phones and desktops</li>
 </ol>
 </div>
 </div>

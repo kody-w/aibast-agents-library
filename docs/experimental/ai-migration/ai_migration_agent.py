@@ -20,8 +20,10 @@ What it does, in order:
 
 Rules it keeps:
   - dry run by default: apply and undo change nothing unless dry_run=false
-  - carry everything but the keys: files named like credentials, tokens,
-    auth or .env are skipped, and key-looking values are redacted
+  - carry everything but the keys: known key files (.env, auth.json,
+    credentials, *.pem and the like) and files holding a private key are
+    skipped and listed by name with the reason; key-looking values are
+    redacted from everything else
   - names and counts only in chat; file contents stay in files on this device
   - nothing leaves the device: no network calls, standard library only
 
@@ -200,11 +202,22 @@ GitHub Copilot offers models from several providers, so you keep model choice. W
 
 
 # ── Safety: carry everything but the keys ────────────────────────────────────
+# Known key and sign-in files, judged by the whole file name. Folder names and
+# words inside a name ("authoring", "design-tokens", "session-notes") are not
+# judged: they are ordinary skills and projects and must come over.
 _SECRET_NAME = re.compile(
-    r"(auth|credential|secret|token|oauth|password|passwd|cookie|session|"
-    r"keychain|api[_-]?key|private[_-]?key|^\.env|\.env$|\.env\.|\.pem$|\.key$|\.p12$|\.pfx$|id_rsa|id_ed25519)",
+    r"^(?:"
+    r"\.env(?:\..*)?|.*\.env"
+    r"|.*\.(?:pem|key|p12|pfx|jks|keystore|kdbx|keychain|keychain-db|gpg|asc)"
+    r"|id_(?:rsa|dsa|ecdsa|ed25519)(?:\.pub)?"
+    r"|\.?credentials(?:\.(?:json|ya?ml|toml|txt))?"
+    r"|\.?(?:auth|oauth|oauth_creds|token|tokens|access_token|refresh_token|secret|secrets|cookies|session|sessions)"
+    r"\.(?:json|ya?ml|toml|txt|db|sqlite)"
+    r"|\.netrc|\.npmrc|\.pypirc|\.git-credentials|\.htpasswd"
+    r")$",
     re.IGNORECASE,
 )
+_PRIVATE_KEY_BLOCK = re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----")
 _SECRET_VALUE_PATTERNS = [
     re.compile(r"sk-[A-Za-z0-9_\-]{16,}"),
     re.compile(r"gh[pousr]_[A-Za-z0-9]{20,}"),
@@ -215,10 +228,18 @@ _SECRET_VALUE_PATTERNS = [
     re.compile(r"eyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}"),
     re.compile(r"(?i)bearer\s+[A-Za-z0-9._\-~+/]{12,}=*"),
 ]
+# A setting name whose value is a key. The key word must be a whole part of
+# the name (api_key, AUTH_TOKEN, apiKey, password), so "Author:" and
+# "Authorization flow:" are ordinary text.
 _ASSIGNMENT = re.compile(
-    r"(?i)\b([A-Z0-9_\-]*(?:key|token|secret|password|passwd|pwd|credential|auth)[A-Z0-9_\-]*)"
+    r"\b((?:[A-Za-z0-9]+[_\-])*(?:[a-z0-9]+(?:Key|Token|Secret|Password|Passwd|Pwd|Credentials?|Auth)"
+    r"|(?i:key|token|secret|password|passwd|pwd|credentials?|auth))(?:[_\-][A-Za-z0-9]+)*)"
     r"(\s*[:=]\s*[\"']?)([^\s\"',}]{4,})"
 )
+# Name parts that are always keys whatever the value looks like. A bare "key"
+# or "auth" ("Primary key: customer_id") is redacted only when the value looks
+# generated: letters and digits together, or very long.
+_STRONG_SECRET_PART = re.compile(r"(?i)(token|secret|password|passwd|pwd|credential|apikey|api_key|api-key|private)")
 _LONG_RANDOM = re.compile(r"\b(?=[A-Za-z0-9_\-+=]*\d)(?=[A-Za-z0-9_\-+=]*[A-Za-z])[A-Za-z0-9_\-+=]{32,}\b")
 _SECRET_FLAG = re.compile(r"(?i)^--?[a-z0-9_\-]*(key|token|secret|password|auth|credential)[a-z0-9_\-]*$")
 REDACTED = "[REDACTED]"
@@ -230,13 +251,33 @@ def redact_text(text):
         return text
     for pattern in _SECRET_VALUE_PATTERNS:
         text = pattern.sub(REDACTED, text)
-    text = _ASSIGNMENT.sub(lambda m: m.group(1) + m.group(2) + REDACTED, text)
+    text = _ASSIGNMENT.sub(_redact_assignment, text)
     text = _LONG_RANDOM.sub(REDACTED, text)
     return text
 
 
+def _redact_assignment(match):
+    name, sep, value = match.group(1), match.group(2), match.group(3)
+    looks_generated = (re.search(r"\d", value) and re.search(r"[A-Za-z]", value) and len(value) >= 8) or len(value) >= 24
+    if _STRONG_SECRET_PART.search(name) or looks_generated:
+        return name + sep + REDACTED
+    return match.group(0)
+
+
 def _is_secret_name(name):
-    return bool(_SECRET_NAME.search(name))
+    """True for a known key or sign-in file, judged by its whole file name."""
+    return bool(_SECRET_NAME.match(os.path.basename(str(name))))
+
+
+def _secret_content_reason(path):
+    """A plain reason when a file's content is a key, else None. Never returns the content."""
+    text = _read_text(path)
+    if text and _PRIVATE_KEY_BLOCK.search(text):
+        return "it holds a private key"
+    return None
+
+
+_KEY_FILE_REASON = "it is a key or sign-in file"
 
 
 def _strip_url(url):
@@ -388,7 +429,7 @@ class _Scan:
         self.project = os.path.abspath(os.path.expanduser(project)) if project else None
         self.export = os.path.abspath(os.path.expanduser(export)) if export else None
         self.items = []
-        self.skipped = 0
+        self.skipped = []  # (where, plain reason); names only, never values
 
     def display(self, path):
         path = os.path.abspath(path)
@@ -416,12 +457,26 @@ class _Scan:
             if not os.path.isfile(path) or os.path.islink(path):
                 continue
             base = self.project if (self.project and path.startswith(self.project + os.sep)) else self.home
-            relative = os.path.relpath(path, base)
-            if any(_is_secret_name(part) for part in relative.split(os.sep)):
-                self.skipped += 1
+            if _is_secret_name(path):
+                self.skip(path, _KEY_FILE_REASON)
                 continue
+            if not path.endswith(".json"):  # tool-server configs are read field by field
+                reason = _secret_content_reason(path)
+                if reason:
+                    self.skip(path, reason)
+                    continue
             found.append(path)
         return found
+
+    def skip(self, path, reason, member=None):
+        path = os.path.abspath(path)
+        if self.export and (path == self.export or path.startswith(self.export + os.sep)):
+            where = os.path.basename(self.export) + path[len(self.export):].replace(os.sep, "/")
+        else:
+            where = self.display(path)
+        if member:
+            where += "/" + member
+        self.skipped.append((where, reason))
 
     def add(self, source, kind, name, path, **extra):
         item = {"source": source, "kind": kind, "name": name, "path": path}
@@ -510,7 +565,7 @@ class _Scan:
                 for member in archive.namelist():
                     base = os.path.basename(member)
                     if _is_secret_name(base):
-                        self.skipped += 1
+                        self.skip(self.export, _KEY_FILE_REASON, member=member)
                         continue
                     if base in spec["conversations"]:
                         count = _conversation_count(archive.read(member))
@@ -523,7 +578,7 @@ class _Scan:
                 if not os.path.isfile(path) or os.path.islink(path):
                     continue
                 if _is_secret_name(base):
-                    self.skipped += 1
+                    self.skip(path, _KEY_FILE_REASON)
                     continue
                 if base in spec["conversations"]:
                     with open(path, "rb") as handle:
@@ -586,6 +641,14 @@ class {class_name}(BasicAgent):
 '''
 
 
+def _docstring_safe(text):
+    """A path that is safe inside the generated module's docstring on every OS:
+    forward slashes (a Windows backslash would start an escape such as \\u or
+    \\N and stop the file compiling), no quotes, printable ASCII only."""
+    text = str(text).replace("\\", "/").replace('"', "'")
+    return "".join(ch if 32 <= ord(ch) < 127 else "?" for ch in text)
+
+
 def _generated_agent(item, scan, used_names, date):
     text = _read_text(item["path"]) or ""
     if item["path"].endswith(".toml"):
@@ -614,7 +677,7 @@ def _generated_agent(item, scan, used_names, date):
     source = _AGENT_TEMPLATE.format(
         date=date,
         kind=item["kind"],
-        where=scan.display(item["path"]).replace('"', "'"),
+        where=_docstring_safe(scan.display(item["path"])),
         instructions=json.dumps(body),
         class_name=class_name,
         tool_name=json.dumps(tool_name),
@@ -763,13 +826,23 @@ class AIMigrationAgent(BasicAgent):
                 else:
                     label = {"archive-file": "other export files", "mcp": "tool servers (MCP)"}.get(kind, kind)
                     lines.append("- %s: %d (%s)" % (label, len(items), self._names(items)))
-        if scan.skipped:
-            lines.append("")
-            lines.append("Skipped %d file(s) whose names look like keys, tokens or sign-ins. They were not opened." % scan.skipped)
+        lines += self._skipped_lines(scan)
         lines.append("")
         lines.append("Next: say \"plan\" to see what each item becomes in your Brainstem.")
         lines.append(NAMING_RULE)
         return "\n".join(lines)
+
+    @staticmethod
+    def _skipped_lines(scan, limit=20):
+        """Every skipped file by name with a plain reason. Values are never shown."""
+        if not scan.skipped:
+            return []
+        lines = ["", "Skipped %d file(s). They are not copied:" % len(scan.skipped)]
+        for where, reason in scan.skipped[:limit]:
+            lines.append("- %s (%s)" % (where, reason))
+        if len(scan.skipped) > limit:
+            lines.append("- (+%d more)" % (len(scan.skipped) - limit))
+        return lines
 
     def _report_plan(self, scan):
         lines = ["Plan (nothing written yet)."]
@@ -787,6 +860,7 @@ class AIMigrationAgent(BasicAgent):
         lines.append("Does not carry over:")
         for note in NOT_CARRIED:
             lines.append("- " + note)
+        lines += self._skipped_lines(scan)
         lines.append("")
         lines.append("apply writes a new staging folder under " + self._display_root() +
                      " and never changes soul.md or your existing agents. "
@@ -851,6 +925,8 @@ class AIMigrationAgent(BasicAgent):
         if hooks:
             review += ["", "Hooks not carried: " + ", ".join(sorted(set(hooks)))]
         review += ["", "Not carried over:"] + ["- " + note for note in NOT_CARRIED]
+        if scan.skipped:
+            review += ["", "Skipped files (not copied):"] + ["- %s (%s)" % entry for entry in scan.skipped]
         files["REVIEW.md"] = redact_text("\n".join(review) + "\n")
         return files
 

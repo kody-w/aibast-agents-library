@@ -286,7 +286,7 @@ html[data-theme="dark"] {
   </div>
 
   <h2>What stays on your device</h2>
-  <p>The agent reads local files only. It skips files named like keys, tokens, sign-ins or <code>.env</code>, and it removes key-looking values from everything it writes. It never overwrites <code>soul.md</code> or an agent you already have.</p>
+  <p>The agent reads local files only. It skips known key and sign-in files, such as <code>.env</code> or <code>auth.json</code>, and any file that holds a private key, and it tells you each file it skipped and why. A skill or project with a word like "auth" or "session" in its name still comes over. It removes key-looking values from everything it writes. It never overwrites <code>soul.md</code> or an agent you already have.</p>
   <p id="data-note">When you use it through a Brainstem, its replies (names and counts, never file contents or keys) go to the model you chose, as any chat does.</p>
 
   <h2>How the setups compare</h2>

@@ -25,8 +25,8 @@ DEFAULT_GUIDE = ROOT / "docs" / "rapp-guide.html"
 DEFAULT_CONTRACT = ROOT / "state" / "rapp_guide_content_contract.json"
 AUDIT_SCHEMA = "aibast-rapp-guide-audit/1.0"
 CONTRACT_SCHEMA = "aibast-rapp-guide-content-contract/1.0"
-TRUSTED_SOURCE_COMMIT = "5fda597330fb55292427faf8659a946b62127f40"
-TRUSTED_SOURCE_BLOB_OID = "d8abbcabf87a142566ba2873b10f255e52383f2c"
+TRUSTED_SOURCE_COMMIT = "ea739d7a3a82f23b84de79cbd20c76c60a7e2a75"
+TRUSTED_SOURCE_BLOB_OID = "a7750e5f2b9f0fa615561fdb445a1a6bffd4e4d1"
 TRUSTED_SOURCE_PATH = "docs/rapp-guide.html"
 CONTENT_SECTION_IDS = (
     "overview",
