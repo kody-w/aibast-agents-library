@@ -1054,6 +1054,12 @@ tbody tr:hover {
   padding-top: 1.25rem;
 }
 
+.vault-deeper {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--cp-border);
+}
+
 .content-section > .nav-controls {
   display: none;
 }
@@ -1566,6 +1572,17 @@ body:not(.js-enabled) .quiz-option input {
 <a class="nav-item" href="#roadmap">
 <span class="nav-icon">§</span>
 <span>Speed Barriers Broken</span>
+</a>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-title">Reference</div>
+<a class="nav-item" href="#reference">
+<span class="nav-icon">§</span>
+<span>RAPP/1 Reference</span>
+</a>
+<a class="nav-item" href="vault/index.html">
+<span class="nav-icon">↗</span>
+<span>Reference Vault</span>
 </a>
 </div>
 <div class="sidebar-section">
@@ -2319,6 +2336,7 @@ def handle_request(user_message, user_guid):
 <p>If yes → Move to Step 2 (Audit)</p>
 <p>If no → Schedule follow-up to get more specific requirements</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2001%20Discovery%20Call.md">Step 1 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -2497,6 +2515,7 @@ analysis, and automated routing.</pre>
 <p><strong>Time saved:</strong> 15 minutes here prevents 3 weeks of building the wrong solution.</p>
 <p><strong>Real impact:</strong> Traditional software development risks spending months building solutions for problems that don't actually matter to stakeholders. The audit gate eliminates this risk by validating stakeholder commitment and problem importance before any development begins.</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2002%20Transcript%20Analysis.md">Step 2 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -2651,6 +2670,7 @@ Tone: Professional but approachable. We're confirming we heard them correctly, n
 <p><strong>Potential time saved:</strong> If customer says "no that's not what we meant," you've saved 3-6 weeks of building the wrong thing</p>
 <p><strong>Important principle:</strong> The customer's response to the poke becomes crucial feedback for agent development. Any additional details they provide - like "our HR system is actually split across 3 instances" - represents the first feedback cycle before a single line of code is written. This early correction prevents building on faulty assumptions.</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2003%20Generate%20MVP%20Poke.md">Step 3 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -2770,6 +2790,7 @@ Tone: Professional but approachable. We're confirming we heard them correctly, n
 <p><strong>Risk eliminated:</strong> Building the wrong solution for 3-6 weeks = hundreds of hours saved</p>
 <p><strong>Risk mitigation:</strong> By Step 6, you have working code with locked scope and customer approval on the requirements. If the customer ultimately decides the solution isn't right, you've only invested a few days rather than months - dramatically reducing the cost of failure.</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2004%20Customer%20Validation.md">Step 4 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -3117,6 +3138,7 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <p><strong>Real example:</strong> When leadership provided a list of 60 agents to test the automation capability, the developer accepted the challenge and generated all 60 production-ready agents during a lunch break - demonstrating that the system could scale agent creation from months to hours.</p>
 <p><strong>Result:</strong> Successfully generated all 60 agents. Most just need minor API endpoint customization.</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2005%20Generate%20Agent%20Code.md">Step 5 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -3258,6 +3280,7 @@ class DynamicRoutePlanningAgent(BasicAgent):
 <p><strong>AI learns from examples:</strong> RAPP Agent Generator is trained on working agents from previous projects</p>
 <p><strong>Modularity helps:</strong> Each agent does ONE thing well. Easier to review than monolithic code.</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2006%20Code%20Quality%20Review.md">Step 6 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -3517,6 +3540,7 @@ func start
 <p><strong>Pre-built Copilot solution:</strong> import it, bind the two connection references (Office 365 Outlook and Office 365 Users), and point the flow at your Function endpoint</p>
 <p><strong>Speed example:</strong> "Cape team member had his own business set up by the next day using this. That's how fast you can move with this. That's what rapid means."</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2007%20Deploy%20Prototype.md">Step 7 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -3831,6 +3855,7 @@ scope a Phase 2 project with those additional capabilities. Sound good?"</code><
 <p><strong>Risk elimination:</strong> You're iterating on WORKING CODE, not arguing about design documents</p>
 <p><strong>Iteration philosophy:</strong> "And they're gonna love it or they're gonna hate it, right? And we go through the same process of, OK, here's the feedback, let's keep iterating."</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2008%20Demo%20Review.md">Step 8 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -4362,6 +4387,7 @@ Best regards,
 </div>
 </div>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2009%20Generate%20Video%20Demo.md">Step 9 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 <div class="nav-controls">
 <button class="nav-btn" onclick="previousSection()" type="button">
 <span>←</span>
@@ -4453,6 +4479,7 @@ Best regards,
 </div>
 </div>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2010%20Final%20Demo%20Review.md">Step 10 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 </div>
 <!-- STEP 11: Production Planning -->
 <div class="content-section" id="step11">
@@ -4536,6 +4563,7 @@ Security additions needed:
 </div>
 </div>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2011%20Production%20Planning.md">Step 11 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 </div>
 <!-- STEP 12: Audit - Security & Compliance Sign-off (Quality Gate #6) -->
 <div class="content-section" id="step12">
@@ -4587,6 +4615,7 @@ Security additions needed:
 </div>
 </div>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2012%20Security%20Sign-off.md">Step 12 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 </div>
 <!-- STEP 13: Production Deployment -->
 <div class="content-section" id="step13">
@@ -4653,6 +4682,7 @@ Security additions needed:
 </div>
 </div>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2013%20Production%20Deployment.md">Step 13 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 </div>
 <!-- STEP 14: Post-Deployment Review -->
 <div class="content-section" id="step14">
@@ -4783,6 +4813,7 @@ Security additions needed:
 <p><strong>Compare to traditional development:</strong> 3-6 months for same scope</p>
 <p><strong>Result:</strong> 20x faster, 6 human quality gates preventing scope creep, validated ROI with real user data</p>
 </div>
+<p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2014%20Post-Deployment%20Review.md">Step 14 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 </div>
 <!-- TEAM SETUP GUIDE -->
 <div class="content-section" id="team-setup">
@@ -5282,6 +5313,36 @@ az functionapp list --query "[?tags.Stage=='Prototype' &amp;&amp; tags.LastUsed&
 <p><strong>Where status actually lives:</strong> this page is the narrative. Milestone status is tracked as GitHub milestones on the repository, and the release ledger records what shipped and what broke afterwards.</p>
 </div>
 </div>
+<!-- RAPP/1 REFERENCE -->
+<div class="content-section" id="reference">
+<h1 class="section-title">RAPP/1 Reference</h1>
+<p class="section-subtitle">Every step of this guide in depth, and the protocol underneath it</p>
+<div class="step-section">
+<h3>What the reference vault is</h3>
+<p>This guide says what to do at each step. The <a href="vault/index.html">RAPP/1 reference vault</a> says more about each step and explains <strong>RAPP/1</strong>, the protocol the Brainstem and its agents rest on: how an agent is identified, recorded, packaged and moved. It is a set of linked notes. Read them here in the browser, or download them and open the folder in Obsidian.</p>
+</div>
+<div class="step-section">
+<h3>Start where you are</h3>
+<div class="grid-2">
+<div class="priority-card notice-accent">
+<h4>Running the 14 steps</h4>
+<p>One note per step, with inputs, outputs, the gate to pass, and the protocol behind it. <a href="vault/index.html#Production%20Guide%2FProduction%20Guide%20Overview.md">Open the guide notes</a>.</p>
+</div>
+<div class="priority-card notice-success">
+<h4>Building agents</h4>
+<p>The single-file agent contract, the Brainstem kernel, and how this library pins it. <a href="vault/index.html#Building%2FThe%20Agent%20Contract.md">Open the building notes</a>.</p>
+</div>
+<div class="priority-card notice-warning">
+<h4>Implementing the protocol</h4>
+<p>Canonicalization, content addressing, identity, frames, the wire and eggs, in plain language. <a href="vault/index.html#Protocol%2FProtocol%20at%20a%20Glance.md">Open the protocol notes</a>.</p>
+</div>
+</div>
+</div>
+<div class="step-section">
+<h3>Take it with you</h3>
+<p><a href="vault/rapp1-vault.zip">Download the vault</a> to read it in Obsidian. AI tools can read <a href="vault/llms.txt">llms.txt</a>, or every note at once in <a href="vault/llms-full.txt">llms-full.txt</a>. Protocol notes are pinned to a named commit of the RAPP/1 specification, and a build check fails if they drift.</p>
+</div>
+</div>
 <div class="content-section" id="tools">
 <h1 class="section-title">Experimental tools</h1>
 <p class="section-subtitle">Brainstem agents and browser tools for exploring what's next</p>
@@ -5479,7 +5540,7 @@ az functionapp list --query "[?tags.Stage=='Prototype' &amp;&amp; tags.LastUsed&
             'overview', 'architecture', 'principles',
             'step1', 'step2', 'step3', 'step4', 'step5', 'step6', 'step7',
             'step8', 'step9', 'step10', 'step11', 'step12', 'step13', 'step14',
-            'team-setup', 'scaling', 'roadmap', 'tools'
+            'team-setup', 'scaling', 'roadmap', 'reference', 'tools'
         ];
 
         function prefersReducedMotion() {
