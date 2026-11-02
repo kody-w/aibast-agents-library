@@ -488,8 +488,9 @@ echo Starting Hippocampus on http://localhost:7071
 echo Press Ctrl+C to stop
 echo.
 start "" "%SOURCE_DIR%\index.html"
-func start
-goto end
+REM npm's func.cmd exits its batch context before starting Node; CALL preserves ours.
+call func start
+exit /b %ERRORLEVEL%
 
 :status
 curl -sf http://localhost:7071/api/health && echo. || echo Server not running
