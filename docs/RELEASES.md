@@ -10,6 +10,46 @@ failures also carry `incident`.
 
 ---
 
+## 2026-11-09 — the one line restarts a running Brainstem on new code
+
+**Shipped:** [#270](https://github.com/microsoft/aibast-agents-library/pull/270)
+from `kody-w:staging`, merge commit `ae2aac24`. Re-running the one line after a
+fix that did not change the version number now fast-forwards the installed
+source and restarts a running Brainstem on the new code, on Mac/Linux and on
+Windows; before, a running Brainstem kept serving old code under the same
+version. The Windows fix lives on Main's fast path (the path every second run
+takes), not only inside `Install-Brainstem`. The Get help link stays under
+1,800 characters so the Microsoft sign-in redirect accepts it (AADSTS90015 seen
+live on a 4,682-character link). One Easy Mode skill: the learner never chooses
+Brainstem+Copilot versus Copilot-only; the old skill and workshop files remain
+as aliases. The practice computer, a pretend Windows 11 desktop for rehearsing
+the setup, is linked from the installer page. Staging pull requests #487, #488,
+#489, #491, #492, #493, #494, #495, #497.
+
+**Gates:** preflight on each pull request. `tools/promotion_check.sh` reported
+GREEN on the staging head:
+[preflight](https://github.com/kody-w/aibast-agents-library/actions/runs/42575445764),
+[Pages deploy](https://github.com/kody-w/aibast-agents-library/actions/runs/42575445719),
+[one-liner smoke](https://github.com/kody-w/aibast-agents-library/actions/runs/42575579827).
+The restart was proven on clean runners that installed an older commit, started
+that Brainstem, then re-ran the installer: macos-15
+[run 42552730803](https://github.com/kody-w/aibast-agents-library/actions/runs/42552730803)
+and windows-latest
+[run 42557559332](https://github.com/kody-w/aibast-agents-library/actions/runs/42557559332)
+both printed "Picked up the latest Brainstem changes" and the new server
+answered on the new commit. After the merge, production Pages served the new
+`install.sh` and `install.ps1` and the raw `brainstem.py` carried the link
+budget (checked 13:25 UTC).
+
+**Post-release:**
+- none yet.
+
+**Lessons:** prove an installer fix on the path the user takes, not the path
+the fix sits on; the first Windows fix passed every test and never ran on a
+second install because that run skips the function it lived in.
+
+---
+
 ## 2026-11-09 — Get help form, Copilot prompts per tier, VS Code end state
 
 **Shipped:** [#269](https://github.com/microsoft/aibast-agents-library/pull/269)
