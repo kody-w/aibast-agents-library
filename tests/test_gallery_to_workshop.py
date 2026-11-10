@@ -267,6 +267,39 @@ def test_empty_skill_evidence_aborts_before_writing(workspace, monkeypatch):
     assert not (workspace / "solutions/meeting-coordinator").exists()
 
 
+def test_json_without_identity_evidence_fails_write_without_mutation(workspace):
+    source = next((workspace / "federation/copilot-studio-gallery/meeting-coordinator").glob("*_agent.py"))
+    source.write_text(source.read_text().replace(
+        "return json.dumps(evaluate(data),", 'return json.dumps({"amount": 1250, "count": 3},'
+    ))
+    records = workspace / "records.md"
+    records.write_text("authored fictional records")
+    before = snapshot(workspace)
+    result = subprocess.run(
+        [sys.executable, "-B", str(workspace / "tools/gallery_to_workshop.py"),
+         "meeting-coordinator", "--vertical", "general", "--records", str(records), "--write"],
+        text=True, capture_output=True,
+    )
+    assert result.returncode == 1
+    assert "empty evidence section" in result.stderr
+    assert snapshot(workspace) == before
+
+
+@pytest.mark.parametrize("slug", NEW_RUNS)
+def test_preview_shows_json_evidence_and_records_draft_without_mutation(workspace, monkeypatch, capsys, slug):
+    monkeypatch.setattr(pipeline, "ROOT", workspace)
+    before = snapshot(workspace)
+    pipeline.main([slug, "--vertical", "general"])
+    output = capsys.readouterr().out
+    assert "JSON output; demo evidence: [" in output
+    assert "demo evidence: []" not in output
+    assert "STOP before stage 5" in output
+    assert "RECORDS-DRAFT.md" in output
+    assert "persona needs authoring" in output
+    assert "SKILL.md" not in output
+    assert snapshot(workspace) == before
+
+
 def snapshot(root):
     return {path.relative_to(root): path.read_bytes() for path in root.rglob("*") if path.is_file()}
 
