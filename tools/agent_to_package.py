@@ -9,7 +9,7 @@ Written text is copied word for word; evidence lines are taken from the agent's 
 
     python3 tools/agent_to_package.py <agent.py> <slug> <out_dir> [--knowledge file.md]
 """
-import argparse, importlib.util, pathlib, re, shutil, sys, tempfile
+import argparse, importlib.util, json, pathlib, re, shutil, sys, tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASIC = ROOT / "rapp_brainstem" / "agents" / "basic_agent.py"
@@ -29,8 +29,35 @@ def load(agent_file):
     return mod, cls()
 
 
+def json_evidence(value, n=3):
+    """Prefer record identities, titles, dates and named workflow stages, not numeric metrics."""
+    keep = []
+
+    def visit(item, key=""):
+        if isinstance(item, dict):
+            for name, child in item.items():
+                visit(child, name)
+        elif isinstance(item, list):
+            for child in item:
+                visit(child, key)
+        elif isinstance(item, str) and item.strip() and re.search(
+            r"(?:^|_)(?:ids?|titles?|names?|case|project|slots?|stages?|dates?)(?:$|_)", key
+        ):
+            keep.append(item)
+
+    visit(value)
+    return list(dict.fromkeys(keep))[:n]
+
+
 def evidence(text, n=3):
     """Exact strings the answer must carry: table rows' first cells and the count line."""
+    try:
+        value = json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    else:
+        if isinstance(value, (dict, list)):
+            return json_evidence(value, n)
     rows = [[c.strip() for c in r.strip("|").split("|")] for r in text.splitlines() if r.startswith("|") and not set(r) <= set("|-: ")]
     keep = [next((c for c in r if c and not c.isdigit()), "") for r in rows[1:]][:n]
     keep = [k for k in keep if k]
