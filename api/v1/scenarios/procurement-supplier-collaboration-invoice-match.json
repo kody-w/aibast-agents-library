@@ -39,6 +39,41 @@
       "loudnessLufs": -18.7,
       "note": "Library narration voice, matched against the Cowork demo voice-over. Change this field and regenerate the clips to swap it."
     },
-    "segments": []
+    "segments": [
+      {
+        "id": "procurement-supplier-collaboration-invoice-match.before",
+        "screenId": "ask",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "An accounts payable lead asks which supplier invoices can go for approval today.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      },
+      {
+        "id": "procurement-supplier-collaboration-invoice-match.after",
+        "screenId": "answer",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "One invoice matches and can go for approval, and two are held for quantity gaps.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      }
+    ]
   }
 }

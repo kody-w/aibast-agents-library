@@ -39,6 +39,41 @@
       "loudnessLufs": -18.7,
       "note": "Library narration voice, matched against the Cowork demo voice-over. Change this field and regenerate the clips to swap it."
     },
-    "segments": []
+    "segments": [
+      {
+        "id": "payments-operations-payment-status.before",
+        "screenId": "ask",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "A payments operations lead asks what to tell a relationship manager about a payment.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      },
+      {
+        "id": "payments-operations-payment-status.after",
+        "screenId": "answer",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "The wire has been acknowledged by the scheme, and settlement is expected by mid-afternoon.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      }
+    ]
   }
 }

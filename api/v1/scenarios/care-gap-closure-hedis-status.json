@@ -39,6 +39,41 @@
       "loudnessLufs": -18.7,
       "note": "Library narration voice, matched against the Cowork demo voice-over. Change this field and regenerate the clips to swap it."
     },
-    "segments": []
+    "segments": [
+      {
+        "id": "care-gap-closure-hedis-status.before",
+        "screenId": "ask",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "A quality manager asks where the Medicare Advantage care gaps stand before the reporting deadline.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      },
+      {
+        "id": "care-gap-closure-hedis-status.after",
+        "screenId": "answer",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "Forty percent of patients have open gaps, the score trails target, and diabetes testing is the biggest driver.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      }
+    ]
   }
 }

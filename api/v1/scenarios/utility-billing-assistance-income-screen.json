@@ -39,6 +39,41 @@
       "loudnessLufs": -18.7,
       "note": "Library narration voice, matched against the Cowork demo voice-over. Change this field and regenerate the clips to swap it."
     },
-    "segments": []
+    "segments": [
+      {
+        "id": "utility-billing-assistance-income-screen.before",
+        "screenId": "ask",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "An eligibility screener asks for a preliminary screen of a two-person senior household.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      },
+      {
+        "id": "utility-billing-assistance-income-screen.after",
+        "screenId": "answer",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "The household is at about half the area median income and may qualify for several programs.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      }
+    ]
   }
 }

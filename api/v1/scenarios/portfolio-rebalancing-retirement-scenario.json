@@ -39,6 +39,41 @@
       "loudnessLufs": -18.7,
       "note": "Library narration voice, matched against the Cowork demo voice-over. Change this field and regenerate the clips to swap it."
     },
-    "segments": []
+    "segments": [
+      {
+        "id": "portfolio-rebalancing-retirement-scenario.before",
+        "screenId": "ask",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "A retirement planning specialist asks to frame the scenarios to model, without inventing odds of success.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      },
+      {
+        "id": "portfolio-rebalancing-retirement-scenario.after",
+        "screenId": "answer",
+        "startMs": 0,
+        "media": null,
+        "captions": {
+          "unit": "milliseconds",
+          "alignment": "provider-segments",
+          "segments": [
+            {
+              "text": "Three scenarios are framed from the portfolio inputs, with no success probability invented.",
+              "startMs": 0,
+              "endMs": null
+            }
+          ]
+        }
+      }
+    ]
   }
 }

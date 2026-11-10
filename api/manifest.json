@@ -131,6 +131,14 @@
         "account-intelligence-value-messaging": {
           "before": "The account executive asks for talking points for each person in the meeting.",
           "after": "Talking points are drafted per role, with objection handling. Nothing is sent until the executive reviews it."
+        },
+        "account-intelligence-risk-assessment": {
+          "before": "A sales director wants the deal risks and options, without touching the forecast.",
+          "after": "Four risks are flagged, two urgent, led by the missing technology chief relationship. The forecast stays unchanged."
+        },
+        "account-intelligence-executive-briefing": {
+          "before": "A customer success manager asks for a short briefing and checklist before the meeting.",
+          "after": "The briefing shows a deal worth 2.4 million dollars at 68 percent, with three prep steps. Nothing is written to the CRM."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -281,6 +289,14 @@
         "ask-hr-health-insurance": {
           "before": "The employee wants a summary of their health plan and what must be verified.",
           "after": "The plan details are summarized, and dependent eligibility is left for the benefits administrator to confirm."
+        },
+        "ask-hr-remote-work": {
+          "before": "A manager asks what the sample remote-work policy says, without guessing why an employee asked.",
+          "after": "The policy allows three remote days a week with core hours, and exceptions go to HR review."
+        },
+        "ask-hr-benefits-summary": {
+          "before": "An HR specialist asks for the sample benefits snapshot, with no pay estimates or eligibility calls.",
+          "after": "The snapshot lists medical, dental, retirement and time off, with no compensation estimate or eligibility decision."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -431,6 +447,18 @@
         "benefits-enrollment-assistant-provider-network": {
           "before": "The employee asks whether two local clinics are in network on each plan.",
           "after": "One clinic is covered on every plan. The pediatric clinic is out of network on the base plan."
+        },
+        "benefits-enrollment-assistant-deadline-reminders": {
+          "before": "An employee asks which benefits deadlines belong on their calendar.",
+          "after": "Open enrollment closes November 20, life event changes are due a week later, and elections start in January."
+        },
+        "benefits-enrollment-assistant-election-draft": {
+          "before": "The employee wants their election changes drafted, without submitting anything.",
+          "after": "The draft moves to family coverage for 46 dollars more per paycheck. Nothing is submitted."
+        },
+        "benefits-enrollment-assistant-document-checklist": {
+          "before": "The employee asks which documents are still outstanding.",
+          "after": "One document is still needed, due November 27, and it goes through the official benefits portal."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -506,6 +534,14 @@
         "briefing-pack-builder-draft-brief": {
           "before": "The coordinator asks for a budget hearing brief on the bridge project.",
           "after": "The draft is ready, with the figure conflict flagged at the top for confirmation before it goes anywhere."
+        },
+        "briefing-pack-builder-gap-report": {
+          "before": "A briefing coordinator asks which sections of the brief still need input.",
+          "after": "Only the talking points are missing, and they need input from communications."
+        },
+        "briefing-pack-builder-approval-route": {
+          "before": "A department director asks who signs off the brief, and how long it takes.",
+          "after": "The budget hearing brief needs two sign-offs and takes eight working days from a complete draft."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -581,6 +617,14 @@
         "build-materials-compliance-vendor-watch": {
           "before": "A supplier quality manager asks which vendor certificates have lapsed or will soon.",
           "after": "One certificate has expired and two expire within weeks. Renewal requests are drafted only on approval."
+        },
+        "build-materials-compliance-audit-evidence": {
+          "before": "A compliance reviewer asks if the evidence package is ready for the program auditor.",
+          "after": "Not yet. Only one of seven material lines has complete evidence, and the blocking items are listed."
+        },
+        "build-materials-compliance-action-drafts": {
+          "before": "A procurement compliance lead approves the hold, the substitution and the vendor follow-ups.",
+          "after": "Five drafts are staged for review. Nothing is sent until the lead dispatches them."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -656,6 +700,14 @@
         "permit-updates": {
           "before": "A customer service lead wants status updates to cut down on calls.",
           "after": "Six ready-to-send applicant updates are drafted, each with current stage and days over target."
+        },
+        "permit-coordination": {
+          "before": "A permit technician asks who needs to review a new restaurant fit-out, and when it is due back.",
+          "after": "It routes through zoning, building and fire review, on a 21-day clock that has already started."
+        },
+        "permit-inspections": {
+          "before": "The chief building inspector asks which inspections are on the board for the solar job.",
+          "after": "Three inspections are scheduled, covered by one electrical and one structural inspector."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -792,6 +844,30 @@
         "care-gap-closure-quality-dashboard": {
           "before": "A clinical operations lead wants the completeness dashboard and its limits.",
           "after": "Each measure shows a closure rate, with clear notes that eligibility and exclusions are not yet validated."
+        },
+        "care-gap-closure-campaign-projection": {
+          "before": "A clinical operations lead asks for the campaign plan and its projected impact.",
+          "after": "The plan spans text, portal, calls and nurse outreach, and the resources wait on clinical approval."
+        },
+        "care-gap-closure-risk-stratification": {
+          "before": "The coordinator asks for the diabetes cohort broken down by risk and engagement barriers.",
+          "after": "The 387 patients fall into three risk tiers, with transportation the most common barrier."
+        },
+        "care-gap-closure-monitoring-plan": {
+          "before": "The operations lead wants monitoring set up, with an alert if performance drops.",
+          "after": "A daily summary tracks close rates, and alerts fire on drops, failed contacts or budget variance."
+        },
+        "care-gap-closure-hedis-status": {
+          "before": "A quality manager asks where the Medicare Advantage care gaps stand before the reporting deadline.",
+          "after": "Forty percent of patients have open gaps, the score trails target, and diabetes testing is the biggest driver."
+        },
+        "care-gap-closure-outreach-strategy": {
+          "before": "A care coordinator asks for outreach designed around each barrier in the diabetes cohort.",
+          "after": "Each barrier gets its own approach, from ride vouchers to Spanish-speaking staff and fast nurse callbacks."
+        },
+        "care-gap-closure-top-gaps": {
+          "before": "The quality manager asks which care gaps are largest and most actionable.",
+          "after": "Diabetes testing ranks first by size and reach, followed by statin therapy and screenings."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1017,6 +1093,10 @@
         "client-risk": {
           "before": "The client success leader wants the accounts needing intervention and first actions.",
           "after": "Three accounts carry 5.1 million dollars at risk. First step for the top one is an executive sponsor meeting."
+        },
+        "client-retention": {
+          "before": "An account manager wants a stakeholder map and executive plan for each account that needs a turnaround.",
+          "after": "Three accounts need turnaround, one critical, and each gets its stakeholders and an outreach sequence."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1303,6 +1383,18 @@
         "cross-selling-revenue-impact": {
           "before": "A sales leader asks for revenue impact and timing, without treating it as committed.",
           "after": "The model shows pipeline rising from 1.8 to 5 million dollars, with every assumption labeled as modeled."
+        },
+        "cross-selling-portfolio-scan": {
+          "before": "A sales leader asks for cross-sell opportunities across the top 100 enterprise accounts.",
+          "after": "The scan finds 3.2 million dollars in expansion, with 32 accounts showing active buying signals."
+        },
+        "cross-selling-account-assignments": {
+          "before": "A sales operations manager asks to assign accounts to reps by expertise and plan the week.",
+          "after": "Accounts are matched to four reps by specialty, with a weekly action plan. Nothing is sent."
+        },
+        "cross-selling-top-opportunities": {
+          "before": "The sales leader asks for the five biggest cross-sell opportunities and a deep dive on the first.",
+          "after": "The top five add up to about 547 thousand dollars, with a full look at the leading account."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1528,6 +1620,14 @@
         "deal-progression-acceleration": {
           "before": "The sales director asks for timing options that do not become forecast commitments.",
           "after": "Three options could save 8 to 15 days, plus 810 thousand dollars in near-ready deals this week."
+        },
+        "deal-progression-assign-tasks": {
+          "before": "A sales director wants follow-up work mapped to rep capacity, without creating any tasks.",
+          "after": "Twenty-one candidate tasks are spread across four reps with suggested deadlines. Nothing is created."
+        },
+        "deal-progression-executive-summary": {
+          "before": "The sales director asks for a leadership-ready summary and the decisions still needing review.",
+          "after": "Twelve stalled deals worth 4.2 million dollars are flagged, with the human decisions listed separately."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1603,6 +1703,10 @@
         "emission-tracking-carbon-offset-analysis": {
           "before": "A sustainability lead wants offset options for the overage, without buying any credits.",
           "after": "Four verified projects are compared on cost to cover the gap. Nothing is purchased or claimed."
+        },
+        "emission-tracking-implementation-roadmap": {
+          "before": "An environmental manager asks for a roadmap for the emissions reductions.",
+          "after": "An eighteen-month plan runs in four phases, from leak detection to renewable power, pending review."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1678,6 +1782,14 @@
         "energy-regulatory-reporting-audit-readiness": {
           "before": "An internal auditor asks what high-severity evidence is still open.",
           "after": "One item remains: a pipeline mileage mismatch between two systems. The other high finding is resolved."
+        },
+        "energy-regulatory-reporting-emissions-summary": {
+          "before": "An environmental manager asks for the data behind the quarterly emissions report.",
+          "after": "All fourteen facilities are compliant, and carbon dioxide is down seven percent from last year."
+        },
+        "energy-regulatory-reporting-prepare-submission": {
+          "before": "A regulatory affairs director asks for the quarterly submission file and any compliance risks.",
+          "after": "The file passes schema checks and waits for signature, and three compliance risks are flagged. Nothing is filed."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1753,6 +1865,14 @@
         "engineering-standards-advisor-review-queue": {
           "before": "A standards engineer asks what is waiting in the review queue.",
           "after": "Three reviews are waiting, two already overdue, plus a reference sheet due for re-vetting."
+        },
+        "engineering-standards-advisor-quick-reference": {
+          "before": "A standards engineer asks for the overhead clearance sheet and anything due for re-vetting.",
+          "after": "The sheet lists the clearance values, and one row is due for re-vetting after a standard changed."
+        },
+        "engineering-standards-advisor-scope-job": {
+          "before": "A field engineering lead asks to scope a pole replacement job for risk, effort and standards.",
+          "after": "The job scores high risk, needs about seven crew days, and three standards apply."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1828,6 +1948,34 @@
         "field-permit-to-work-authorization-route": {
           "before": "The coordinator asks where the permit sits in sign-off and if it will be ready.",
           "after": "It is at the first of three sign-offs, and on current targets it is ready 30 minutes before start."
+        },
+        "field-permit-to-work-acceptance-readiness": {
+          "before": "A crew lead asks if the crew can accept the substation permit on site yet.",
+          "after": "Not yet. Isolation, sign-offs and one safety brief acknowledgment are still outstanding."
+        },
+        "field-permit-to-work-clearance-check": {
+          "before": "An authorized person asks if the finished job's permit can be closed.",
+          "after": "Not yet. One tool is unaccounted for, so the permit stays on hold until it is found."
+        },
+        "field-permit-to-work-crew-briefing": {
+          "before": "The crew lead asks whether the whole crew has acknowledged the briefing.",
+          "after": "Three of four have acknowledged, and work cannot start until the apprentice does. No one is messaged."
+        },
+        "field-permit-to-work-work-request-check": {
+          "before": "The crew lead asks if the pole replacement request is ready to raise a permit.",
+          "after": "Not yet. Isolation points and crew competencies are missing from the request."
+        },
+        "field-permit-to-work-safety-kpis": {
+          "before": "An operations manager asks how permit safety looks this month.",
+          "after": "Ninety-two percent of permits closed on time, and lockout gaps are the top finding before work."
+        },
+        "field-permit-to-work-audit-trail": {
+          "before": "A safety auditor asks for the audit trail of an archived permit, and whether anything is missing.",
+          "after": "One step is missing: the permit was cleared without a named sign-off. Every other step is signed."
+        },
+        "field-permit-to-work-isolation-confirmation": {
+          "before": "A permit coordinator asks if the control room confirmed isolation, and wants a crew notice drafted.",
+          "after": "Isolation is confirmed, but the portable earths are not yet shown, so the crew should check that first."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1903,6 +2051,18 @@
         "field-service-dispatch-emergency-response": {
           "before": "An emergency duty manager reports a major downtown outage and wants crews dispatched.",
           "after": "Three crews are proposed with arrival times, and two hospitals are on backup. Nothing moves until a dispatcher signs off."
+        },
+        "field-service-dispatch-post-incident-review": {
+          "before": "A reliability engineer asks for the post-incident review and how to prevent the next outage.",
+          "after": "Power was restored in 87 minutes, and the prevention plan cuts recurrence risk by about 78 percent."
+        },
+        "field-service-dispatch-incident-status": {
+          "before": "A control room operator asks for live outage updates and customer impact.",
+          "after": "Crews have found the cause and are rerouting power, with impact ranked by customer priority."
+        },
+        "field-service-dispatch-work-orders-report": {
+          "before": "An operations analyst asks for the prevention work orders and the monthly report.",
+          "after": "Three work orders are drafted for approval, and response times are down to eight minutes."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -1978,6 +2138,14 @@
         "financial-advisor-copilot-recommendation-engine": {
           "before": "The advisor wants discussion topics for a client, without advice or an order.",
           "after": "Three topics are listed for discussion, including emerging markets and a cash reserve. No order is created."
+        },
+        "financial-advisor-copilot-advisor-handoff": {
+          "before": "A branch banker asks for an advisor handoff with request, identity status, risk and compliance flags.",
+          "after": "The handoff is drafted, with identity still pending verification and compliance sign-off required."
+        },
+        "financial-advisor-copilot-compliance-check": {
+          "before": "A compliance officer asks which client needs senior-investor controls and what else applies.",
+          "after": "One trust client is flagged for senior protections, and the standard checkpoints apply to everyone."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -2278,6 +2446,10 @@
         "regulatory-algorithm-go-live": {
           "before": "A head of quant execution asks whether anything is about to go live that should not.",
           "after": "Yes. A new momentum algorithm has only two of four required documents and needs sign-off first."
+        },
+        "regulatory-board-evidence": {
+          "before": "A chief risk officer wants specifics for the board that challenge the claim that reporting is fine.",
+          "after": "Twenty-four trades have reporting errors, and one critical case is called out for the board."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -2564,6 +2736,30 @@
         "license-renewal-expansion-revenue-impact": {
           "before": "The sales leader wants renewal, expansion and churn scenarios compared, without commitments.",
           "after": "Best, midpoint and worst cases are compared, each labeled as planning data, not a commitment."
+        },
+        "license-renewal-expansion-deal-summary": {
+          "before": "Sales leadership asks to send the proposal and summarize the renewal strategy.",
+          "after": "The package is drafted, not sent: 2,500 seats on a three-year term, led by usage proof."
+        },
+        "license-renewal-expansion-negotiation-plan": {
+          "before": "Sales leadership asks for the negotiation strategy and the approvals needed.",
+          "after": "Discount, term and payment boundaries are set, with the approvals to line up for each."
+        },
+        "license-renewal-expansion-executive-brief": {
+          "before": "The account executive asks for the executive presentation with talking points.",
+          "after": "An eight-slide outline covers value delivered, adoption, growth and the competitive comparison."
+        },
+        "license-renewal-expansion-renewal-proposal": {
+          "before": "The account executive asks for the renewal and expansion proposal.",
+          "after": "The draft covers 2,500 seats with support included, matching the competitor's discount on a three-year term."
+        },
+        "license-renewal-expansion-competitive-defense": {
+          "before": "A customer success manager asks for the competitive defense strategy.",
+          "after": "The competitor's discount hides about 500 thousand dollars in switching costs, and a counter-offer is proposed."
+        },
+        "license-renewal-expansion-account-health": {
+          "before": "An account executive brings a renewal 45 days out, with seats to add and a competitor discounting.",
+          "after": "Health is strong at 87, nearly every seat is used, and a waitlist proves the expansion demand."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -2714,6 +2910,10 @@
         "loan-origination-assistant-decision-recommendation": {
           "before": "A senior underwriter asks which files meet the criteria, and whether any loan was approved.",
           "after": "Three files meet the criteria and one is flagged for exceptions. No loan was approved."
+        },
+        "loan-origination-assistant-condition-tracking": {
+          "before": "A closing coordinator asks which conditions are open on the commercial refinance, and if a date is promised.",
+          "after": "Two conditions are open, an environmental report and a rent roll, and no closing date is promised."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -2789,6 +2989,14 @@
         "ma-target-sourcing-challenge-ranking": {
           "before": "The head of corporate development asks whether the ranking holds if finances weigh more.",
           "after": "Yes, the top target holds. The second and third places become nearly tied."
+        },
+        "ma-target-sourcing-ic-memo-draft": {
+          "before": "The head of corporate development asks for the investment committee screening memo.",
+          "after": "Eight companies were screened down to three, each with its score and key risk."
+        },
+        "ma-target-sourcing-evidence-gaps": {
+          "before": "A research analyst asks where the evidence on targets is thin or out of date.",
+          "after": "Two shortlisted targets have stale or missing evidence, and they are flagged as the priority."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -2897,6 +3105,26 @@
         "omnichannel-engagement-campaign-attribution": {
           "before": "The manager wants an attribution summary that avoids causal claims.",
           "after": "Five campaigns are compared, and results are labeled as associated with each channel, not caused by it."
+        },
+        "omnichannel-engagement-customer-journey": {
+          "before": "A contact center supervisor asks for the customer's journey across every channel.",
+          "after": "Three days of attempts left two open issues, a declined payment and a sizing question."
+        },
+        "omnichannel-engagement-channel-recommendation": {
+          "before": "A digital engagement manager asks which channel and timing will reach this customer best.",
+          "after": "A phone call resolves the issue now, with text for updates and evenings as the best window."
+        },
+        "omnichannel-engagement-handoff-package": {
+          "before": "A customer experience leader asks for context in case the customer moves to another agent.",
+          "after": "The handoff covers her history, open blockers and mood, so the next agent can pick up cleanly."
+        },
+        "omnichannel-engagement-proactive-plan": {
+          "before": "The engagement manager asks for follow-up plans whether or not the customer buys.",
+          "after": "Two sequences are drafted, one after purchase and one to win her back, all pending approval."
+        },
+        "omnichannel-engagement-unresolved-issues": {
+          "before": "The supervisor asks what the customer has been asking and where the team dropped the ball.",
+          "after": "A dropped chat left two questions unanswered, and both answers are now ready to send."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -2972,6 +3200,18 @@
         "order-entry-validation-configuration-check": {
           "before": "A product configuration analyst asks to check the configuration on another order.",
           "after": "A required safety kit is missing for the sensor heads. Nothing is booked until sales operations resolves it."
+        },
+        "order-entry-validation-order-classification": {
+          "before": "The specialist asks which order type, class and sales channel the purchase order should use.",
+          "after": "It goes in as a standard domestic new order in the public sector channel, pending confirmation."
+        },
+        "order-entry-validation-queue-review": {
+          "before": "A sales operations manager asks which orders in the queue are ready and which need a fix.",
+          "after": "One order is ready to enter, and four need fixes for pricing, kits, terms or release status."
+        },
+        "order-entry-validation-draft-sales-order": {
+          "before": "A sales operations specialist asks for a sales order drafted from a purchase order.",
+          "after": "The order is drafted but on hold for one price mismatch against the quote."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -3108,6 +3348,22 @@
         "patient-intake-pre-visit-summary": {
           "before": "Front desk staff want a pre-visit readiness summary for the patient.",
           "after": "The visit is set, but the emergency contact and coverage still need confirmation."
+        },
+        "patient-intake-reminder-plan": {
+          "before": "The scheduling coordinator asks for reminders that reduce no-shows for the visit.",
+          "after": "Reminders go out three days, one day and two hours before, with an easy way to reschedule."
+        },
+        "patient-intake-new-patient-intake": {
+          "before": "Front desk staff start registration for a new patient asking for a neurology consult.",
+          "after": "Registration is drafted for staff review, with availability and insurance checks as next steps."
+        },
+        "patient-intake-appointment-hold-draft": {
+          "before": "A scheduling coordinator asks to book a new patient's consult and list the intake forms.",
+          "after": "A Tuesday consult is drafted, pending staff confirmation, with six intake forms listed."
+        },
+        "patient-intake-intake-packet": {
+          "before": "A patient access representative asks what is in the intake packet, including consent and medications.",
+          "after": "The packet includes the privacy authorization and a medical history covering medications and allergies."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -3183,6 +3439,30 @@
         "payments-operations-release-risk-review": {
           "before": "The analyst asks whether a 2.75 million dollar payment is safe to release.",
           "after": "No. It is nearly nine times the usual amount, a first-time payee, and was sent after hours. Hold for review."
+        },
+        "payments-operations-daily-kpi-brief": {
+          "before": "The head of payments operations asks for yesterday's KPI brief by payment rail.",
+          "after": "Over 290 thousand payments ran at 99 percent straight-through, with cross-border wires lowest."
+        },
+        "payments-operations-customer-verification": {
+          "before": "A payments analyst asks how to verify a flagged payment with the customer.",
+          "after": "The plan calls a trusted contact before cutoff, because the account details changed by email. Nothing is released."
+        },
+        "payments-operations-reconcile-settlement": {
+          "before": "A reconciliation analyst asks which breaks are still open on the settlement account.",
+          "after": "Four breaks remain open, and 98 percent of statement items matched."
+        },
+        "payments-operations-sanctions-review-queue": {
+          "before": "A compliance analyst asks which sanctions alerts to review first, and what to compare.",
+          "after": "The alert with the least time left and no analyst goes first, with what to compare for each."
+        },
+        "payments-operations-payment-status": {
+          "before": "A payments operations lead asks what to tell a relationship manager about a payment.",
+          "after": "The wire has been acknowledged by the scheme, and settlement is expected by mid-afternoon."
+        },
+        "payments-operations-correspondent-limits": {
+          "before": "A treasury analyst asks if any correspondent limits are close, and whether accounts need funding.",
+          "after": "One correspondent has breached its limit and needs a treasury decision, and another is on watch."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -3258,6 +3538,10 @@
         "permit-license-management-application-status": {
           "before": "Environmental counsel asks where a solar project application stands, and whether anything was submitted.",
           "after": "It is in public comment, with a decision expected June 30. Nothing was submitted today."
+        },
+        "permit-license-management-renewal-plan": {
+          "before": "An operations director asks to start emergency renewals for the critical permits.",
+          "after": "A renewal package covers all eight critical permits, expiring in 18 to 29 days."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -3427,6 +3711,14 @@
         "portfolio-rebalancing-tax-loss-harvest": {
           "before": "A portfolio manager asks for loss candidates and what keeps this from being tax advice.",
           "after": "Three positions show unrealized losses, each labeled a candidate on demo data, not tax advice."
+        },
+        "portfolio-rebalancing-retirement-scenario": {
+          "before": "A retirement planning specialist asks to frame the scenarios to model, without inventing odds of success.",
+          "after": "Three scenarios are framed from the portfolio inputs, with no success probability invented."
+        },
+        "portfolio-rebalancing-execution-plan": {
+          "before": "A trading supervisor asks for the implementation checklist, and whether any order was sent.",
+          "after": "Three trades are listed for review, and no order has been created, routed or executed."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -3652,6 +3944,10 @@
         "procurement-supplier-collaboration-delivery-tracking": {
           "before": "An expediter asks which open orders have delivery problems to chase today.",
           "after": "Two orders need chasing, most urgently two cable drums due nine days late for a project starting soon."
+        },
+        "procurement-supplier-collaboration-invoice-match": {
+          "before": "An accounts payable lead asks which supplier invoices can go for approval today.",
+          "after": "One invoice matches and can go for approval, and two are held for quantity gaps."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -3727,6 +4023,14 @@
         "procurement-support-purchase-timing": {
           "before": "The buyer wants an implementation plan with deadlines and savings at risk, without ordering.",
           "after": "A dated plan shows the savings at risk at each deadline. Nothing is ordered or committed."
+        },
+        "procurement-support-draft-purchase-order": {
+          "before": "A procurement manager asks for the laptop and monitor order and the license savings.",
+          "after": "The order is drafted for approval with nine thousand dollars saved, plus 27 thousand a year on licenses."
+        },
+        "procurement-support-license-optimization": {
+          "before": "An IT asset manager asks which licenses should move to annual terms, and if any are duplicated.",
+          "after": "Four products move to annual or enterprise terms, saving 27 thousand dollars a year."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -3952,6 +4256,14 @@
         "proposal-generation-references-positioning": {
           "before": "The bid manager wants reference and competitive positioning options prepared.",
           "after": "Three references are proposed, and availability must be verified before any calls are scheduled."
+        },
+        "proposal-generation-compile-proposal": {
+          "before": "A bid manager asks for the proposal package outline and every human review it needs.",
+          "after": "The 38-page draft is outlined section by section, with each required review called out."
+        },
+        "proposal-generation-delivery-summary": {
+          "before": "A sales leader asks how ready the proposal draft is, and what reviewers must decide next.",
+          "after": "The draft fits the requirements closely, and references and compliance documents still need sign-off."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4027,6 +4339,14 @@
         "public-correspondence-response-route-and-refer": {
           "before": "A team lead asks who owns each part and what to ask about the gap.",
           "after": "Each topic has an owning team, and the compensation question goes to the property team for an answer."
+        },
+        "public-correspondence-response-library-update": {
+          "before": "A knowledge owner asks how to add newly approved wording to the precedent library.",
+          "after": "A new entry is proposed for review, so future replies can cite it instead of asking again."
+        },
+        "public-correspondence-response-draft-response": {
+          "before": "A correspondence officer asks for a draft reply to a resident's letter.",
+          "after": "Three of four questions are answered with cited precedents, and one is flagged for input. Nothing is sent."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4102,6 +4422,14 @@
         "reporting-package-validation-driver-reconciliation": {
           "before": "The manager asks whether the driver bridge reconciles from budget to actual.",
           "after": "No. There is a 40 thousand dollar gap over tolerance that needs a missing driver found."
+        },
+        "reporting-package-validation-executive-summary": {
+          "before": "A finance director asks for the executive summary for the leadership pack.",
+          "after": "Operating income lands on budget, with gains and shortfalls by division and the watch items listed."
+        },
+        "reporting-package-validation-exception-queue": {
+          "before": "A financial controller asks to route the reporting exceptions to their owners.",
+          "after": "Six exceptions are routed with owners and due dates, two blocking release. Nothing is sent."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4177,6 +4505,10 @@
         "resource-staffing": {
           "before": "The resource manager asks which consultants fit the pipeline, and who needs another path.",
           "after": "Three consultants match current opportunities, saving about 46 thousand dollars a month in bench cost."
+        },
+        "resource-workforce-plan": {
+          "before": "An operations leader asks for an upskilling plan and business case for people who cannot be placed yet.",
+          "after": "Consultants close to ready get a shadow track and certifications, with the business case laid out."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4327,6 +4659,14 @@
         "sales-qualification-assign-leads": {
           "before": "The sales manager wants lead routing recommended, without assigning owners.",
           "after": "Leads are matched to reps by specialty and capacity, for the manager to approve."
+        },
+        "sales-qualification-qualification-report": {
+          "before": "An account executive asks for the pipeline summary, with every assumption labeled.",
+          "after": "Forty-five leads split into hot, warm and nurture, and every value is labeled as an assumption."
+        },
+        "sales-qualification-setup-tracking": {
+          "before": "A sales manager asks for a response plan and escalation rules, without turning anything on.",
+          "after": "Response times are set by tier with proposed escalations. Nothing is activated."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4402,6 +4742,14 @@
         "solution-design-review-requirements-matrix": {
           "before": "An enterprise architecture lead asks which requirements apply and who owns each.",
           "after": "Eight requirements are listed with owners, and data retention has no owner assigned yet."
+        },
+        "solution-design-review-target-design": {
+          "before": "A solution architect asks for the target design and what changes in the inventory.",
+          "after": "One notification service replaces two legacy tools, with seven inventory changes listed."
+        },
+        "solution-design-review-readiness-check": {
+          "before": "A review board coordinator asks if the design is ready for the review board.",
+          "after": "Not yet. Seven of ten checks pass, and three gaps need closing first."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4477,6 +4825,14 @@
         "staffing-territory-planning-competitive-landscape": {
           "before": "A branch manager asks who the competition is in each metro.",
           "after": "The firm ranks third in two metros, second in one and last in the smallest-share metro."
+        },
+        "staffing-territory-planning-territory-plan": {
+          "before": "The regional sales director asks for a draft quarterly territory plan.",
+          "after": "The plan names the biggest opportunities and flags one understaffed region as the main risk."
+        },
+        "staffing-territory-planning-labor-trends": {
+          "before": "A regional sales director asks which labor market trends to plan around.",
+          "after": "Engineering roles are growing fastest but take three times longer to fill than industrial roles."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4613,6 +4969,18 @@
         "supplier-claim-engagement-draft-supplier-claim": {
           "before": "The coordinator wants the claim notice drafted for the supplier, but not sent.",
           "after": "The notice lists the order, value, evidence and deadlines. It waits for the coordinator to send."
+        },
+        "supplier-claim-engagement-supplier-response": {
+          "before": "A claims coordinator asks what a supplier offered on a pricing claim, and what the gap is.",
+          "after": "The supplier offered a partial credit, leaving a 30-dollar gap to verify against ship dates."
+        },
+        "supplier-claim-engagement-sla-tracker": {
+          "before": "The claims team lead asks which supplier claims are at risk of missing their deadline.",
+          "after": "One claim has already breached its window, and another has only an hour left."
+        },
+        "supplier-claim-engagement-escalation-brief": {
+          "before": "A claims team lead asks for an escalation on an overdue shortage claim.",
+          "after": "The claim is two hours past its window, and an escalation message is drafted. Nothing is sent."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4838,6 +5206,10 @@
         "invoice-support": {
           "before": "The billing manager wants invoice support for only what is ready.",
           "after": "About 12 thousand dollars is ready to invoice, and unapproved entries are held back."
+        },
+        "billing-disputes": {
+          "before": "A client finance partner asks what evidence is missing on the disputed hours.",
+          "after": "Each dispute gets its evidence gap and the safest path, with draft messages held for review."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4913,6 +5285,26 @@
         "underwriting-support-exception-review": {
           "before": "A senior underwriter wants the exception file, and whether any coverage was decided.",
           "after": "The exception file lists the required reviews. No coverage decision has been made."
+        },
+        "underwriting-support-coverage-structure": {
+          "before": "An underwriter asks for the recommended coverage, endorsements and conditions.",
+          "after": "Liability and property coverage are proposed, with endorsements for aging equipment and a single site."
+        },
+        "underwriting-support-submission-review": {
+          "before": "An underwriter asks for help evaluating a commercial application, and what is missing.",
+          "after": "The risk is moderate, and financial statements and a property valuation are still missing."
+        },
+        "underwriting-support-risk-assessment": {
+          "before": "A risk analyst asks for the full risk assessment and the loss history.",
+          "after": "Each risk factor is scored, and the five-year loss history comes in below the class average."
+        },
+        "underwriting-support-underwriting-summary": {
+          "before": "The senior underwriter asks for the complete underwriting summary.",
+          "after": "The summary recommends approval with conditions, at a moderate risk score within authority."
+        },
+        "underwriting-support-compliance-check": {
+          "before": "A senior underwriter asks for a compliance and authority check before finalizing.",
+          "after": "The check is clear and within binding authority, with three documents still to collect."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -4988,6 +5380,26 @@
         "utility-billing-assistance-assistance-programs": {
           "before": "An assistance coordinator asks what programs could help a resident on a fixed income.",
           "after": "The resident appears potentially eligible for two assistance programs and an extended payment plan."
+        },
+        "utility-billing-assistance-application-packet": {
+          "before": "An enrollment specialist asks for the payment plan and assistance application, and the paperwork needed.",
+          "after": "A six-month plan is drafted, and the application needs proof of income and residency."
+        },
+        "utility-billing-assistance-leak-adjustment": {
+          "before": "A leak adjustment analyst asks if the household qualifies for a leak credit, and how much.",
+          "after": "It qualifies for a draft credit of 97 dollars and 80 cents, cutting the bill by more than half."
+        },
+        "utility-billing-assistance-repair-assistance": {
+          "before": "A water conservation coordinator asks if the resident's leak can be fixed at no cost.",
+          "after": "Yes. The billing credit applies, and a free repair program covers the parts and labor."
+        },
+        "utility-billing-assistance-income-screen": {
+          "before": "An eligibility screener asks for a preliminary screen of a two-person senior household.",
+          "after": "The household is at about half the area median income and may qualify for several programs."
+        },
+        "utility-billing-assistance-resolution-summary": {
+          "before": "A customer resolution manager asks to pull everything together before sending and closing the notes.",
+          "after": "Credits, a payment plan, assistance applications and a free repair visit are packaged for review."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -5063,6 +5475,14 @@
         "warranty-registration-validate-serial": {
           "before": "Dealer sales staff ask to check a serial number before registering a sale.",
           "after": "The serial is valid and unregistered, with 20 days left in the registration window."
+        },
+        "warranty-registration-registration-draft": {
+          "before": "Dealer sales staff ask for a warranty registration drafted, without submitting it.",
+          "after": "The registration is drafted with twenty days left to file. Nothing is submitted."
+        },
+        "warranty-registration-extension-offers": {
+          "before": "Dealer sales staff ask which units should get extended coverage offers this month.",
+          "after": "Two units qualify for offers, and one lapsed unit is excluded. Nothing is sent."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -5138,6 +5558,10 @@
         "wealth-insights-generator-performance-attribution": {
           "before": "A portfolio strategist asks which client is below its benchmark.",
           "after": "One client trails its benchmark by 0.2 percent and is labeled underperformance."
+        },
+        "wealth-insights-generator-meeting-brief": {
+          "before": "A wealth advisor asks for a review brief, without turning it into advice or outreach.",
+          "after": "The brief covers the household snapshot and items to validate, starting with an outdated estate plan."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
@@ -5213,6 +5637,14 @@
         "win-loss-analysis-revenue-impact": {
           "before": "A sales leader wants intervention scenarios modeled, not presented as committed revenue.",
           "after": "Four interventions model 4.2 million dollars in recoverable revenue, labeled as hypothetical."
+        },
+        "win-loss-analysis-board-presentation": {
+          "before": "A sales leader asks for a board narrative, with every value labeled as a scenario.",
+          "after": "The narrative covers the decline, the loss drivers and the plan, with every number marked as a scenario."
+        },
+        "win-loss-analysis-action-summary": {
+          "before": "A sales operations manager asks for the findings and next steps, without starting any programs.",
+          "after": "Win rate fell seven points, security certifications lead the losses, and next steps await approval."
         }
       },
       "status": "first pass - Emma voice, scored against the Cowork reference",
