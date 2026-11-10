@@ -23,6 +23,8 @@ def test_jargon_matches_literal_terms_without_matching_substrings():
         "RAPP", "agent.py", "SKILL.md",
     ]
     assert judge.jargon_in("wrapping skull.md agentXpy 1Person") == []
+    assert judge.jargon_in("It will open at rapp.microsoft.com.") == []
+    assert judge.jargon_in("RAPP at rapp.microsoft.com") == ["RAPP"]
 
 
 @pytest.mark.parametrize("href", [
@@ -242,9 +244,42 @@ def test_missing_playwright_is_reported_without_hiding_failure(
     monkeypatch.setattr(builtins, "__import__", without_playwright)
     assert judge.main(argv) == expected
     report = json.loads(capsys.readouterr().out.splitlines()[0])
-    assert len(report["checks"]) == 41
+    assert len(report["checks"]) == 44
     assert all(check["value"] is None and not check["pass"] for check in report["checks"])
     assert "Playwright unavailable" in report["flags"][0]
+
+
+def test_polish_measurements_detect_translucent_headers_and_broken_words(monkeypatch, tmp_path):
+    playwright = pytest.importorskip("playwright.sync_api")
+    root = judge.ROOT
+    monkeypatch.setattr(judge, "ROOT", tmp_path)
+    with judge.local_site(root) as base, playwright.sync_playwright() as runtime:
+        browser = runtime.chromium.launch()
+        try:
+            assert judge.measure_polish(browser, base, set())[0]["pass"]
+
+            def regressed_context(**kwargs):
+                context = browser.new_context(**kwargs)
+                context.add_init_script("""document.addEventListener('DOMContentLoaded', () => {
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .topbar { background:rgba(255,255,255,.5) !important; }
+                        #setup-line { word-break:break-all !important; }
+                        #setup-line span { white-space:normal !important; }
+                    `;
+                    document.head.append(style);
+                });""")
+                return context
+
+            regressed = SimpleNamespace(new_context=regressed_context)
+            check = judge.measure_polish(regressed, base, set())[0]
+            assert not check["pass"]
+            assert not check["value"]["opaque_headers"]
+            assert not check["value"]["setup_wraps_at_spaces"]
+            assert check["value"]["card_articles"]
+            assert check["value"]["workshop_count"]
+        finally:
+            browser.close()
 
 
 def test_every_solution_requires_exact_slug_visible_line_and_deployment_contract():
@@ -586,3 +621,25 @@ def test_picker_replaces_replayed_run_and_rejects_an_inexact_setup_line(stage_pa
     assert page.locator(".win").count() == 1
     assert not page.locator("#ms-signin").count()
     assert options[2] in page.locator("#setup-line").inner_text()
+
+
+@pytest.mark.parametrize("text", [
+    "Seller starts here", "Close the deal", "Only we have this",
+    "Built for Contoso", "Globex Corporation", "$1,000", "EUR 250",
+    "500 dollars", "A company named Example",
+])
+def test_aideate_copy_rejects_claims_customers_and_currency(text):
+    assert judge.aideate_copy_violations(text)
+
+
+def test_aideate_copy_allows_microsoft_products_steps_and_plain_preview_address():
+    assert not judge.aideate_copy_violations(
+        "Microsoft Copilot. 01 Clarify. Private preview at rapp.microsoft.com."
+    )
+
+
+def test_aideate_links_require_served_targets_and_real_fragments(stage_page):
+    page, base = stage_page
+    assert judge.aideate_link_failures(page, ["#request", "start.html"], base) == []
+    assert judge.aideate_link_failures(page, ["#missing-anchor"], base)
+    assert judge.aideate_link_failures(page, ["not-a-real-page.html"], base)
