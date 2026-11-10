@@ -2,13 +2,14 @@
   "schema": "aibast-rapp-guide-content-contract/1.0",
   "version": 1,
   "source": "docs/rapp-guide.html",
-  "trusted_source_commit": "4deae4123bae1c2f04fc3478b39700f8aba4fa90",
-  "trusted_source_blob_oid": "f47e0d04e1b75111b7a36416df78cef2a9f0199a",
+  "trusted_source_commit": "e1d429befe8f300402e580bcbe7710bdda418176",
+  "trusted_source_blob_oid": "9de0d7ba714c4654405bd597278b93d1a5a72eb6",
   "normalization": "Remove script, style, template, and comments; join rendered text with spaces; collapse Unicode whitespace.",
   "content_section_ids": [
     "overview",
     "architecture",
     "principles",
+    "aideate",
     "step1",
     "step2",
     "step3",
@@ -23,6 +24,7 @@
     "step12",
     "step13",
     "step14",
+    "agent-library",
     "team-setup",
     "scaling",
     "roadmap",
@@ -32,7 +34,7 @@
   "content_sections": [
     {
       "id": "overview",
-      "normalized_visible_text_sha256": "dc4abca509fd5959c8a118e1c892f7970485c69f25de6ef6ad5c4a6c265e2dd1"
+      "normalized_visible_text_sha256": "32e739753576685b53987c184c31312240aabd41529dc2f92f0094bd50443fec"
     },
     {
       "id": "architecture",
@@ -41,6 +43,10 @@
     {
       "id": "principles",
       "normalized_visible_text_sha256": "22ec900092b67d9207b821e9fd2b4c51f71aef46af797195ab83e23ed672c142"
+    },
+    {
+      "id": "aideate",
+      "normalized_visible_text_sha256": "7fc9d780b7f0a9ace408ad934a66da91664f67ee506e97ad3fa857acafbbf264"
     },
     {
       "id": "step1",
@@ -99,6 +105,10 @@
       "normalized_visible_text_sha256": "879d4e88b6af1d6f4c5263455eedb68d8ed09fc4019a57771405389b9c436fd1"
     },
     {
+      "id": "agent-library",
+      "normalized_visible_text_sha256": "de2d7da2e509796d04db900af6756efb4e7008cbf770ba197b837d5cc2ff7e9c"
+    },
+    {
       "id": "team-setup",
       "normalized_visible_text_sha256": "46bc9fb72da7044d969bad9da062deb99b5a5e143d6f1200a8f00e92f1bad8d1"
     },
@@ -131,6 +141,10 @@
     {
       "href": "#principles",
       "label": "§ Core Principles"
+    },
+    {
+      "href": "#aideate",
+      "label": "AIdeate"
     },
     {
       "href": "#step1",
@@ -187,6 +201,10 @@
     {
       "href": "#step14",
       "label": "14 Post-Deployment Review"
+    },
+    {
+      "href": "#agent-library",
+      "label": "AI Agent Library"
     },
     {
       "href": "#team-setup",

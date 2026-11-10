@@ -25,14 +25,16 @@ DEFAULT_GUIDE = ROOT / "docs" / "rapp-guide.html"
 DEFAULT_CONTRACT = ROOT / "state" / "rapp_guide_content_contract.json"
 AUDIT_SCHEMA = "aibast-rapp-guide-audit/1.0"
 CONTRACT_SCHEMA = "aibast-rapp-guide-content-contract/1.0"
-TRUSTED_SOURCE_COMMIT = "4deae4123bae1c2f04fc3478b39700f8aba4fa90"
-TRUSTED_SOURCE_BLOB_OID = "f47e0d04e1b75111b7a36416df78cef2a9f0199a"
+TRUSTED_SOURCE_COMMIT = "e1d429befe8f300402e580bcbe7710bdda418176"
+TRUSTED_SOURCE_BLOB_OID = "9de0d7ba714c4654405bd597278b93d1a5a72eb6"
 TRUSTED_SOURCE_PATH = "docs/rapp-guide.html"
 CONTENT_SECTION_IDS = (
     "overview",
     "architecture",
     "principles",
+    "aideate",
     *(f"step{number}" for number in range(1, 15)),
+    "agent-library",
     "team-setup",
     "scaling",
     "roadmap",

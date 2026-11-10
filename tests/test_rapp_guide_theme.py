@@ -2,9 +2,11 @@ import importlib.util
 import json
 import shutil
 import sys
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
+from bs4 import BeautifulSoup
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -316,7 +318,7 @@ window.addEventListener("popstate", handleHashNavigation);
   <button class="js-control" data-sidebar-toggle aria-label="Toggle sidebar" aria-controls="sidebar"
           onclick="toggleSidebar()">Menu</button>
 </header>
-<noscript>JavaScript is disabled. All 22 sections are visible below.</noscript>
+<noscript>JavaScript is disabled. All 24 sections are visible below.</noscript>
 <div class="layout">
   <aside class="sidebar" id="sidebar" aria-label="Production Guide sections">
     <nav aria-label="Guide navigation">{sidebar_links}</nav>
@@ -689,12 +691,32 @@ def test_gate_catches_post_migration_interaction_mutations(
     assert category in categories(run_audit(changed))
 
 
-def test_gate_catches_content_section_text_drift():
+@pytest.mark.parametrize("section_id", ["overview", "aideate", "agent-library"])
+def test_gate_catches_content_section_text_drift(section_id):
     original = valid_fixture()
     changed = original.replace(
-        "Preserved overview", "Preserved overview with drift", 1
+        f"Preserved {section_id}", f"Preserved {section_id} with drift", 1
     )
     assert "content.text" in categories(run_audit(changed))
+
+
+def test_legacy_rapp_sections_remain_word_for_word():
+    hashes = json.loads(
+        (ROOT / "_shots" / "guide" / "section-hashes.json").read_text(encoding="utf-8")
+    )
+    current = BeautifulSoup(AUDIT.DEFAULT_GUIDE.read_text(encoding="utf-8"), "html.parser")
+    overview = current.select_one("#overview")
+    assert overview.select_one("h1").get_text() == "AIBAST Production Guide"
+    assert overview.select_one(".section-subtitle").get_text() == (
+        "Clarify the problem. Prove it with a working agent. Reuse what works."
+    )
+    overview.select_one("h1").decompose()
+    overview.select_one(".section-subtitle").decompose()
+    overview.select_one("#production-loop").decompose()
+    assert len(hashes) == 22
+    for record in hashes:
+        normalized = AUDIT.normalized_visible_text(current.find(id=record["section"]))
+        assert sha256(normalized.encode("utf-8")).hexdigest() == record["before"], record["section"]
 
 
 def test_gate_catches_missing_section():
@@ -792,7 +814,7 @@ def test_gate_catches_feedback_issue_body_without_marker():
 
 def test_gate_catches_wrong_noscript_section_count():
     original = valid_fixture()
-    changed = original.replace("All 22 sections", "All 19 sections", 1)
+    changed = original.replace("All 24 sections", "All 19 sections", 1)
     assert "behavior.noscript" in categories(run_audit(changed))
 
 
