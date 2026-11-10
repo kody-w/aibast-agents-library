@@ -133,7 +133,7 @@ def case_evidence(text):
     return list(dict.fromkeys(safe))[:3]
 
 
-def draft_cases(slug, filename, module, agent, report_only=False):
+def draft_cases(slug, filename, module, agent, notices):
     cases = []
     prefix = "".join(word[0] for word in slug.split("-")).upper()
     for index, (operation, guide) in enumerate(module.OPERATION_GUIDE.items(), 1):
@@ -142,8 +142,15 @@ def draft_cases(slug, filename, module, agent, report_only=False):
         arguments = {"operation": operation, **(guide.get("args") or {})}
         output = agent.perform(**arguments)
         evidence = case_evidence(output)
-        if not evidence and not report_only:
-            raise ValueError(f"{operation}: no safe demo evidence in actual perform() output")
+        try:
+            json.loads(output)
+        except json.JSONDecodeError:
+            kind = "text"
+        else:
+            kind = "JSON"
+        notices.append(f"Operation {operation}: {kind} output; demo evidence: {json.dumps(evidence, ensure_ascii=False)}")
+        if not evidence:
+            notices.append(f"WARNING: {operation} has no safe automatic demo evidence; authored must_include needed before live validation.")
         cases.append({
             "id": f"{prefix}-{index:02d}", "persona": "TODO persona",
             "operation": operation, "onepager_bullet": None, "prompt": guide["ask"],
@@ -262,16 +269,13 @@ def plan(root, slug, vertical=None, records=None):
         module, agent = load_agent(staged_agent, root)
         notices.append(f'metadata.description contains "on file": {"yes" if "on file" in agent.metadata["description"].lower() else "no"} (unchanged)')
         authored_cases = (root / case_path).exists()
-        draft = draft_cases(slug, source.name, module, agent, report_only=authored_cases)
+        draft = draft_cases(slug, source.name, module, agent, notices)
         if authored_cases:
             cases = json.loads((root / case_path).read_text(encoding="utf-8"))
             differences = [key for key in ("persona", "prompt", "must_include", "arguments")
                            if [case.get(key) for case in cases["cases"]]
                            != [case.get(key) for case in draft["cases"]]]
             notices.append("Demo cases: kept authored file; draft differences: " + (", ".join(differences) or "none"))
-            for case in draft["cases"]:
-                if not case["must_include"]:
-                    notices.append(f'Demo comparison: {case["operation"]} has no safe automatic evidence; authored must_include retained.')
         else:
             cases = draft
             planned[case_path] = json_bytes(cases)

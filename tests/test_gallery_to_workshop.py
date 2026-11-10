@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -162,6 +163,40 @@ def test_json_evidence_uses_nested_identity_strings_not_numbers():
     assert pipeline.agent_to_package.evidence(output) == ["REQ-42", "Repair loading bay", "REQ-43"]
     assert pipeline.case_evidence(output) == ["REQ-42", "Repair loading bay", "REQ-43"]
     assert pipeline.agent_to_package.evidence('{"amount": 1234, "count": 3}') == []
+
+
+def test_draft_case_limit_and_empty_evidence_are_explicit():
+    module = SimpleNamespace(
+        __manifest__={"display_name": "Example"},
+        OPERATION_GUIDE={f"op_{index}": {"ask": f"Ask {index}", "args": {"filter": "sample"}}
+                         for index in range(3)},
+    )
+    arguments = []
+
+    def perform(**kwargs):
+        arguments.append(kwargs)
+        return '{"amount": 1250, "count": 3}'
+
+    notices = []
+    draft = pipeline.draft_cases(
+        "some-example-agent", "example_agent.py", module,
+        SimpleNamespace(name="Example", perform=perform), notices,
+    )
+    assert [case["id"] for case in draft["cases"]] == ["SEA-01", "SEA-02"]
+    assert arguments == [{"operation": f"op_{index}", "filter": "sample"} for index in range(2)]
+    assert all(case["must_include"] == [] for case in draft["cases"])
+    assert "authored must_include needed" in "\n".join(notices)
+
+
+def test_invoice_description_is_reported_without_rewriting():
+    path = ROOT / pipeline.LIBRARY / "general_stacks/invoice_processing_stack/invoice_ledger_agent.py"
+    source = path.read_text()
+    assert pipeline.normalized_source(source, "general") == source
+    _, agent = pipeline.load_agent(path, ROOT)
+    assert "on file" not in agent.metadata["description"]
+    planned, notices = pipeline.plan(ROOT, "invoice-processing", records=records_path(ROOT, "invoice-processing"))
+    assert planned[path.relative_to(ROOT)] == source.encode()
+    assert 'metadata.description contains "on file": no (unchanged)' in notices
 
 
 def test_case_evidence_ignores_amounts_and_count_words():
