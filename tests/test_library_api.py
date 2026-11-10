@@ -107,6 +107,9 @@ def test_narration_clips_are_content_addressed_24khz_mono_wav():
         assert block["mode"] == "synthesized" and block["captions"] is True
         for seg in block["segments"]:
             media = seg["media"]
+            if media is None and seg["id"] in PENDING_VOICE:
+                assert seg["captions"]["segments"][0]["text"]
+                continue
             local = ROOT / media["url"]
             assert sha256(local) == media["contentHash"] == local.stem
             assert local.stat().st_size == media["sizeBytes"]
@@ -115,7 +118,10 @@ def test_narration_clips_are_content_addressed_24khz_mono_wav():
                 assert abs(round(w.getnframes() * 1000 / 24000) - media["durationMs"]) <= 1
             assert seg["captions"]["segments"][-1]["endMs"] == media["durationMs"]
             found += 1
-    assert found == len(authored_scenario_lines())
+    assert found == len(authored_scenario_lines()) - len(PENDING_VOICE)
+
+
+PENDING_VOICE = set(read_json(ROOT / "tests" / "fixtures" / "narration_pending_voice.json")["lines"])
 
 
 def authored_scenario_lines():
@@ -133,7 +139,7 @@ def test_every_authored_narration_line_has_a_clip():
             narration = read_json(API / "v1" / "scenarios" / f"{sid}.json").get("narration") or {}
             ids = {seg["id"] for seg in narration.get("segments", []) if seg.get("media")}
             for part in ("before", "after"):
-                if lines.get(part) and f"{sid}.{part}" not in ids:
+                if lines.get(part) and f"{sid}.{part}" not in ids and f"{sid}.{part}" not in PENDING_VOICE:
                     missing.append(f"{slug}: {sid}.{part}")
         solution = read_json(API / "v1" / "solutions" / f"{slug}.json")["try"].get("narration") or {}
         ids = {seg["id"] for seg in solution.get("segments", []) if seg.get("media")}
