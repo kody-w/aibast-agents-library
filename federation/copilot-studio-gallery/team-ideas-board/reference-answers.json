@@ -1,8 +1,8 @@
 {
  "schema": "aibast-reference-answers/1.0",
  "agent": "team_ideas_board_agent.py",
- "agent_sha256": "6c235d773f47230c51d94706945540f69013aba677e0dd66f20e301a75b0e442",
- "recorded": "2026-11-09",
+ "agent_sha256": "c8270f05dd3d3a63fb60458cd366d17d736e90395b3899e3e2cd0249805f1503",
+ "recorded": "2026-11-10",
  "rule": "A deployed version passes when, for each case, its answer carries the same facts as tool_output.",
  "cases": [
   {
@@ -19,7 +19,7 @@
    "tool_output": "Not ready: Status must be one of New, Exploring, Planned. Priority must be one of High, Medium, Low.",
    "tool_sha256": "0f897243a8fe0d8ad1422ee71a86c3143866fed5d5b5540e467e48b4ee87a088",
    "local_called_tool": true,
-   "local_answer": "I can't add it as requested. The board's rules don't allow those values:\n\n- **Status** must be New, Exploring, or Planned. \"Done\" isn't accepted.\n- **Priority** must be High, Medium, or Low. \"Urgent\" isn't accepted.\n\nThe title \"Better standups\" passed the check. If you pick one of the allowed statuses and priorities, I can re-run the check. I can't add the idea myself because my board tool only validates entries and doesn't create them."
+   "local_answer": "No, not as written. The board only accepts these values:\n\n- **Status:** New, Exploring, or Planned. \"Done\" isn't allowed.\n- **Priority:** High, Medium, or Low. \"Urgent\" isn't allowed.\n\nThe title \"Better standups\" passes. If you want, I can check it with a valid combination, such as status **Planned** and priority **High**. I can't add ideas to the board myself, so you'd need to add it through the board itself."
   }
  ]
 }
