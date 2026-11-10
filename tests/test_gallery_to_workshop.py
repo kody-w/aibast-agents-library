@@ -156,6 +156,46 @@ def test_conflict_requires_an_exact_existing_resolution():
             pipeline.resolved_source(source, existing, [])
 
 
+def test_authored_skill_procedure_is_preserved_but_evidence_is_regenerated(workspace):
+    skill = Path("solutions/example/manual/skills/aibast_check_01/SKILL.md")
+    (workspace / skill).parent.mkdir(parents=True)
+    (workspace / skill).write_text(
+        "# Existing\n\n## Procedure\n\nUse the authored legal review workflow.\n\n"
+        "## Deterministic pilot evidence\n\n- `STALE-01`\n\n## Safety gate\n\nExisting safety.\n"
+    )
+    generated = {
+        skill: (
+            "# Generated\n\n## Procedure\n\nGeneric generated steps.\n\n"
+            "## Deterministic pilot evidence\n\n- `ACTUAL-42`\n\n## Safety gate\n\nGenerated safety.\n"
+        ).encode()
+    }
+    notices = []
+    pipeline.keep_authored_procedures(workspace, generated, notices)
+    text = generated[skill].decode()
+    assert "authored legal review workflow" in text
+    assert "ACTUAL-42" in text and "STALE-01" not in text
+    assert "# Generated" in text and "Generated safety." in text
+    assert "evidence regenerated" in "\n".join(notices)
+
+
+def test_normalized_agent_loads_through_library_templates_fallback(workspace):
+    planned, _ = pipeline.plan(workspace, "meeting-coordinator", "general")
+    path = next(path for path in planned if path.suffix == ".py")
+    target = workspace / path
+    target.parent.mkdir(parents=True)
+    target.write_bytes(planned[path])
+    script = (
+        "import importlib.util, pathlib, sys; "
+        "spec = importlib.util.spec_from_file_location('example_agent', sys.argv[1]); "
+        "module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module); "
+        "assert module.MeetingCoordinatorAgent().perform(); "
+        "assert pathlib.Path(sys.modules['basic_agent'].__file__).parent.name == 'templates'"
+    )
+    result = subprocess.run([sys.executable, "-B", "-c", script, str(target)],
+                            cwd=workspace, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+
 def test_json_evidence_uses_nested_identity_strings_not_numbers():
     output = json.dumps({"amount": 1234.56, "count": 3, "approved": True,
                          "records": [{"id": "REQ-42", "title": "Repair loading bay"},
