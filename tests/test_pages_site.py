@@ -10,6 +10,8 @@ from contextlib import contextmanager
 from pathlib import Path, PurePosixPath
 from unittest import mock
 
+from bs4 import BeautifulSoup
+
 from scripts import build_pages_site as pages
 
 
@@ -796,6 +798,21 @@ class FullRepositoryArtifactTests(unittest.TestCase):
 
     def test_complete_artifact_has_no_broken_relative_links(self):
         self.assertEqual(pages.validate_html_links(self.site), [])
+
+    def test_guide_session_request_lands_on_served_aideate_form(self):
+        guide = BeautifulSoup(
+            (self.site / "docs/rapp-guide.html").read_text(encoding="utf-8"),
+            "html.parser",
+        )
+        request = guide.select_one("#aideate a.nav-btn")
+        self.assertIsNotNone(request)
+        self.assertEqual(request.get_text(strip=True), "Request a session")
+        self.assertEqual(request["href"], "../aideate.html#request")
+        aideate = BeautifulSoup(
+            (self.site / "aideate.html").read_text(encoding="utf-8"),
+            "html.parser",
+        )
+        self.assertIsNotNone(aideate.select_one("#request"))
 
     def test_served_installers_match_the_manifest_ring(self):
         manifest = json.loads((self.site / pages.MANIFEST_NAME).read_text(encoding="utf-8"))

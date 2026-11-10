@@ -1,6 +1,6 @@
 {
   "schema": "aibast-library-api/1.0",
-  "generated": "2026-11-10T14:05:16Z",
+  "generated": "2026-11-10T16:44:44Z",
   "spec": "rapp-static-api/1.1",
   "name": "aibast-library-api",
   "pages": "https://microsoft.github.io/aibast-agents-library/",
@@ -1470,107 +1470,107 @@
     {
       "name": "rapp/steps/1",
       "path": "api/v1/rapp/steps/1.json",
-      "sha256": "75ba6ecce5f884dec2944318e096dc8176798fd73a98c856c90d0cac516271cb",
-      "sha8": "75ba6ecce5f8",
-      "version": "api/versions/rapp/steps/1/75ba6ecce5f8.json"
+      "sha256": "a44dd8b484f1779431531af822ae33dc8014ae06ed68dfbc4eaeb9df1ce47fb2",
+      "sha8": "a44dd8b484f1",
+      "version": "api/versions/rapp/steps/1/a44dd8b484f1.json"
     },
     {
       "name": "rapp/steps/10",
       "path": "api/v1/rapp/steps/10.json",
-      "sha256": "4aa723a872ab89cea9ebb1783e2c5d4c25e0bd3e578c3368da9e4e39aed74a76",
-      "sha8": "4aa723a872ab",
-      "version": "api/versions/rapp/steps/10/4aa723a872ab.json"
+      "sha256": "3f4067030efdf149179a98caabeb974c550ca31c0914bb9f28215daacb811e59",
+      "sha8": "3f4067030efd",
+      "version": "api/versions/rapp/steps/10/3f4067030efd.json"
     },
     {
       "name": "rapp/steps/11",
       "path": "api/v1/rapp/steps/11.json",
-      "sha256": "7a08357ef0aedeeb66cdd5f886927528d71c8e14ceeb30d96729d6a3d4e02c96",
-      "sha8": "7a08357ef0ae",
-      "version": "api/versions/rapp/steps/11/7a08357ef0ae.json"
+      "sha256": "d131a7b0390c9f58623c0bc8dad37822da27db8f5dbc57842c0969b91bb716ca",
+      "sha8": "d131a7b0390c",
+      "version": "api/versions/rapp/steps/11/d131a7b0390c.json"
     },
     {
       "name": "rapp/steps/12",
       "path": "api/v1/rapp/steps/12.json",
-      "sha256": "62cbed4589a70fde11d22ed42ce4d2cd676d06d3fa7fbfdb3edac1fd01f8cd6f",
-      "sha8": "62cbed4589a7",
-      "version": "api/versions/rapp/steps/12/62cbed4589a7.json"
+      "sha256": "22beca44fe42689240c949df22384687de4b75174cc8936bfce23d9c18c8aa9a",
+      "sha8": "22beca44fe42",
+      "version": "api/versions/rapp/steps/12/22beca44fe42.json"
     },
     {
       "name": "rapp/steps/13",
       "path": "api/v1/rapp/steps/13.json",
-      "sha256": "1bc4aa541bcaf76ea33f4e55a2a60a38d7ec936df929b8b2f6028de7d23aa144",
-      "sha8": "1bc4aa541bca",
-      "version": "api/versions/rapp/steps/13/1bc4aa541bca.json"
+      "sha256": "d209049ec8c165bc9e42ee09d3bffba3202f159c42895981e7d11a8549f69f9c",
+      "sha8": "d209049ec8c1",
+      "version": "api/versions/rapp/steps/13/d209049ec8c1.json"
     },
     {
       "name": "rapp/steps/14",
       "path": "api/v1/rapp/steps/14.json",
-      "sha256": "14de7027da7acb40de785d25bed5521b1988cf9dbc84ab4fe333ee9a13523fc1",
-      "sha8": "14de7027da7a",
-      "version": "api/versions/rapp/steps/14/14de7027da7a.json"
+      "sha256": "3b58d1150cad9ebac3f3583369bfd4365659f255187142ab4bb5e14facde4ea8",
+      "sha8": "3b58d1150cad",
+      "version": "api/versions/rapp/steps/14/3b58d1150cad.json"
     },
     {
       "name": "rapp/steps/2",
       "path": "api/v1/rapp/steps/2.json",
-      "sha256": "6e3166d7a406363c2f069ead5c1c8921a01a78ae4bf83f574d5799dbe36834af",
-      "sha8": "6e3166d7a406",
-      "version": "api/versions/rapp/steps/2/6e3166d7a406.json"
+      "sha256": "832d13d9f3bff87e343bb2ab1528085870a949f66154b9bd9c4f9516a017edd7",
+      "sha8": "832d13d9f3bf",
+      "version": "api/versions/rapp/steps/2/832d13d9f3bf.json"
     },
     {
       "name": "rapp/steps/3",
       "path": "api/v1/rapp/steps/3.json",
-      "sha256": "244614b065753d26745ffcdea21b5a6e98321908b85536da8888472328dbb66c",
-      "sha8": "244614b06575",
-      "version": "api/versions/rapp/steps/3/244614b06575.json"
+      "sha256": "d0b47be1377d004bc18f376a34085a889af1a74e95fe566604c3650c1ce6ed5a",
+      "sha8": "d0b47be1377d",
+      "version": "api/versions/rapp/steps/3/d0b47be1377d.json"
     },
     {
       "name": "rapp/steps/4",
       "path": "api/v1/rapp/steps/4.json",
-      "sha256": "dedde5a50fc4d512390fdb073cd67cac106eeb32b5add22821a4391e849414fe",
-      "sha8": "dedde5a50fc4",
-      "version": "api/versions/rapp/steps/4/dedde5a50fc4.json"
+      "sha256": "63105e3afcd82e758ea2af9a34755b11acb8b79bbb6055b258fa8fc7bdb03b73",
+      "sha8": "63105e3afcd8",
+      "version": "api/versions/rapp/steps/4/63105e3afcd8.json"
     },
     {
       "name": "rapp/steps/5",
       "path": "api/v1/rapp/steps/5.json",
-      "sha256": "b4c72a00152019ea71963be02ca01d7ca2182147b86c5e98e211ac97b88e502b",
-      "sha8": "b4c72a001520",
-      "version": "api/versions/rapp/steps/5/b4c72a001520.json"
+      "sha256": "07ab8945fb2d2ed9b4fa5b06ffee1079896a5ab207f0bca199d811de4282c61c",
+      "sha8": "07ab8945fb2d",
+      "version": "api/versions/rapp/steps/5/07ab8945fb2d.json"
     },
     {
       "name": "rapp/steps/6",
       "path": "api/v1/rapp/steps/6.json",
-      "sha256": "8983c19c4b3487f0ed9a397246602616bb329cfb049317e5dde1125533558e64",
-      "sha8": "8983c19c4b34",
-      "version": "api/versions/rapp/steps/6/8983c19c4b34.json"
+      "sha256": "f5f2c19f8b2164e7f1680a8deabb537f5e5d19f5c4b503d6eb88add8cea341b8",
+      "sha8": "f5f2c19f8b21",
+      "version": "api/versions/rapp/steps/6/f5f2c19f8b21.json"
     },
     {
       "name": "rapp/steps/7",
       "path": "api/v1/rapp/steps/7.json",
-      "sha256": "ba8e640e6072fd7bf986cfdf14a99a3d0c651d2c48c1f5552816ce043ca5b0c6",
-      "sha8": "ba8e640e6072",
-      "version": "api/versions/rapp/steps/7/ba8e640e6072.json"
+      "sha256": "bb5bcb31f70a4dfcdb92e3f497cbef548ef0a03ad9baf240d1cdfba27e91334a",
+      "sha8": "bb5bcb31f70a",
+      "version": "api/versions/rapp/steps/7/bb5bcb31f70a.json"
     },
     {
       "name": "rapp/steps/8",
       "path": "api/v1/rapp/steps/8.json",
-      "sha256": "86caf687ccbe6fc96311d272ce432234e37aab683dc638cb8a1547843117250c",
-      "sha8": "86caf687ccbe",
-      "version": "api/versions/rapp/steps/8/86caf687ccbe.json"
+      "sha256": "b005064e8d6661edfc483c2e3b6c58e35cd589f265a7ad6bca8216d002699d3b",
+      "sha8": "b005064e8d66",
+      "version": "api/versions/rapp/steps/8/b005064e8d66.json"
     },
     {
       "name": "rapp/steps/9",
       "path": "api/v1/rapp/steps/9.json",
-      "sha256": "94512d45c9a56333d3e2f3c02b945c38450ba56bb429489cd62b4049da637d0d",
-      "sha8": "94512d45c9a5",
-      "version": "api/versions/rapp/steps/9/94512d45c9a5.json"
+      "sha256": "750aa04097a9cff4317b50b7d1052c17b94a252142477a5ba55656722a54a0c9",
+      "sha8": "750aa04097a9",
+      "version": "api/versions/rapp/steps/9/750aa04097a9.json"
     },
     {
       "name": "rapp/tools",
       "path": "api/v1/rapp/tools.json",
-      "sha256": "9ebbdcbf627f5abbef25562759a2b787973cb24dffc1acc4dd1e0d835b8a96c0",
-      "sha8": "9ebbdcbf627f",
-      "version": "api/versions/rapp/tools/9ebbdcbf627f.json"
+      "sha256": "3b3d7fe64f00567a35f54fb56ab919acd48e72189731b538717319116945b92d",
+      "sha8": "3b3d7fe64f00",
+      "version": "api/versions/rapp/tools/3b3d7fe64f00.json"
     },
     {
       "name": "scenarios/account-intelligence-account-overview",
