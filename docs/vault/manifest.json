@@ -21,8 +21,8 @@
       "title": "Welcome",
       "section": null,
       "status": "published",
-      "bytes": 1757,
-      "sha256": "e64495e2be77b73652dd1de010560c03bdaf2b13a0b36d3e0748360aab6b4ff5"
+      "bytes": 1790,
+      "sha256": "2f6b181ccc862420b10abb5de181bc2124f4e384efdac644fe4b85df12752171"
     },
     {
       "path": "_index.md",
@@ -61,8 +61,8 @@
       "title": "Production Guide Overview",
       "section": "Production Guide",
       "status": "published",
-      "bytes": 5443,
-      "sha256": "74ff31bbc93317addd9580330be28966cf65df386b33b6f3d0f407f7b85bbaf8"
+      "bytes": 6260,
+      "sha256": "2bc5cc9c45cdfe247114d44a4e85c8bc336a1a6d6a05a330bd8a8b48a6efd8e6"
     },
     {
       "path": "Production Guide/Step 01 Discovery Call.md",

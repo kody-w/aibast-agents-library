@@ -3,11 +3,21 @@ title: Production Guide Overview
 section: Production Guide
 status: published
 hook: What the 14-step RAPP production process is, who runs each step, and where the six human quality gates sit.
-source: "docs/rapp-guide.html#overview; docs/rapp-guide.html#architecture; docs/rapp-guide.html#principles; SPEC.md §1.1, §8, §11.1, §11.2"
+source: "docs/rapp-guide.html#overview; docs/rapp-guide.html#aideate; docs/rapp-guide.html#agent-library; docs/rapp-guide.html#architecture; docs/rapp-guide.html#principles; SPEC.md §1.1, §8, §11.1, §11.2"
 upstream_commit: 0b24e7d60786d39d97265338add9ca784bf5a7ab
 ---
 
 # Production Guide Overview
+
+The **AIBAST Production Guide** has three parts, one loop:
+
+- **Clarify with AIdeate:** a customer working session to name problems, vote, and choose one first use case and its owner. Run it before Step 1 if the problem is not yet chosen.
+- **Prove with RAPP:** the existing 14-step process below.
+- **Reuse with the AI Agent Library:** start from an industry solution before building in Step 3, then contribute only the general shell once a prototype proves out.
+
+Session content stays with the host and customer. Customer data and customer-specific work never enter the library; library solutions ship with synthetic sample data only.
+
+Guide sections: [AIdeate](../rapp-guide.html#aideate) and [AI Agent Library](../rapp-guide.html#agent-library).
 
 The **Rapid Agent Prototype Pattern (RAPP)** turns a customer conversation into a working AI agent in days, not months.
 AI does the heavy lifting. People apply judgment at **six quality gates**.

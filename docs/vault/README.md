@@ -7,9 +7,9 @@ source: docs/rapp-guide.html; upstream RAPP/1 specification
 
 # Welcome
 
-**This vault is the reference half of the RAPP production guide.**
-The [production guide](../rapp-guide.html) tells you what to do at each of the
-14 steps. This vault tells you more about each step, and explains the
+**This vault is the reference half of the AIBAST Production Guide.**
+The [AIBAST Production Guide](../rapp-guide.html) connects AIdeate, the
+14-step RAPP process, and the AI Agent Library. This vault tells you more about each step, and explains the
 **RAPP/1 protocol** underneath it: how an agent is identified, recorded,
 packaged and moved.
 

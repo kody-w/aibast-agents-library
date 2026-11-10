@@ -16,7 +16,7 @@ def test_installer_page_keeps_two_primary_actions():
     )
     actions = soup.select(".hero-actions a")
     assert [(link.get_text(" ", strip=True), link.get("href")) for link in actions] == [
-        ("Open Production Guide", "rapp-guide.html"),
+        ("Open AIBAST Production Guide", "rapp-guide.html"),
         ("Browse Agent Library", "../index.html"),
     ]
     assert soup.select_one('body > p a[href="../start.html"]')

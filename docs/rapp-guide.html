@@ -12,7 +12,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="data:," rel="icon"/>
-<title>Rapid Agent Prototype Pattern (RAPP) - Production Guide</title>
+<title>AIBAST Production Guide</title>
 
 <!-- aibast-design:start -->
 <style>
@@ -1483,7 +1483,7 @@ body:not(.js-enabled) .quiz-option input {
 <div class="feedback-notice" role="note">
         <strong>IMPORTANT:</strong> This is an experimental project managed by a v-team from the Artificial Intelligence Business Applications Specialist Team (AIBAST), not an officially supported Microsoft product. Agent templates are starting points — human review remains important. <a href="https://github.com/microsoft/aibast-agents-library/issues">File an issue</a> to help us improve.
     </div>
-<noscript><div class="no-js-notice">JavaScript is disabled. All 22 sections are visible below. Use the sidebar links or scroll to navigate. Interactive controls are hidden, and fallback content is expanded.</div></noscript>
+<noscript><div class="no-js-notice">JavaScript is disabled. All 24 sections are visible below. Use the sidebar links or scroll to navigate. Interactive controls are hidden, and fallback content is expanded.</div></noscript>
 <aside aria-label="Production guide sections" class="sidebar" id="sidebar" tabindex="-1"><div class="sidebar-heading"><strong>Guide sections</strong><button aria-label="Close guide menu" class="sidebar-close js-control" onclick="toggleSidebar(false)" type="button">Close</button></div><nav aria-label="Production guide sections">
 <div class="sidebar-section">
 <div class="sidebar-title">Framework Overview</div>
@@ -1501,7 +1501,13 @@ body:not(.js-enabled) .quiz-option input {
 </a>
 </div>
 <div class="sidebar-section">
-<div class="sidebar-title">RAPP 14-Step Process</div>
+<div class="sidebar-title">Clarify</div>
+<a class="nav-item" href="#aideate">
+<span>AIdeate</span>
+</a>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-title">Prove</div>
 <a class="nav-item" href="#step1">
 <span class="nav-icon">1</span>
 <span>Discovery Call</span>
@@ -1560,6 +1566,12 @@ body:not(.js-enabled) .quiz-option input {
 </a>
 </div>
 <div class="sidebar-section">
+<div class="sidebar-title">Reuse</div>
+<a class="nav-item" href="#agent-library">
+<span>AI Agent Library</span>
+</a>
+</div>
+<div class="sidebar-section">
 <div class="sidebar-title">Team Enablement</div>
 <a class="nav-item" href="#team-setup">
 <span class="nav-icon">§</span>
@@ -1609,7 +1621,28 @@ body:not(.js-enabled) .quiz-option input {
 <div class="breadcrumb">
 <span class="breadcrumb-item">Framework Overview</span>
 </div>
-<h1 class="section-title">Rapid Agent Prototype Pattern (RAPP)</h1>
+<h1 class="section-title">AIBAST Production Guide</h1>
+<p class="section-subtitle">Clarify the problem. Prove it with a working agent. Reuse what works.</p>
+</div>
+<div class="step-section" id="production-loop">
+<h2>Three parts, one loop</h2>
+<div class="tool-grid">
+<a class="tool-card" href="#aideate">
+<h3 class="tool-card-title">Clarify · AIdeate</h3>
+<p class="tool-card-description">A working session that ends with one problem worth solving first.</p>
+</a>
+<a class="tool-card" href="#step1">
+<h3 class="tool-card-title">Prove · Rapid Agent Prototype Pattern (RAPP)</h3>
+<p class="tool-card-description">The 14 steps from discovery call to production.</p>
+</a>
+<a class="tool-card" href="#agent-library">
+<h3 class="tool-card-title">Reuse · AI Agent Library</h3>
+<p class="tool-card-description">Industry solutions the next team can start from.</p>
+</a>
+</div>
+</div>
+<div class="step-section">
+<h2>Rapid Agent Prototype Pattern (RAPP)</h2>
 <p class="section-subtitle">Compress 3-6 month development cycles into days using the "Buzz Saw + Human Taste" methodology.</p>
 </div>
 <div class="step-section">
@@ -2236,6 +2269,31 @@ def handle_request(user_message, user_guid):
 </div>
 </div>
 <!-- STEP 1: DISCOVERY CALL -->
+<div class="content-section" id="aideate">
+<div class="section-header">
+<h1 class="section-title">AIdeate: clarify the problem</h1>
+</div>
+<div class="step-section">
+<h2>What it is</h2>
+<p>AIdeate is a working session with a customer team. They name their problems, vote, and leave with a ranked short list and one clear first use case.</p>
+<h2>When to run it</h2>
+<p>Before Step 1, when the customer wants AI but has not chosen where to start. If the problem is already chosen, go straight to <a href="#step1">Step 1</a>.</p>
+<h2>How a session runs</h2>
+<ol>
+<li><strong>Come prepared</strong>: bring use cases for the customer's industry from the Agent Library.</li>
+<li><strong>Ideate</strong>: the team adds its own problems, live on the shared screen.</li>
+<li><strong>Vote</strong>: the ranking updates as they do.</li>
+<li><strong>Results</strong>: a ranked list and a first use case.</li>
+</ol>
+<h2>What you carry into Step 1</h2>
+<p>The top-ranked use case, in the customer's words, and who in the room owns it.</p>
+</div>
+<div class="highlight-box notice notice-accent">
+<h3>Rule</h3>
+<p>Session content stays with the host and the customer. Nothing customer-specific goes into the library.</p>
+</div>
+<p><a class="nav-btn" href="../request-info.html">Request a session</a></p>
+</div>
 <div class="content-section" id="step1">
 <div class="section-header">
 <div class="breadcrumb">
@@ -4822,6 +4880,23 @@ Security additions needed:
 <p class="vault-deeper"><strong>Go deeper:</strong> <a href="vault/index.html#Production%20Guide%2FStep%2014%20Post-Deployment%20Review.md">Step 14 in the RAPP/1 reference vault</a>, with the protocol behind it.</p>
 </div>
 <!-- TEAM SETUP GUIDE -->
+<div class="content-section" id="agent-library">
+<div class="section-header">
+<h1 class="section-title">AI Agent Library: reuse what works</h1>
+</div>
+<div class="step-section">
+<h2>What it is</h2>
+<p>A public catalog of industry agent solutions. Each one has a recorded demo, a build-it-yourself workshop, and a one-line setup into your own Copilot Studio with sample data.</p>
+<h2>Start from it</h2>
+<p>Before building anything in Step 3, look for a solution close to the customer's problem and start there.</p>
+<p><a href="../index.html">AI Agent Library</a> · <a href="../start.html">Get one running</a></p>
+<h2>Give back</h2>
+<p>When a prototype proves out, shape the general part into an industry solution. The solution is the shell: the same for every customer with that job. It never contains the customer's data or the customer's own work.</p>
+</div>
+<div class="highlight-box notice notice-accent">
+<p><strong>Synthetic data only: every library solution ships with sample data.</strong></p>
+</div>
+</div>
 <div class="content-section" id="team-setup">
 <h1 class="section-title">Team Setup Guide</h1>
 <p class="section-subtitle">How to onboard Team Members A, B, and other team members to run this workflow autonomously</p>
@@ -5544,10 +5619,10 @@ az functionapp list --query "[?tags.Stage=='Prototype' &amp;&amp; tags.LastUsed&
         const feedbackSchema = "aibast-workshop-feedback/1.0";
         let currentSectionIndex = 0;
         const sections = [
-            'overview', 'architecture', 'principles',
+            'overview', 'architecture', 'principles', 'aideate',
             'step1', 'step2', 'step3', 'step4', 'step5', 'step6', 'step7',
             'step8', 'step9', 'step10', 'step11', 'step12', 'step13', 'step14',
-            'team-setup', 'scaling', 'roadmap', 'reference', 'tools'
+            'agent-library', 'team-setup', 'scaling', 'roadmap', 'reference', 'tools'
         ];
 
         function prefersReducedMotion() {

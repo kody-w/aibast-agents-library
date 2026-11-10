@@ -1,0 +1,112 @@
+[
+  {
+    "section": "overview",
+    "before": "dc4abca509fd5959c8a118e1c892f7970485c69f25de6ef6ad5c4a6c265e2dd1",
+    "after": "32e739753576685b53987c184c31312240aabd41529dc2f92f0094bd50443fec"
+  },
+  {
+    "section": "architecture",
+    "before": "4ed6ea38cf018d0a7f9e13c5672151654f7d4b40954d6447ccdf7ed71b9ea8d8",
+    "after": "4ed6ea38cf018d0a7f9e13c5672151654f7d4b40954d6447ccdf7ed71b9ea8d8"
+  },
+  {
+    "section": "principles",
+    "before": "22ec900092b67d9207b821e9fd2b4c51f71aef46af797195ab83e23ed672c142",
+    "after": "22ec900092b67d9207b821e9fd2b4c51f71aef46af797195ab83e23ed672c142"
+  },
+  {
+    "section": "step1",
+    "before": "806e6f651a5b32ceaee54e2f3f0574ff66ff8c329ef4c70bdd7feb57bd087358",
+    "after": "806e6f651a5b32ceaee54e2f3f0574ff66ff8c329ef4c70bdd7feb57bd087358"
+  },
+  {
+    "section": "step2",
+    "before": "177ade725f1e26b1e68529cff71253585077622779ba8d20ca9bc162cd7a4c05",
+    "after": "177ade725f1e26b1e68529cff71253585077622779ba8d20ca9bc162cd7a4c05"
+  },
+  {
+    "section": "step3",
+    "before": "0e7da43bd36c5f62d07460c45a6cb1e230af6a10e3ad45aba8cc057f39160280",
+    "after": "0e7da43bd36c5f62d07460c45a6cb1e230af6a10e3ad45aba8cc057f39160280"
+  },
+  {
+    "section": "step4",
+    "before": "4f090e424ebbf8e4baab8b517497edbdc3de8fe26263d02c2d8a64ed34d274e9",
+    "after": "4f090e424ebbf8e4baab8b517497edbdc3de8fe26263d02c2d8a64ed34d274e9"
+  },
+  {
+    "section": "step5",
+    "before": "5b63550ee11a3ad4dee1e5c5615223e40276ed84a5c076ce918a6529956a49a6",
+    "after": "5b63550ee11a3ad4dee1e5c5615223e40276ed84a5c076ce918a6529956a49a6"
+  },
+  {
+    "section": "step6",
+    "before": "54999418cd93c35aef30ac698cd08aae56b0c87217dee41dc68a68cb6415c432",
+    "after": "54999418cd93c35aef30ac698cd08aae56b0c87217dee41dc68a68cb6415c432"
+  },
+  {
+    "section": "step7",
+    "before": "de954f4aacae9ca92133b507a3eb5783fbf76a69bb941dfbbdea5501004f09cd",
+    "after": "de954f4aacae9ca92133b507a3eb5783fbf76a69bb941dfbbdea5501004f09cd"
+  },
+  {
+    "section": "step8",
+    "before": "5791fd4ec3dd29a3f1b89ad3b769756436e7b7a19a49afa06ccc6e556d8acf48",
+    "after": "5791fd4ec3dd29a3f1b89ad3b769756436e7b7a19a49afa06ccc6e556d8acf48"
+  },
+  {
+    "section": "step9",
+    "before": "e075c7e24739d02f68de4f865e0b2bc9f97f561faebd5996cbe6a55803ca4abb",
+    "after": "e075c7e24739d02f68de4f865e0b2bc9f97f561faebd5996cbe6a55803ca4abb"
+  },
+  {
+    "section": "step10",
+    "before": "be151c6327dfac060095d987d3004a39cd24b3618ba0006d0fff67cdfb36f529",
+    "after": "be151c6327dfac060095d987d3004a39cd24b3618ba0006d0fff67cdfb36f529"
+  },
+  {
+    "section": "step11",
+    "before": "557cf5474283a704b0d314313399cc092ef9e4bcf6b065e4ce9d99ad54a2f0a7",
+    "after": "557cf5474283a704b0d314313399cc092ef9e4bcf6b065e4ce9d99ad54a2f0a7"
+  },
+  {
+    "section": "step12",
+    "before": "2c7d1b3ee07000211cc132fb03ca66bc9369b8399f5cafb3c5493050d154f997",
+    "after": "2c7d1b3ee07000211cc132fb03ca66bc9369b8399f5cafb3c5493050d154f997"
+  },
+  {
+    "section": "step13",
+    "before": "189606f380a11663a8cffcc81337cb685c512f49decbe55d8433d77786fd4040",
+    "after": "189606f380a11663a8cffcc81337cb685c512f49decbe55d8433d77786fd4040"
+  },
+  {
+    "section": "step14",
+    "before": "879d4e88b6af1d6f4c5263455eedb68d8ed09fc4019a57771405389b9c436fd1",
+    "after": "879d4e88b6af1d6f4c5263455eedb68d8ed09fc4019a57771405389b9c436fd1"
+  },
+  {
+    "section": "team-setup",
+    "before": "46bc9fb72da7044d969bad9da062deb99b5a5e143d6f1200a8f00e92f1bad8d1",
+    "after": "46bc9fb72da7044d969bad9da062deb99b5a5e143d6f1200a8f00e92f1bad8d1"
+  },
+  {
+    "section": "scaling",
+    "before": "6624e63797afe8d079cadfa044723d5b57a77b5c0d3825cd01e8d0883ea55369",
+    "after": "6624e63797afe8d079cadfa044723d5b57a77b5c0d3825cd01e8d0883ea55369"
+  },
+  {
+    "section": "roadmap",
+    "before": "ea6abd68d38d25b3426f8d31da867a8ca1ff2cdffb4d28a83e77bb94db9a6139",
+    "after": "ea6abd68d38d25b3426f8d31da867a8ca1ff2cdffb4d28a83e77bb94db9a6139"
+  },
+  {
+    "section": "reference",
+    "before": "1e5b44e3da3659e5410bf244770ab82b8be16893c4f73743ca36e6c8019ca0c0",
+    "after": "1e5b44e3da3659e5410bf244770ab82b8be16893c4f73743ca36e6c8019ca0c0"
+  },
+  {
+    "section": "tools",
+    "before": "d9220dbfa095473cd2866b8b66277211548d2569a97a8193d5667daaa1b2a62a",
+    "after": "d9220dbfa095473cd2866b8b66277211548d2569a97a8193d5667daaa1b2a62a"
+  }
+]

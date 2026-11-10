@@ -1,10 +1,10 @@
 # RAPP/1 Reference Vault
 
-> The reference vault for the RAPP production guide in the AIBAST Agents Library: every step of the
+> The reference vault for the AIBAST Production Guide in the AIBAST Agents Library: every step of the
 > 14-step guide expanded, and the RAPP/1 protocol it rests on, as linked Markdown notes. Notes that
 > restate the RAPP/1 specification are pinned to upstream commit 0b24e7d60786d39d97265338add9ca784bf5a7ab (MIT; see NOTICE.md).
 
-- [Production guide](https://microsoft.github.io/aibast-agents-library/docs/vault/../rapp-guide.html): the 14-step RAPP production process
+- [AIBAST Production Guide](https://microsoft.github.io/aibast-agents-library/docs/vault/../rapp-guide.html): clarify with AIdeate, prove with RAPP, reuse with the AI Agent Library
 - [All notes as one file](https://microsoft.github.io/aibast-agents-library/docs/vault/llms-full.txt)
 - [Obsidian vault download](https://microsoft.github.io/aibast-agents-library/docs/vault/rapp1-vault.zip)
 

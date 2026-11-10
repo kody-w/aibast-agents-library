@@ -247,11 +247,11 @@ def render_all() -> dict[str, bytes]:
     llms = [
         "# RAPP/1 Reference Vault",
         "",
-        "> The reference vault for the RAPP production guide in the AIBAST Agents Library: every step of the",
+        "> The reference vault for the AIBAST Production Guide in the AIBAST Agents Library: every step of the",
         "> 14-step guide expanded, and the RAPP/1 protocol it rests on, as linked Markdown notes. Notes that",
         f"> restate the RAPP/1 specification are pinned to upstream commit {UPSTREAM_COMMIT} (MIT; see NOTICE.md).",
         "",
-        f"- [Production guide]({SITE}../rapp-guide.html): the 14-step RAPP production process",
+        f"- [AIBAST Production Guide]({SITE}../rapp-guide.html): clarify with AIdeate, prove with RAPP, reuse with the AI Agent Library",
         f"- [All notes as one file]({SITE}llms-full.txt)",
         f"- [Obsidian vault download]({SITE}rapp1-vault.zip)",
     ]
