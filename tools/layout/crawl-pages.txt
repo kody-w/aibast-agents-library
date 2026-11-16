@@ -321,3 +321,4 @@ solutions/win-loss-analysis/manual-tutorial.html
 solutions/win-loss-analysis/quest.html
 start.html
 why.html
+solutions/_shared/workshop-settings.html
