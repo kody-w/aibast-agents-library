@@ -1,0 +1,10 @@
+# Pages the crawl does not check, each with its reason. Every other built page is in crawl-pages.txt.
+solutions/_shared/m365-copilot-demo.html	full-window simulated Microsoft 365 Copilot surface; also embedded on the home page
+solutions/_shared/surfaces/cowork/index.html	demo surface shown inside a frame
+solutions/_shared/surfaces/m365/index.html	demo surface shown inside a frame
+solutions/_shared/surfaces/studio/index.html	demo surface shown inside a frame
+qr.html	print-only QR page
+docs/vault/index.html	full-window reader app with its own frame
+beta/index.html	separate Frontier app
+beta/show-mode.html	separate Frontier app
+beta/ui/index.html	separate Frontier app

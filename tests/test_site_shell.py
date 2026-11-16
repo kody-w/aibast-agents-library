@@ -50,3 +50,9 @@ def test_topbar_with_its_own_controls_is_kept():
 def test_headers_inside_the_main_content_do_not_count():
     page = '<html><body><main><article><header>card</header></article></main></body></html>'
     assert bps.SHELL_START_MARK in bps.inject_site_shell(PurePosixPath("blog.html"), page)
+
+
+def test_workshop_settings_is_framed_but_demo_surfaces_are_not():
+    assert bps.shell_applies(PurePosixPath("solutions/_shared/workshop-settings.html"))
+    assert not bps.shell_applies(PurePosixPath("solutions/_shared/m365-copilot-demo.html"))
+    assert not bps.shell_applies(PurePosixPath("solutions/_shared/surfaces/m365/index.html"))
