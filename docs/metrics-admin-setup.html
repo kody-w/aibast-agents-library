@@ -676,7 +676,7 @@ h3 {
 }
 
 .outcome strong {
-  color: var(--cp-success);
+  color: var(--cp-text);
 }
 
 .code-wrap {
@@ -1170,7 +1170,7 @@ pre code {
             <p>The safe CLI alternative below prompts securely for the value. Run it interactively. Do not append a value, use a body flag, echo or pipe a value, or paste a token into shell history.</p>
             <div class="code-wrap">
               <div class="code-head"><span>Secure prompt</span><button class="copy-button" type="button" data-copy-target="command-secret">Copy safe command</button></div>
-              <pre><code id="command-secret">gh secret set METRICS_TOKEN --repo microsoft/aibast-agents-library</code></pre>
+              <pre tabindex="0"><code id="command-secret">gh secret set METRICS_TOKEN --repo microsoft/aibast-agents-library</code></pre>
             </div>
             <div class="outcome"><strong>Expected:</strong> Repository Actions secrets lists <code>METRICS_TOKEN</code> with a recent update time, while its value remains unreadable.</div>
           </div>
@@ -1200,7 +1200,7 @@ pre code {
             </ul>
             <div class="code-wrap">
               <div class="code-head"><span>Required autonomous compiler permissions</span><button class="copy-button" type="button" data-copy-target="workflow-permissions">Copy YAML excerpts</button></div>
-              <pre><code id="workflow-permissions"># .github/workflows/workshop-feedback.yml
+              <pre tabindex="0"><code id="workflow-permissions"># .github/workflows/workshop-feedback.yml
 permissions:
   actions: write
   issues: write
@@ -1230,7 +1230,7 @@ permissions:
             <p>Open <a href="https://github.com/microsoft/aibast-agents-library/actions/workflows/metrics.yml" target="_blank" rel="noopener">Actions → metrics</a>, choose <strong>Run workflow</strong>, select branch <code>main</code>, and run <code>.github/workflows/metrics.yml</code>.</p>
             <div class="code-wrap">
               <div class="code-head"><span>Equivalent non-secret dispatch</span><button class="copy-button" type="button" data-copy-target="command-run">Copy command</button></div>
-              <pre><code id="command-run">gh workflow run metrics.yml --repo microsoft/aibast-agents-library --ref main</code></pre>
+              <pre tabindex="0"><code id="command-run">gh workflow run metrics.yml --repo microsoft/aibast-agents-library --ref main</code></pre>
             </div>
             <p>Review the completed run and generated snapshot. Verify the traffic and workshop-scope signals:</p>
             <ul>
@@ -1284,7 +1284,7 @@ permissions:
             <p>Run the block in a trusted interactive shell. <code>read -s</code> suppresses terminal echo; the token exists only in the temporary environment variable and is unset after the request.</p>
             <div class="code-wrap">
               <div class="code-head"><span>Secure traffic verification</span><button class="copy-button" type="button" data-copy-target="command-api">Copy safe commands</button></div>
-              <pre><code id="command-api">read -s -p "Fine-grained PAT: " GH_TOKEN
+              <pre tabindex="0"><code id="command-api">read -s -p "Fine-grained PAT: " GH_TOKEN
 printf "\n"
 export GH_TOKEN
 gh api repos/microsoft/aibast-agents-library/traffic/clones
@@ -1309,7 +1309,7 @@ unset GH_TOKEN</code></pre>
           <div class="step-body">
             <div class="code-wrap">
               <div class="code-head"><span>Readable local inspection</span><button class="copy-button" type="button" data-copy-target="command-json">Copy command</button></div>
-              <pre><code id="command-json">python3 -m json.tool state/metrics.json</code></pre>
+              <pre tabindex="0"><code id="command-json">python3 -m json.tool state/metrics.json</code></pre>
             </div>
             <ul>
               <li><code>traffic.live</code> is <code>true</code>, <code>traffic.as_of</code> is current for the run, and <code>traffic.unavailable_reason</code> is empty or absent.</li>
