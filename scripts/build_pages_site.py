@@ -1149,12 +1149,25 @@ TOPBAR_CONTROL_RE = re.compile(r"<(button|input|select)\b|\bid=\"(?!quest-trigge
 SHELL_STYLE = """<style>
 body:has(>.site-shell){margin-top:0;padding-top:0}
 body:has(>.site-shell) .topbar{top:60px}
+/* Gallery look, one source for every framed page: headings at the gallery's size and weight, flat cards (border, no shadow). */
+body:has(>.site-shell) h1:not(.site-shell *){font-size:clamp(30px,3.4vw,48px);font-weight:600;letter-spacing:-.01em;line-height:1.15}
+body:has(>.site-shell) :is(main,body>div,body>section,body>article) :is(section,article,details,aside,div,figure,a,iframe):not(:focus-visible){box-shadow:none}
 /* The shared header carries the brand, so a page's own decorative AI tile above its heading is hidden. */
 body:has(>.site-shell) .logo[aria-hidden="true"]{display:none}
 body:has(>.site-shell):not(:has(#sidebar)) > header:not(.site-shell){position:static;min-height:0;height:auto;margin:0;border:0;box-shadow:none;background:transparent;padding:14px max(16px,calc((100vw - 1360px) / 2 + 40px)) 0;flex-wrap:wrap;gap:8px 12px}
 body:has(>.site-shell):not(:has(#sidebar)) > header:not(.site-shell) :is(.brand-mark,.aibast-mark,.logo-mark){display:none}
 body:has(>.site-shell):not(:has(#sidebar)) > header:not(.site-shell) :is(.brand,.brand-copy,.topbar-identity){font-size:.95rem}
 body:has(>.site-shell):not(:has(#sidebar)) > header:not(.site-shell) :is(a.button,button,.button,.nav-link,.topbar-link,.topbar-action,nav a){border-radius:999px;font-size:.875rem;min-height:36px;padding:6px 14px}
+/* A page's own top bar may sit inside a wrapper; it gets the same treatment. Its home-brand link repeats the shared header, so it is hidden, and its links read as a left-aligned pill row like the gallery's filters. */
+body:has(>.site-shell):not(:has(#sidebar)) header.topbar:not(.site-shell){position:static;min-height:0;height:auto;margin:0;border:0;box-shadow:none;background:transparent;padding:14px max(16px,calc((100vw - 1360px) / 2 + 40px)) 0}
+body:has(>.site-shell):not(:has(#sidebar)) header.topbar:not(.site-shell) .topbar-inner{max-width:none;width:auto;margin:0;padding:0}
+body:has(>.site-shell):not(:has(#sidebar)) :is(header,.topbar):not(.site-shell) a.brand[href$="index.html"]{display:none}
+body:has(>.site-shell):not(:has(#sidebar)) header.topbar:not(.site-shell) :is(.topbar-inner,nav){justify-content:flex-start;flex-wrap:wrap;gap:8px}
+/* Workshop pages: the "AIBAST ..." label repeats the brand; the breadcrumb under it keeps the page's place. */
+body:has(>.site-shell):not(:has(#sidebar)) :is(header,.topbar):not(.site-shell) .topbar-identity > .brand{display:none}
+@media (max-width:620px){body:has(>.site-shell):not(:has(#sidebar)) :is(header,.topbar):not(.site-shell) .topbar-actions{display:flex;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;max-width:100%;gap:8px;scrollbar-width:thin}body:has(>.site-shell):not(:has(#sidebar)) :is(header,.topbar):not(.site-shell) .topbar-actions>*{flex:0 0 auto}}
+@media (max-width:620px){body:has(>.site-shell):not(:has(#sidebar)) header.topbar:not(.site-shell) :is(nav,.topnav){flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;max-width:100%;scrollbar-width:thin}body:has(>.site-shell):not(:has(#sidebar)) header.topbar:not(.site-shell) :is(nav,.topnav)>*{flex:0 0 auto}}
+body:has(>.site-shell):not(:has(#sidebar)) header.topbar:not(.site-shell) :is(a.button,button,.button,.nav-link,.topbar-link,.topbar-action,nav a){border-radius:999px;font-size:.875rem;min-height:36px;padding:6px 14px;border:1px solid var(--cp-border,rgba(128,128,128,.35))}
 body:has(>.topbar) .site-shell{margin-bottom:0}
 body:has(>.site-shell){max-width:none}
 body:has(>.site-shell):not(:has(#sidebar)) > :is(main,.container,.page-shell):not([data-own-width]){box-sizing:border-box;width:100%;max-width:1360px;margin-left:auto;margin-right:auto;padding-left:40px;padding-right:40px}
