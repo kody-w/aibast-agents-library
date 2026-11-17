@@ -62760,6 +62760,1080 @@
           ]
         }
       ]
+    },
+    "2026-11-17": {
+      "collected_at": "2026-11-17T05:26:05+00:00",
+      "metrics": [
+        {
+          "metricName": "DeadClickCount",
+          "information": [
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 100,
+              "sessionsWithoutMetricPercentage": 0,
+              "pagesViews": 1,
+              "subTotal": 2,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "sessionsCount": 2,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 100,
+              "sessionsWithoutMetricPercentage": 0,
+              "pagesViews": 1,
+              "subTotal": 2,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 100,
+              "sessionsWithoutMetricPercentage": 0,
+              "pagesViews": 1,
+              "subTotal": 1,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "ExcessiveScroll",
+          "information": [
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "sessionsCount": 2,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "RageClickCount",
+          "information": [
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 2,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "QuickbackClick",
+          "information": [
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 100,
+              "sessionsWithoutMetricPercentage": 0,
+              "pagesViews": 1,
+              "subTotal": 1,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 100,
+              "sessionsWithoutMetricPercentage": 0,
+              "pagesViews": 1,
+              "subTotal": 1,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "sessionsCount": 2,
+              "sessionsWithMetricPercentage": 50,
+              "sessionsWithoutMetricPercentage": 50,
+              "pagesViews": 1,
+              "subTotal": 1,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 100,
+              "sessionsWithoutMetricPercentage": 0,
+              "pagesViews": 2,
+              "subTotal": 2,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 100,
+              "sessionsWithoutMetricPercentage": 0,
+              "pagesViews": 1,
+              "subTotal": 1,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "ScriptErrorCount",
+          "information": [
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "sessionsCount": 2,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "ErrorClickCount",
+          "information": [
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 2,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "sessionsCount": 1,
+              "sessionsWithMetricPercentage": 0,
+              "sessionsWithoutMetricPercentage": 100,
+              "pagesViews": 0,
+              "subTotal": 0,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "ScrollDepth",
+          "information": [
+            {
+              "averageScrollDepth": 24,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "averageScrollDepth": 10,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "averageScrollDepth": 12,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "averageScrollDepth": 10,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "averageScrollDepth": 100,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "averageScrollDepth": 7,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "averageScrollDepth": 57,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "Traffic",
+          "information": [
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 14,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 6,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 6,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 6,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 14,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 14,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 14,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 3,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 6,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 1,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalSessionCount": 2,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 10,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 3,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 6,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 14,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 14,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "totalSessionCount": 1,
+              "totalBotSessionCount": 0,
+              "distinctUserCount": 1,
+              "pagesPerSessionPercentage": 14,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        },
+        {
+          "metricName": "EngagementTime",
+          "information": [
+            {
+              "totalTime": 43,
+              "activeTime": 43,
+              "Url": "https://kody-w.github.io/aibast-agents-library/academy.html"
+            },
+            {
+              "totalTime": 5,
+              "activeTime": 5,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "totalTime": 3,
+              "activeTime": 3,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalTime": 247,
+              "activeTime": 7,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalTime": 2,
+              "activeTime": 2,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "totalTime": 2,
+              "activeTime": 2,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "totalTime": 21,
+              "activeTime": 21,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "totalTime": 3,
+              "activeTime": 3,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalTime": 5,
+              "activeTime": 5,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalTime": 420,
+              "activeTime": 0,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalTime": 10,
+              "activeTime": 10,
+              "Url": "https://kody-w.github.io/aibast-agents-library/solutions/_shared/m365-copilot-demo.html"
+            },
+            {
+              "totalTime": 507,
+              "activeTime": 23,
+              "Url": "https://microsoft.github.io/aibast-agents-library/solutions/ask-hr/quest.html"
+            },
+            {
+              "totalTime": 31,
+              "activeTime": 10,
+              "Url": "https://kody-w.github.io/aibast-agents-library/"
+            },
+            {
+              "totalTime": 266,
+              "activeTime": 13,
+              "Url": "https://kody-w.github.io/aibast-agents-library/paths.html"
+            },
+            {
+              "totalTime": 2,
+              "activeTime": 2,
+              "Url": "https://kody-w.github.io/aibast-agents-library/index.html"
+            },
+            {
+              "totalTime": 5,
+              "activeTime": 5,
+              "Url": "https://kody-w.github.io/aibast-agents-library/walk.html"
+            }
+          ]
+        }
+      ]
     }
   }
 }

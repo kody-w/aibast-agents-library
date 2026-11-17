@@ -1,17 +1,17 @@
 {
  "schema": "aibast-metrics/1.0",
- "generated_at": "2026-11-16T05:28:05Z",
+ "generated_at": "2026-11-17T05:25:52Z",
  "repo": {
   "stars": 8,
   "forks": 9,
   "watchers": 0,
   "open_issues": 16,
-  "size_kb": 5808104,
+  "size_kb": 5808890,
   "created_at": "2025-10-17T16:17:53Z",
-  "pushed_at": "2026-11-16T05:21:23Z",
+  "pushed_at": "2026-11-17T05:20:16Z",
   "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
   "homepage": null,
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "carried_forward": false,
   "owner": "microsoft",
   "name": "aibast-agents-library",
@@ -19,15 +19,15 @@
   "site": "https://microsoft.github.io/aibast-agents-library/"
  },
  "totals": {
-  "downloads": 31282,
+  "downloads": 31514,
   "clones": 29539,
   "cdn_hits": 525,
-  "release_downloads": 1218,
+  "release_downloads": 1450,
   "agent_file_downloads": 976,
-  "installer_downloads": 306,
+  "installer_downloads": 314,
   "skill_downloads": 105,
-  "cowork_plugin_downloads": 289,
-  "copilot_solution_downloads": 290,
+  "cowork_plugin_downloads": 361,
+  "copilot_solution_downloads": 362,
   "agent_upvotes": null,
   "agent_acquisitions": null,
   "clones_excluding_ci_estimate": 29539,
@@ -40,14 +40,14 @@
   "days_tracked": 102,
   "tracking_since": "2026-07-26",
   "global_agent_distribution_fetch_events": 976,
-  "agents": 94,
+  "agents": 95,
   "stacks": 73,
   "solutions": 72,
   "verticals": 13,
   "publishers": 1,
   "categories": 13,
-  "total_lines": 51810,
-  "total_kb": 2617.0
+  "total_lines": 52171,
+  "total_kb": 2631.7
  },
  "daily": [
   {
@@ -789,7 +789,7 @@
   "clones_14d": 7510,
   "views_14d": 137,
   "live": true,
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "unavailable_reason": null,
   "carried_forward": false
  },
@@ -798,7 +798,7 @@
   "bandwidth": 395795,
   "rank": null,
   "agent_hits": 976,
-  "installer_hits": 306,
+  "installer_hits": 314,
   "files": [
    {
     "file": "/registry.json",
@@ -1081,1098 +1081,1098 @@
     "kind": "agent"
    }
   ],
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "carried_forward": false
  },
  "releases": {
   "available": true,
-  "total_downloads": 1218,
+  "total_downloads": 1450,
   "count": 6,
   "releases": [
    {
     "tag": "solution-bundles",
     "name": "AIBAST Solution Source Bundles",
     "published_at": "2026-10-25T00:19:39Z",
-    "downloads": 602,
+    "downloads": 826,
     "assets": [
      {
       "name": "account-intelligence-copilot-studio-solution.zip",
-      "downloads": 5,
+      "downloads": 6,
       "size": 48823
      },
      {
       "name": "account-intelligence-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9862
      },
      {
       "name": "account-intelligence-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16640081
      },
      {
       "name": "ai-customer-assistant-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 23281
      },
      {
       "name": "ai-customer-assistant-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10469
      },
      {
       "name": "ai-customer-assistant-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 18577861
      },
      {
       "name": "ask-hr-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 20451
      },
      {
       "name": "ask-hr-cowork-plugin.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 8519
      },
      {
       "name": "ask-hr-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 17718390
      },
      {
       "name": "asset-maintenance-forecast-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 16687
      },
      {
       "name": "asset-maintenance-forecast-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8103
      },
      {
       "name": "asset-maintenance-forecast-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10653394
      },
      {
       "name": "benefits-enrollment-assistant-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 46745
      },
      {
       "name": "benefits-enrollment-assistant-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8465
      },
      {
       "name": "benefits-enrollment-assistant-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15719064
      },
      {
       "name": "briefing-pack-builder-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 45167
      },
      {
       "name": "briefing-pack-builder-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8410
      },
      {
       "name": "briefing-pack-builder-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 15356680
      },
      {
       "name": "build-materials-compliance-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 44507
      },
      {
       "name": "build-materials-compliance-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8140
      },
      {
       "name": "build-materials-compliance-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15903872
      },
      {
       "name": "building-permit-processing-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 58162
      },
      {
       "name": "building-permit-processing-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 14799
      },
      {
       "name": "building-permit-processing-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 37174663
      },
      {
       "name": "campaign-delivery-optimizer-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 39168
      },
      {
       "name": "campaign-delivery-optimizer-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 6105
      },
      {
       "name": "campaign-delivery-optimizer-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8984055
      },
      {
       "name": "care-gap-closure-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 26302
      },
      {
       "name": "care-gap-closure-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10798
      },
      {
       "name": "care-gap-closure-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 20616296
      },
      {
       "name": "cart-abandonment-recovery-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 20666
      },
      {
       "name": "cart-abandonment-recovery-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9824
      },
      {
       "name": "cart-abandonment-recovery-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 16248274
      },
      {
       "name": "claims-processing-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 32735
      },
      {
       "name": "claims-processing-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 21327
      },
      {
       "name": "claims-processing-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 17996536
      },
      {
       "name": "client-health-score-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 26899
      },
      {
       "name": "client-health-score-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 14772
      },
      {
       "name": "client-health-score-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 19720325
      },
      {
       "name": "clinical-notes-summarizer-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 14534
      },
      {
       "name": "clinical-notes-summarizer-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 11114
      },
      {
       "name": "clinical-notes-summarizer-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 17951446
      },
      {
       "name": "content-launch-clearance-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 39617
      },
      {
       "name": "content-launch-clearance-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 6543
      },
      {
       "name": "content-launch-clearance-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9066875
      },
      {
       "name": "contract-risk-review-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 22895
      },
      {
       "name": "contract-risk-review-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9966
      },
      {
       "name": "contract-risk-review-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 23895360
      },
      {
       "name": "cross-selling-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 27300
      },
      {
       "name": "cross-selling-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 13050
      },
      {
       "name": "cross-selling-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 17786412
      },
      {
       "name": "customer-loyalty-rewards-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 24729
      },
      {
       "name": "customer-loyalty-rewards-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 11818
      },
      {
       "name": "customer-loyalty-rewards-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 29479961
      },
      {
       "name": "customer-sentiment-churn-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 31568
      },
      {
       "name": "customer-sentiment-churn-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 21000
      },
      {
       "name": "customer-sentiment-churn-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 17242096
      },
      {
       "name": "deal-progression-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 27890
      },
      {
       "name": "deal-progression-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15398
      },
      {
       "name": "deal-progression-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16547930
      },
      {
       "name": "emission-tracking-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 19776
      },
      {
       "name": "emission-tracking-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10429
      },
      {
       "name": "emission-tracking-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12923648
      },
      {
       "name": "energy-regulatory-reporting-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 20531
      },
      {
       "name": "energy-regulatory-reporting-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9606
      },
      {
       "name": "energy-regulatory-reporting-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15479167
      },
      {
       "name": "engineering-standards-advisor-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 44937
      },
      {
       "name": "engineering-standards-advisor-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8403
      },
      {
       "name": "engineering-standards-advisor-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15511754
      },
      {
       "name": "field-permit-to-work-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 59118
      },
      {
       "name": "field-permit-to-work-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 11130
      },
      {
       "name": "field-permit-to-work-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 23753567
      },
      {
       "name": "field-service-dispatch-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 23904
      },
      {
       "name": "field-service-dispatch-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 11603
      },
      {
       "name": "field-service-dispatch-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16936995
      },
      {
       "name": "financial-advisor-copilot-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 42707
      },
      {
       "name": "financial-advisor-copilot-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 24627
      },
      {
       "name": "financial-advisor-copilot-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 25523058
      },
      {
       "name": "first-time-fix-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 41304
      },
      {
       "name": "first-time-fix-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 7165
      },
      {
       "name": "first-time-fix-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10903112
      },
      {
       "name": "fraud-detection-alert-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 32945
      },
      {
       "name": "fraud-detection-alert-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 22448
      },
      {
       "name": "fraud-detection-alert-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 16343345
      },
      {
       "name": "fs-customer-onboarding-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 36746
      },
      {
       "name": "fs-customer-onboarding-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 22585
      },
      {
       "name": "fs-customer-onboarding-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 22479505
      },
      {
       "name": "fs-regulatory-compliance-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 21187
      },
      {
       "name": "fs-regulatory-compliance-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9306
      },
      {
       "name": "fs-regulatory-compliance-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 18289888
      },
      {
       "name": "grid-asset-maintenance-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 50642
      },
      {
       "name": "grid-asset-maintenance-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10544
      },
      {
       "name": "grid-asset-maintenance-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12615492
      },
      {
       "name": "inventory-rebalancing-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 27561
      },
      {
       "name": "inventory-rebalancing-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 11598
      },
      {
       "name": "inventory-rebalancing-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 30260552
      },
      {
       "name": "inventory-visibility-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 26073
      },
      {
       "name": "inventory-visibility-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 14167
      },
      {
       "name": "inventory-visibility-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 19896771
      },
      {
       "name": "license-renewal-expansion-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 36501
      },
      {
       "name": "license-renewal-expansion-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16560
      },
      {
       "name": "license-renewal-expansion-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 23570465
      },
      {
       "name": "live-event-launch-planner-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 40937
      },
      {
       "name": "live-event-launch-planner-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 6968
      },
      {
       "name": "live-event-launch-planner-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 10350650
      },
      {
       "name": "loan-origination-assistant-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 32002
      },
      {
       "name": "loan-origination-assistant-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 18765
      },
      {
       "name": "loan-origination-assistant-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 19215383
      },
      {
       "name": "ma-target-sourcing-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 45570
      },
      {
       "name": "ma-target-sourcing-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9026
      },
      {
       "name": "ma-target-sourcing-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 15715162
      },
      {
       "name": "maintenance-scheduling-copilot-studio-solution.zip",
-      "downloads": 5,
+      "downloads": 6,
       "size": 22041
      },
      {
       "name": "maintenance-scheduling-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10623
      },
      {
       "name": "maintenance-scheduling-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 17164599
      },
      {
       "name": "omnichannel-engagement-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 25306
      },
      {
       "name": "omnichannel-engagement-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12375
      },
      {
       "name": "omnichannel-engagement-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 21780835
      },
      {
       "name": "order-entry-validation-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 46703
      },
      {
       "name": "order-entry-validation-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8978
      },
      {
       "name": "order-entry-validation-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16204144
      },
      {
       "name": "order-status-communication-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 25284
      },
      {
       "name": "order-status-communication-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 11713
      },
      {
       "name": "order-status-communication-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 15846366
      },
      {
       "name": "patient-intake-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 23435
      },
      {
       "name": "patient-intake-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9993
      },
      {
       "name": "patient-intake-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 17670203
      },
      {
       "name": "payments-operations-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 60466
      },
      {
       "name": "payments-operations-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12757
      },
      {
       "name": "payments-operations-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 23588823
      },
      {
       "name": "permit-license-management-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 19430
      },
      {
       "name": "permit-license-management-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9753
      },
      {
       "name": "permit-license-management-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12878582
      },
      {
       "name": "personalized-marketing-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 23683
      },
      {
       "name": "personalized-marketing-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12505
      },
      {
       "name": "personalized-marketing-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 20063355
      },
      {
       "name": "personalized-shopping-assistant-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 19808
      },
      {
       "name": "personalized-shopping-assistant-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10513
      },
      {
       "name": "personalized-shopping-assistant-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15008445
      },
      {
       "name": "portfolio-rebalancing-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 39023
      },
      {
       "name": "portfolio-rebalancing-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 25438
      },
      {
       "name": "portfolio-rebalancing-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 24279453
      },
      {
       "name": "prior-authorization-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 33147
      },
      {
       "name": "prior-authorization-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12880
      },
      {
       "name": "prior-authorization-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 28902622
      },
      {
       "name": "procurement-agent-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 29697
      },
      {
       "name": "procurement-agent-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 13917
      },
      {
       "name": "procurement-agent-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 20076603
      },
      {
       "name": "procurement-supplier-collaboration-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 51498
      },
      {
       "name": "procurement-supplier-collaboration-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 10237
      },
      {
       "name": "procurement-supplier-collaboration-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 13796061
      },
      {
       "name": "procurement-support-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 18189
      },
      {
       "name": "procurement-support-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 7864
      },
      {
       "name": "procurement-support-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 16664475
      },
      {
       "name": "product-feedback-synthesizer-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 19801
      },
      {
       "name": "product-feedback-synthesizer-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9249
      },
      {
       "name": "product-feedback-synthesizer-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 17622890
      },
      {
       "name": "product-line-optimization-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 23560
      },
      {
       "name": "product-line-optimization-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 14571
      },
      {
       "name": "product-line-optimization-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 12492613
      },
      {
       "name": "proposal-generation-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 28699
      },
      {
       "name": "proposal-generation-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15925
      },
      {
       "name": "proposal-generation-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16616593
      },
      {
       "name": "public-correspondence-response-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 45875
      },
      {
       "name": "public-correspondence-response-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9267
      },
      {
       "name": "public-correspondence-response-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 15718700
      },
      {
       "name": "reporting-package-validation-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 44463
      },
      {
       "name": "reporting-package-validation-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 7990
      },
      {
       "name": "reporting-package-validation-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15151661
      },
      {
       "name": "resource-utilization-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 20953
      },
      {
       "name": "resource-utilization-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9452
      },
      {
       "name": "resource-utilization-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 20176597
      },
      {
       "name": "returns-complaints-resolution-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 29640
      },
      {
       "name": "returns-complaints-resolution-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 15050
      },
      {
       "name": "returns-complaints-resolution-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 22893742
      },
      {
       "name": "sales-qualification-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 29253
      },
      {
       "name": "sales-qualification-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16610
      },
      {
       "name": "sales-qualification-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16540964
      },
      {
       "name": "solution-design-review-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 45648
      },
      {
       "name": "solution-design-review-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8867
      },
      {
       "name": "solution-design-review-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 15781936
      },
      {
       "name": "staffing-territory-planning-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 44701
      },
      {
       "name": "staffing-territory-planning-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 7982
      },
      {
       "name": "staffing-territory-planning-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 15241440
      },
      {
       "name": "store-associate-copilot-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 23047
      },
      {
       "name": "store-associate-copilot-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12269
      },
      {
       "name": "store-associate-copilot-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16062455
      },
      {
       "name": "supplier-claim-engagement-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 46432
      },
      {
       "name": "supplier-claim-engagement-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8474
      },
      {
       "name": "supplier-claim-engagement-source.zip",
-      "downloads": 2,
+      "downloads": 4,
       "size": 15910451
      },
      {
       "name": "supplier-risk-monitoring-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 27536
      },
      {
       "name": "supplier-risk-monitoring-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 13254
      },
      {
       "name": "supplier-risk-monitoring-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 18577078
      },
      {
       "name": "supply-chain-disruption-alert-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 32706
      },
      {
       "name": "supply-chain-disruption-alert-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16813
      },
      {
       "name": "supply-chain-disruption-alert-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 22831624
      },
      {
       "name": "tiered-huddle-board-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 49063
      },
      {
       "name": "tiered-huddle-board-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9048
      },
      {
       "name": "tiered-huddle-board-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 12064983
      },
      {
       "name": "time-entry-billing-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 22080
      },
      {
       "name": "time-entry-billing-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 9534
      },
      {
       "name": "time-entry-billing-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 21299121
      },
      {
       "name": "underwriting-support-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 32769
      },
      {
       "name": "underwriting-support-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 18581
      },
      {
       "name": "underwriting-support-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 22519449
      },
      {
       "name": "utility-billing-assistance-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 28551
      },
      {
       "name": "utility-billing-assistance-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 13484
      },
      {
       "name": "utility-billing-assistance-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 21012733
      },
      {
       "name": "warranty-registration-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 44892
      },
      {
       "name": "warranty-registration-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 8251
      },
      {
       "name": "warranty-registration-source.zip",
-      "downloads": 3,
+      "downloads": 4,
       "size": 14619524
      },
      {
       "name": "wealth-insights-generator-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 34531
      },
      {
       "name": "wealth-insights-generator-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 20261
      },
      {
       "name": "wealth-insights-generator-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 20220309
      },
      {
       "name": "win-loss-analysis-copilot-studio-solution.zip",
-      "downloads": 4,
+      "downloads": 5,
       "size": 29587
      },
      {
       "name": "win-loss-analysis-cowork-plugin.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16976
      },
      {
       "name": "win-loss-analysis-source.zip",
-      "downloads": 2,
+      "downloads": 3,
       "size": 16204050
      }
     ]
@@ -2181,26 +2181,26 @@
     "tag": "installers",
     "name": "AIBAST Installers",
     "published_at": "2026-09-02T01:31:52Z",
-    "downloads": 53,
+    "downloads": 61,
     "assets": [
      {
       "name": "community_rapp-install.ps1",
-      "downloads": 20,
+      "downloads": 22,
       "size": 11392
      },
      {
       "name": "community_rapp-install.sh",
-      "downloads": 19,
+      "downloads": 21,
       "size": 9345
      },
      {
       "name": "install.ps1",
-      "downloads": 9,
+      "downloads": 11,
       "size": 80395
      },
      {
       "name": "install.sh",
-      "downloads": 5,
+      "downloads": 7,
       "size": 59864
      }
     ]
@@ -2806,6 +2806,11 @@
       "size": 25304
      },
      {
+      "name": "recorded_demo__cfdbf1caf9df_agent.py",
+      "downloads": 0,
+      "size": 15045
+     },
+     {
       "name": "reporting_package_validation__3c507a1c5925_agent.py",
       "downloads": 2,
       "size": 18609
@@ -2990,7 +2995,7 @@
     "assets": []
    }
   ],
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "carried_forward": false
  },
  "leaderboards": {
@@ -3683,6 +3688,26 @@
   ],
   "newest": [
    {
+    "name": "@aibast-agents-library/recorded-demo",
+    "display_name": "Recorded demo",
+    "publisher": "@aibast-agents-library",
+    "category": "general",
+    "tier": "pilot",
+    "downloads": 0,
+    "upvotes": null,
+    "acquisitions": null,
+    "upvote_discussion_url": null,
+    "acquisition_discussion_url": null,
+    "lines": 361,
+    "size_kb": 14.7,
+    "added_at": "2026-11-16T15:00:55-05:00",
+    "file": "agents/@aibast-agents-library/templates/recorded_demo_agent.py",
+    "description": "Runs a step-by-step demo of an AIBAST library solution in the standard Brainstem chat page from its recorded answers. No AI call, no sign-in.",
+    "stack": null,
+    "vertical": null,
+    "catalog_kind": "template"
+   },
+   {
     "name": "@aibast-agents-library/copilot-studio-deploy",
     "display_name": "Deploy to Copilot Studio",
     "publisher": "@aibast-agents-library",
@@ -3961,26 +3986,6 @@
     "stack": "benefits_enrollment_assistant",
     "vertical": "human_resources",
     "catalog_kind": "solution"
-   },
-   {
-    "name": "@aibast-agents-library/build-materials-compliance",
-    "display_name": "Build Materials Compliance Agent",
-    "publisher": "@aibast-agents-library",
-    "category": "manufacturing",
-    "tier": "verified",
-    "downloads": 6,
-    "upvotes": null,
-    "acquisitions": null,
-    "upvote_discussion_url": null,
-    "acquisition_discussion_url": null,
-    "lines": 411,
-    "size_kb": 22.7,
-    "added_at": "2026-10-08T10:30:56-04:00",
-    "file": "agents/@aibast-agents-library/manufacturing_stacks/build_materials_compliance_stack/build_materials_compliance_agent.py",
-    "description": "Keep grant-funded construction bills of materials compliant every week: flag items that newly fall out of the program's materials sourcing rule with cited evidence, find same-specification compliant alternates, watch vendor certificates, and keep the audit evidence package ready.",
-    "stack": "build_materials_compliance",
-    "vertical": "manufacturing",
-    "catalog_kind": "solution"
    }
   ],
   "stacks": [
@@ -4185,16 +4190,16 @@
     "lines": 4545
    },
    {
+    "name": "general",
+    "agents": 8,
+    "downloads": 60,
+    "lines": 4961
+   },
+   {
     "name": "manufacturing",
     "agents": 8,
     "downloads": 71,
     "lines": 4444
-   },
-   {
-    "name": "general",
-    "agents": 7,
-    "downloads": 60,
-    "lines": 4600
    },
    {
     "name": "professional_services",
@@ -4327,7 +4332,7 @@
   ],
   "tiers": {
    "verified": 91,
-   "pilot": 2
+   "pilot": 3
   }
  },
  "agent_metrics": [
@@ -5268,6 +5273,19 @@
    "catalog_kind": "solution"
   },
   {
+   "name": "@aibast-agents-library/recorded-demo",
+   "display_name": "Recorded demo",
+   "downloads": 0,
+   "upvotes": null,
+   "acquisitions": null,
+   "upvote_discussion_url": null,
+   "acquisition_discussion_url": null,
+   "file": "agents/@aibast-agents-library/templates/recorded_demo_agent.py",
+   "category": "general",
+   "stack": null,
+   "catalog_kind": "template"
+  },
+  {
    "name": "@aibast-agents-library/reporting-package-validation",
    "display_name": "Reporting Package Validation Agent",
    "downloads": 5,
@@ -5556,7 +5574,7 @@
  ],
  "agent_discussion_coverage": {
   "status": "partial",
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "pages": 2,
   "discussions_scanned": 144,
   "diagnostics": {
@@ -5572,22 +5590,22 @@
    "upvote": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 22
+    "missing_discussions": 23
    },
    "acquisition": {
     "status": "partial",
     "discussions": 72,
-    "missing_discussions": 22
+    "missing_discussions": 23
    }
   }
  },
  "agent_upvote_coverage": {
   "status": "partial",
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 22,
+  "missing_discussions": 23,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -5600,11 +5618,11 @@
  },
  "agent_acquisition_coverage": {
   "status": "partial",
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
-  "missing_discussions": 22,
+  "missing_discussions": 23,
   "diagnostics": {
    "duplicate_discussions": 0,
    "invalid_discussions": 0,
@@ -5618,26 +5636,26 @@
  "file_metrics": {
   "schema": "aibast-file-metrics/1.0",
   "source_status": "complete",
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "carried_forward": false,
   "totals": {
-   "files": 13187,
-   "observed_files": 13187,
+   "files": 13337,
+   "observed_files": 13337,
    "downloads": 575,
    "by_kind": {
     "agent": {
-     "files": 94,
-     "observed_files": 94,
+     "files": 95,
+     "observed_files": 95,
      "downloads": 415
     },
     "skill": {
-     "files": 607,
-     "observed_files": 607,
+     "files": 618,
+     "observed_files": 618,
      "downloads": 105
     },
     "workshop": {
-     "files": 9506,
-     "observed_files": 9506,
+     "files": 9507,
+     "observed_files": 9507,
      "downloads": 0
     },
     "source_bundle": {
@@ -5651,8 +5669,8 @@
      "downloads": 13
     },
     "documentation": {
-     "files": 211,
-     "observed_files": 211,
+     "files": 215,
+     "observed_files": 215,
      "downloads": 0
     },
     "catalog": {
@@ -5661,13 +5679,13 @@
      "downloads": 39
     },
     "code": {
-     "files": 401,
-     "observed_files": 401,
+     "files": 424,
+     "observed_files": 424,
      "downloads": 3
     },
     "asset": {
-     "files": 2352,
-     "observed_files": 2352,
+     "files": 2462,
+     "observed_files": 2462,
      "downloads": 0
     }
    }
@@ -5690,7 +5708,31 @@
     "status": "observed_zero"
    },
    {
+    "path": ".github/ISSUE_TEMPLATE/bug-report.yml",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": ".github/ISSUE_TEMPLATE/demo-submission.yml",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": ".github/ISSUE_TEMPLATE/feature-request.yml",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": ".github/ISSUE_TEMPLATE/question.yml",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -5874,6 +5916,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "CITATION.cff",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "CLAUDE.md",
     "kind": "documentation",
     "agent_name": null,
@@ -5923,6 +5973,14 @@
    },
    {
     "path": "SECURITY.md",
+    "kind": "documentation",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "SUPPORT.md",
     "kind": "documentation",
     "agent_name": null,
     "workshop_slug": null,
@@ -7170,6 +7228,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "agents/@aibast-agents-library/templates/recorded_demo_agent.py",
+    "kind": "agent",
+    "agent_name": "@aibast-agents-library/recorded-demo",
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "agents/@aibast-agents-library/templates/salesforce_query_agent.py",
     "kind": "code",
     "agent_name": null,
@@ -7795,6 +7861,14 @@
    },
    {
     "path": "api/v1/catalog/public-correspondence-response.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/v1/catalog/recorded-demo.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -13290,6 +13364,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/catalog/recorded-demo/28f5fc214826.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/catalog/reporting-package-validation/a05075403354.json",
     "kind": "asset",
     "agent_name": null,
@@ -13491,6 +13573,14 @@
    },
    {
     "path": "api/versions/index/7a1b5939e71c.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/index/94ea54892d1f.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14138,6 +14228,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/paths/404b460abc84.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/paths/4e8b37fe4e5a.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/paths/8eab1a06a7b3.json",
     "kind": "asset",
     "agent_name": null,
@@ -14147,6 +14253,14 @@
    },
    {
     "path": "api/versions/paths/b8eabaabe238.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/paths/d6d33cc52e50.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14490,6 +14604,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/1/326accbb6e3a.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/1/4c2a7c118b77.json",
     "kind": "asset",
     "agent_name": null,
@@ -14523,6 +14645,14 @@
    },
    {
     "path": "api/versions/rapp/steps/1/d0e45bfbf628.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/1/e7bbe986970f.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14570,7 +14700,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/10/5dbfd755197d.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/10/7d1be80bf73b.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/10/a16bc7bfcdd8.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14618,6 +14764,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/11/ae939beeae6d.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/11/bba3339848d5.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/11/ce584f12e43a.json",
     "kind": "asset",
     "agent_name": null,
@@ -14650,6 +14812,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/12/4727a62972e2.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/12/a41e0557cdc9.json",
     "kind": "asset",
     "agent_name": null,
@@ -14666,7 +14836,31 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/12/e85eb04881e1.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/12/eb76ac90db25.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/13/074e898a8a99.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/13/0d69e9504d75.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14730,6 +14924,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/14/1e0f986eb14b.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/14/25a23a1c7d79.json",
     "kind": "asset",
     "agent_name": null,
@@ -14754,6 +14956,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/14/917e6bc25b99.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/14/a532228fb427.json",
     "kind": "asset",
     "agent_name": null,
@@ -14763,6 +14973,14 @@
    },
    {
     "path": "api/versions/rapp/steps/14/f52485f627cf.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/2/23852e90d136.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14810,6 +15028,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/2/9ed541535aa4.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/2/a5a22cb2a5d5.json",
     "kind": "asset",
     "agent_name": null,
@@ -14842,6 +15068,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/3/68f6cb0c0e35.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/3/8eb6987afc52.json",
     "kind": "asset",
     "agent_name": null,
@@ -14851,6 +15085,14 @@
    },
    {
     "path": "api/versions/rapp/steps/3/a98367e3e7b7.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/3/bf5616f3ea93.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14914,7 +15156,39 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/4/d682bbc886a7.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/4/d95bd0874b51.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/5/770641114633.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/5/7a0c880accac.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/5/7ac4796a0420.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -14978,6 +15252,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/6/25cbe2a58add.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/6/3c1d6bef66a2.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/6/7ad2939f2d6d.json",
     "kind": "asset",
     "agent_name": null,
@@ -15026,6 +15316,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/7/210505580289.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/7/47719986a3dd.json",
     "kind": "asset",
     "agent_name": null,
@@ -15035,6 +15333,14 @@
    },
    {
     "path": "api/versions/rapp/steps/7/541c8efd06a2.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/7/67c9e444907a.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -15082,7 +15388,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/8/5af66dbd6123.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/8/691d6f68460b.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/8/cc861e31fcce.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -15138,6 +15460,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/rapp/steps/9/78589d51c702.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/rapp/steps/9/8a82f8205ec7.json",
     "kind": "asset",
     "agent_name": null,
@@ -15147,6 +15477,22 @@
    },
    {
     "path": "api/versions/rapp/steps/9/b1d95b087e51.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/steps/9/c5f8e0350a55.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/tools/3ed757603ead.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -15195,6 +15541,14 @@
    },
    {
     "path": "api/versions/rapp/tools/e5f0576585c6.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/rapp/tools/eefd33956ddd.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21386,6 +21740,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/account-intelligence/1179ed37381f.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/account-intelligence/e4a03f5fa0c1.json",
     "kind": "asset",
     "agent_name": null,
@@ -21410,7 +21772,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/ai-customer-assistant/6b81c2cc9a39.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/ai-customer-assistant/ac5f0fb899c2.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/ask-hr/026d53a009f4.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21442,7 +21820,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/asset-maintenance-forecast/671bccbc5dd4.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/asset-maintenance-forecast/f60acc29b8d0.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/benefits-enrollment-assistant/77b63b30d8f6.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21482,7 +21876,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/briefing-pack-builder/c0cf2c3f238e.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/build-materials-compliance/22d8d2d26852.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/build-materials-compliance/3ce1ac0fb239.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21506,7 +21916,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/building-permit-processing/acfbc76f9b3a.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/building-permit-processing/b54e81bb3a84.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/campaign-delivery-optimizer/3df30b21db64.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21546,7 +21972,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/care-gap-closure/aa734803dfe8.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/cart-abandonment-recovery/4bb11297ef72.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/cart-abandonment-recovery/c352dfd51d08.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21578,7 +22020,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/claims-processing/9d6b76edfac3.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/client-health-score/6ace896f3229.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/client-health-score/af6d3f51ac28.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21602,6 +22060,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/clinical-notes-summarizer/af9aba4f673e.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/clinical-notes-summarizer/c8b325beee9b.json",
     "kind": "asset",
     "agent_name": null,
@@ -21611,6 +22077,14 @@
    },
    {
     "path": "api/versions/solutions/content-launch-clearance/2792b1edbf78.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/content-launch-clearance/e694054101b1.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21634,6 +22108,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/contract-risk-review/8d22bc5e2507.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/contract-risk-review/a08c8bf5eaea.json",
     "kind": "asset",
     "agent_name": null,
@@ -21650,7 +22132,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/cross-selling/c7531bcc703f.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/cross-selling/cbe37f4b3782.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/customer-loyalty-rewards/870f0b570793.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21667,6 +22165,14 @@
    },
    {
     "path": "api/versions/solutions/customer-loyalty-rewards/c9ff27f104d7.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/customer-sentiment-churn/6852d935c838.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21698,6 +22204,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/deal-progression/b3581f990326.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/deal-progression/cdedc4700dad.json",
     "kind": "asset",
     "agent_name": null,
@@ -21714,7 +22228,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/emission-tracking/a23edc613b32.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/emission-tracking/f4b1d65c1b1d.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/energy-regulatory-reporting/0adb24610a96.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21754,6 +22284,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/engineering-standards-advisor/6cc8814ffe9d.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/field-permit-to-work/06cf98d287d2.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/field-permit-to-work/b8016fd59941.json",
     "kind": "asset",
     "agent_name": null,
@@ -21763,6 +22309,14 @@
    },
    {
     "path": "api/versions/solutions/field-permit-to-work/ef836a9816dd.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/field-service-dispatch/1893ec0ac47f.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21794,7 +22348,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/financial-advisor-copilot/922b3f68a371.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/financial-advisor-copilot/f6d18d57541d.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/first-time-fix/24849fd2b0d9.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21834,6 +22404,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/fraud-detection-alert/c0ada7ac7c1d.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/fs-customer-onboarding/2706635aaf03.json",
     "kind": "asset",
     "agent_name": null,
@@ -21850,7 +22428,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/fs-customer-onboarding/ab5b6e447344.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/fs-regulatory-compliance/183aba5a005f.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/fs-regulatory-compliance/41695acbf43f.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21867,6 +22461,14 @@
    },
    {
     "path": "api/versions/solutions/grid-asset-maintenance/145babf2a204.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/grid-asset-maintenance/8fd830b8af9b.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21898,6 +22500,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/inventory-rebalancing/cf5c4fcdfd13.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/inventory-visibility/6761ca319907.json",
     "kind": "asset",
     "agent_name": null,
@@ -21914,6 +22524,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/inventory-visibility/a507cb8d7cb7.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/license-renewal-expansion/1d219e0fe769.json",
     "kind": "asset",
     "agent_name": null,
@@ -21923,6 +22541,22 @@
    },
    {
     "path": "api/versions/solutions/license-renewal-expansion/93edbf81b735.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/license-renewal-expansion/adb565d60294.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/live-event-launch-planner/1bc6f5f9d5a8.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -21962,6 +22596,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/loan-origination-assistant/e57ba84ad66a.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/ma-target-sourcing/10a6563d2e07.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/ma-target-sourcing/2105d63f0e09.json",
     "kind": "asset",
     "agent_name": null,
@@ -21986,6 +22636,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/maintenance-scheduling/3812eb9eab0b.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/maintenance-scheduling/a17972e219e3.json",
     "kind": "asset",
     "agent_name": null,
@@ -21995,6 +22653,14 @@
    },
    {
     "path": "api/versions/solutions/omnichannel-engagement/7b65a9065dee.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/omnichannel-engagement/7d89a3451443.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22026,6 +22692,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/order-entry-validation/543ef5e736db.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/order-status-communication/5f4c52efd131.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/order-status-communication/bfadd7377f3d.json",
     "kind": "asset",
     "agent_name": null,
@@ -22035,6 +22717,14 @@
    },
    {
     "path": "api/versions/solutions/order-status-communication/fce23bfd979d.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/patient-intake/090cfb43a181.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22074,7 +22764,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/payments-operations/99f098742bf8.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/permit-license-management/1feb8b68199e.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/permit-license-management/590cf18b4174.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22106,7 +22812,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/personalized-marketing/cd050f1a28f7.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/personalized-shopping-assistant/04eec142d37b.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/personalized-shopping-assistant/2bab51d22861.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22138,6 +22860,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/portfolio-rebalancing/dad81c7227ad.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/prior-authorization/1b7a246519db.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/prior-authorization/bec3079c456d.json",
     "kind": "asset",
     "agent_name": null,
@@ -22155,6 +22893,14 @@
    },
    {
     "path": "api/versions/solutions/procurement-agent/0a0a92aed952.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/procurement-agent/5158c5e4ec9d.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22186,6 +22932,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/procurement-supplier-collaboration/f534af9310c0.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/procurement-support/863300910f1e.json",
     "kind": "asset",
     "agent_name": null,
@@ -22202,7 +22956,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/procurement-support/a3a58013d298.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/product-feedback-synthesizer/34fe93036a45.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/product-feedback-synthesizer/6c514c677ad0.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22234,6 +23004,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/product-line-optimization/c632a46d19c9.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/proposal-generation/1aed0b57e16f.json",
     "kind": "asset",
     "agent_name": null,
@@ -22243,6 +23021,14 @@
    },
    {
     "path": "api/versions/solutions/proposal-generation/d1c3745c1ac2.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/proposal-generation/ed47100f7117.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22266,7 +23052,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/public-correspondence-response/985a482a6a36.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/reporting-package-validation/4d8e45d5d4f8.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/reporting-package-validation/bc541f789715.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22298,6 +23100,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/resource-utilization/d75ee2d530ec.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/returns-complaints-resolution/22567306f0a4.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/returns-complaints-resolution/39febe3eb5bc.json",
     "kind": "asset",
     "agent_name": null,
@@ -22322,6 +23140,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/sales-qualification/a1a23316684c.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/sales-qualification/bc227d1de987.json",
     "kind": "asset",
     "agent_name": null,
@@ -22338,7 +23164,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/solution-design-review/90ad5d5a1400.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/solution-design-review/ab183ca36a99.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/staffing-territory-planning/3f3079e462ce.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22355,6 +23197,14 @@
    },
    {
     "path": "api/versions/solutions/staffing-territory-planning/d741da11a403.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/store-associate-copilot/62f40b7ddbd1.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22394,7 +23244,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/supplier-claim-engagement/f5b585279196.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/supplier-risk-monitoring/2340a9e0107b.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/supplier-risk-monitoring/b4ec295cfed6.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22411,6 +23277,14 @@
    },
    {
     "path": "api/versions/solutions/supply-chain-disruption-alert/1a0533f33b9f.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/supply-chain-disruption-alert/261316a859ed.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22442,6 +23316,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/tiered-huddle-board/854f203f3e28.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/tiered-huddle-board/cadcf4bde7f7.json",
     "kind": "asset",
     "agent_name": null,
@@ -22466,7 +23348,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/time-entry-billing/cb5ee58fb152.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/underwriting-support/c4b06087f15c.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/underwriting-support/d97c133e02ee.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22498,7 +23396,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/utility-billing-assistance/ea5d4b651eb0.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/warranty-registration/3163b97059bf.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/warranty-registration/9ea949e9fd40.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22530,7 +23444,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "api/versions/solutions/wealth-insights-generator/f9cbb56ec914.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "api/versions/solutions/win-loss-analysis/07d17c7d2e9e.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/solutions/win-loss-analysis/102a196d7954.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -22555,6 +23485,14 @@
    },
    {
     "path": "api/versions/status/37caf3e2e8ec.json",
+    "kind": "asset",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "api/versions/status/64dff15c3038.json",
     "kind": "asset",
     "agent_name": null,
     "workshop_slug": null,
@@ -26394,6 +27332,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "prepare.html",
+    "kind": "documentation",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "qr.html",
     "kind": "documentation",
     "agent_name": null,
@@ -27450,6 +28396,30 @@
     "status": "observed_zero"
    },
    {
+    "path": "skills/aibast-business-case/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-cost-estimate/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-demo-rehearsal/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "skills/aibast-easy-mode-brainstem/SKILL.md",
     "kind": "skill",
     "agent_name": null,
@@ -27474,12 +28444,76 @@
     "status": "observed_zero"
    },
    {
+    "path": "skills/aibast-industry-shortlist/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-intake/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-it-answer-pack/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-meeting-follow-up/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-meeting-prep/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-pilot-scorecard/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "skills/aibast-recorded-demo/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "skills/aibast-staging-ring-test/SKILL.md",
     "kind": "skill",
     "agent_name": null,
     "workshop_slug": null,
     "downloads": 3,
     "status": "observed"
+   },
+   {
+    "path": "skills/aibast/SKILL.md",
+    "kind": "skill",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
    },
    {
     "path": "skills/deploy-to-copilot-studio/SKILL.md",
@@ -27555,6 +28589,14 @@
    },
    {
     "path": "solutions/_shared/m365-copilot-demo.html",
+    "kind": "workshop",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "solutions/_shared/my-skill.js",
     "kind": "workshop",
     "agent_name": null,
     "workshop_slug": null,
@@ -109706,6 +110748,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_aibast_front_door_skill.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_aideate.py",
     "kind": "code",
     "agent_name": null,
@@ -109731,6 +110781,14 @@
    },
    {
     "path": "tests/test_building_permit_source_contract.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/test_business_case_skill.py",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -109802,6 +110860,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_cost_estimate_skill.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_cowork_plugins.py",
     "kind": "code",
     "agent_name": null,
@@ -109827,6 +110893,14 @@
    },
    {
     "path": "tests/test_demo_end_packages.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/test_demo_rehearsal_skill.py",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -109994,6 +111068,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_industry_shortlist_skill.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_installer.sh",
     "kind": "code",
     "agent_name": null,
@@ -110034,7 +111116,23 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_intake_skill.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_inventory_rebalancing_journey.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/test_it_answer_pack_skill.py",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -110114,6 +111212,22 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_meeting_follow_up_skill.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/test_meeting_prep_skill.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_metrics_admin_setup.py",
     "kind": "code",
     "agent_name": null,
@@ -110155,6 +111269,14 @@
    },
    {
     "path": "tests/test_ms_rapp1.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/test_my_skill_builder.py",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -110226,6 +111348,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_pages_tree_retry.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_partner_standards_page.py",
     "kind": "code",
     "agent_name": null,
@@ -110258,6 +111388,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_pilot_scorecard_skill.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_portfolio_manual_contracts.py",
     "kind": "code",
     "agent_name": null,
@@ -110275,6 +111413,14 @@
    },
    {
     "path": "tests/test_preflight_checkout.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/test_prepare_page.py",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -110354,6 +111500,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_recorded_demo.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_registry_build.py",
     "kind": "code",
     "agent_name": null,
@@ -110418,6 +111572,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "tests/test_site_shell.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tests/test_site_traffic.py",
     "kind": "code",
     "agent_name": null,
@@ -110451,6 +111613,14 @@
    },
    {
     "path": "tests/test_solution_packages.py",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tests/test_solution_prep_line.py",
     "kind": "code",
     "agent_name": null,
     "workshop_slug": null,
@@ -110826,6 +111996,46 @@
     "status": "observed_zero"
    },
    {
+    "path": "tools/layout/copy-keyboard.mjs",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tools/layout/crawl-pages.txt",
+    "kind": "documentation",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tools/layout/layout-crawl.mjs",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tools/layout/layout-judge.mjs",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
+    "path": "tools/layout/solution-ids.mjs",
+    "kind": "code",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "tools/library_api_paths.py",
     "kind": "code",
     "agent_name": null,
@@ -111162,6 +112372,14 @@
     "status": "observed_zero"
    },
    {
+    "path": "walk.html",
+    "kind": "documentation",
+    "agent_name": null,
+    "workshop_slug": null,
+    "downloads": 0,
+    "status": "observed_zero"
+   },
+   {
     "path": "why.html",
     "kind": "documentation",
     "agent_name": null,
@@ -111182,11 +112400,11 @@
  "workshops": {
   "totals": {
    "workshops": 72,
-   "usage_events": 1264,
+   "usage_events": 1344,
    "views_14d": null,
    "view_uniques_14d": null,
    "file_downloads": 497,
-   "bundle_downloads": 767,
+   "bundle_downloads": 847,
    "feedback_reports": 0,
    "feedback_open": 0,
    "feedback_closed": 0,
@@ -111195,21 +112413,21 @@
   "source_totals": {
    "views_14d": null,
    "file_downloads": 497,
-   "bundle_downloads": 767,
+   "bundle_downloads": 847,
    "feedback_reports": 0
   },
   "by_source": {
    "catalog": {
     "solutions": 54,
-    "usage_events": 994,
+    "usage_events": 1054,
     "file_downloads": 425,
-    "bundle_downloads": 569
+    "bundle_downloads": 629
    },
    "field": {
     "solutions": 18,
-    "usage_events": 270,
+    "usage_events": 290,
     "file_downloads": 72,
-    "bundle_downloads": 198
+    "bundle_downloads": 218
    }
   },
   "rows": [
@@ -111225,12 +112443,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 78,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 1,
-    "usage_events": 89
+    "usage_events": 90
    },
    {
     "catalog_key": "@aibast-agents-library/deal-progression",
@@ -111244,12 +112462,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 66,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 77
+    "usage_events": 78
    },
    {
     "catalog_key": "@aibast-agents-library/ask-hr",
@@ -111263,12 +112481,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 21,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 32
+    "usage_events": 33
    },
    {
     "catalog_key": "@aibast-agents-library/portfolio-rebalancing",
@@ -111282,12 +112500,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 18,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 29
+    "usage_events": 30
    },
    {
     "catalog_key": "@aibast-agents-library/ai-customer-assistant",
@@ -111301,12 +112519,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 15,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 26
+    "usage_events": 27
    },
    {
     "catalog_key": "@aibast-agents-library/procurement-agent",
@@ -111320,12 +112538,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 14,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 25
+    "usage_events": 26
    },
    {
     "catalog_key": "@aibast-agents-library/prior-authorization",
@@ -111333,6 +112551,25 @@
     "slug": "prior-authorization",
     "display_name": "Prior Authorization Agent",
     "quest_url": "solutions/prior-authorization/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 12,
+    "bundle_downloads": 13,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 25
+   },
+   {
+    "catalog_key": "@aibast-agents-library/fs-customer-onboarding",
+    "agent_name": "@aibast-agents-library/fs-customer-onboarding",
+    "slug": "fs-customer-onboarding",
+    "display_name": "Customer Onboarding Agent",
+    "quest_url": "solutions/fs-customer-onboarding/quest.html",
     "source": "catalog",
     "origin": null,
     "views_14d": null,
@@ -111347,25 +112584,6 @@
     "usage_events": 24
    },
    {
-    "catalog_key": "@aibast-agents-library/fs-customer-onboarding",
-    "agent_name": "@aibast-agents-library/fs-customer-onboarding",
-    "slug": "fs-customer-onboarding",
-    "display_name": "Customer Onboarding Agent",
-    "quest_url": "solutions/fs-customer-onboarding/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 12,
-    "bundle_downloads": 10,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 22
-   },
-   {
     "catalog_key": "@aibast-agents-library/field-service-dispatch",
     "agent_name": "@aibast-agents-library/field-service-dispatch",
     "slug": "field-service-dispatch",
@@ -111377,12 +112595,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 9,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 20
+    "usage_events": 21
    },
    {
     "catalog_key": "@aibast-agents-library/win-loss-analysis",
@@ -111396,12 +112614,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 9,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 20
+    "usage_events": 21
    },
    {
     "catalog_key": "@aibast-agents-library/engineering-standards-advisor",
@@ -111415,12 +112633,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 6,
-    "bundle_downloads": 12,
+    "bundle_downloads": 13,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 18
+    "usage_events": 19
    },
    {
     "catalog_key": "@aibast-agents-library/first-time-fix",
@@ -111434,12 +112652,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 6,
-    "bundle_downloads": 12,
+    "bundle_downloads": 13,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 18
+    "usage_events": 19
    },
    {
     "catalog_key": "@aibast-agents-library/campaign-delivery-optimizer",
@@ -111453,316 +112671,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 6,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/customer-sentiment-churn",
-    "agent_name": "@aibast-agents-library/customer-sentiment-churn",
-    "slug": "customer-sentiment-churn",
-    "display_name": "Customer Sentiment and Churn Prediction Agent",
-    "quest_url": "solutions/customer-sentiment-churn/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/emission-tracking",
-    "agent_name": "@aibast-agents-library/emission-tracking",
-    "slug": "emission-tracking",
-    "display_name": "Emissions Tracking Agent",
-    "quest_url": "solutions/emission-tracking/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/field-permit-to-work",
-    "agent_name": "@aibast-agents-library/field-permit-to-work",
-    "slug": "field-permit-to-work",
-    "display_name": "Field Permit to Work Agent",
-    "quest_url": "solutions/field-permit-to-work/quest.html",
-    "source": "field",
-    "origin": "both",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": null,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/financial-advisor-copilot",
-    "agent_name": "@aibast-agents-library/financial-advisor-copilot",
-    "slug": "financial-advisor-copilot",
-    "display_name": "Financial Advisor Agent",
-    "quest_url": "solutions/financial-advisor-copilot/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/license-renewal-expansion",
-    "agent_name": "@aibast-agents-library/license-renewal-expansion",
-    "slug": "license-renewal-expansion",
-    "display_name": "License Renewal and Expansion Agent",
-    "quest_url": "solutions/license-renewal-expansion/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/live-event-launch-planner",
-    "agent_name": "@aibast-agents-library/live-event-launch-planner",
-    "slug": "live-event-launch-planner",
-    "display_name": "Live Event Launch Planner Agent",
-    "quest_url": "solutions/live-event-launch-planner/quest.html",
-    "source": "field",
-    "origin": "both",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": null,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/order-status-communication",
-    "agent_name": "@aibast-agents-library/order-status-communication",
-    "slug": "order-status-communication",
-    "display_name": "Order Status Communications Agent",
-    "quest_url": "solutions/order-status-communication/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/payments-operations",
-    "agent_name": "@aibast-agents-library/payments-operations",
-    "slug": "payments-operations",
-    "display_name": "Payments Operations Agent",
-    "quest_url": "solutions/payments-operations/quest.html",
-    "source": "field",
-    "origin": "both",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": null,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/permit-license-management",
-    "agent_name": "@aibast-agents-library/permit-license-management",
-    "slug": "permit-license-management",
-    "display_name": "Permit Management Agent",
-    "quest_url": "solutions/permit-license-management/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/personalized-shopping-assistant",
-    "agent_name": "@aibast-agents-library/personalized-shopping-assistant",
-    "slug": "personalized-shopping-assistant",
-    "display_name": "Personalized Shopping Agent",
-    "quest_url": "solutions/personalized-shopping-assistant/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/proposal-generation",
-    "agent_name": "@aibast-agents-library/proposal-generation",
-    "slug": "proposal-generation",
-    "display_name": "Proposal Generation Agent",
-    "quest_url": "solutions/proposal-generation/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/store-associate-copilot",
-    "agent_name": "@aibast-agents-library/store-associate-copilot",
-    "slug": "store-associate-copilot",
-    "display_name": "Retail Store Associate Copilot",
-    "quest_url": "solutions/store-associate-copilot/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/sales-qualification",
-    "agent_name": "@aibast-agents-library/sales-qualification",
-    "slug": "sales-qualification",
-    "display_name": "Sales Qualification Agent",
-    "quest_url": "solutions/sales-qualification/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 11,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 17
-   },
-   {
-    "catalog_key": "@aibast-agents-library/asset-maintenance-forecast",
-    "agent_name": "@aibast-agents-library/asset-maintenance-forecast",
-    "slug": "asset-maintenance-forecast",
-    "display_name": "Asset Maintenance Forecast Agent",
-    "quest_url": "solutions/asset-maintenance-forecast/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 10,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 16
-   },
-   {
-    "catalog_key": "@aibast-agents-library/building-permit-processing",
-    "agent_name": "@aibast-agents-library/building-permit-processing",
-    "slug": "building-permit-processing",
-    "display_name": "Building Permit Processing Agent",
-    "quest_url": "solutions/building-permit-processing/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 10,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 1,
-    "usage_events": 16
-   },
-   {
-    "catalog_key": "@aibast-agents-library/cart-abandonment-recovery",
-    "agent_name": "@aibast-agents-library/cart-abandonment-recovery",
-    "slug": "cart-abandonment-recovery",
-    "display_name": "Cart Abandonment Recovery Agent",
-    "quest_url": "solutions/cart-abandonment-recovery/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 6,
-    "bundle_downloads": 10,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 16
+    "usage_events": 18
    },
    {
     "catalog_key": "@aibast-agents-library/customer-loyalty-rewards",
@@ -111776,12 +112690,88 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 6,
-    "bundle_downloads": 10,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 16
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/customer-sentiment-churn",
+    "agent_name": "@aibast-agents-library/customer-sentiment-churn",
+    "slug": "customer-sentiment-churn",
+    "display_name": "Customer Sentiment and Churn Prediction Agent",
+    "quest_url": "solutions/customer-sentiment-churn/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/emission-tracking",
+    "agent_name": "@aibast-agents-library/emission-tracking",
+    "slug": "emission-tracking",
+    "display_name": "Emissions Tracking Agent",
+    "quest_url": "solutions/emission-tracking/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/field-permit-to-work",
+    "agent_name": "@aibast-agents-library/field-permit-to-work",
+    "slug": "field-permit-to-work",
+    "display_name": "Field Permit to Work Agent",
+    "quest_url": "solutions/field-permit-to-work/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/financial-advisor-copilot",
+    "agent_name": "@aibast-agents-library/financial-advisor-copilot",
+    "slug": "financial-advisor-copilot",
+    "display_name": "Financial Advisor Agent",
+    "quest_url": "solutions/financial-advisor-copilot/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
    },
    {
     "catalog_key": "@aibast-agents-library/fraud-detection-alert",
@@ -111795,12 +112785,50 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 6,
-    "bundle_downloads": 10,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 16
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/license-renewal-expansion",
+    "agent_name": "@aibast-agents-library/license-renewal-expansion",
+    "slug": "license-renewal-expansion",
+    "display_name": "License Renewal and Expansion Agent",
+    "quest_url": "solutions/license-renewal-expansion/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/live-event-launch-planner",
+    "agent_name": "@aibast-agents-library/live-event-launch-planner",
+    "slug": "live-event-launch-planner",
+    "display_name": "Live Event Launch Planner Agent",
+    "quest_url": "solutions/live-event-launch-planner/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 18
    },
    {
     "catalog_key": "@aibast-agents-library/omnichannel-engagement",
@@ -111814,12 +112842,202 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 6,
-    "bundle_downloads": 10,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 16
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/order-status-communication",
+    "agent_name": "@aibast-agents-library/order-status-communication",
+    "slug": "order-status-communication",
+    "display_name": "Order Status Communications Agent",
+    "quest_url": "solutions/order-status-communication/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/payments-operations",
+    "agent_name": "@aibast-agents-library/payments-operations",
+    "slug": "payments-operations",
+    "display_name": "Payments Operations Agent",
+    "quest_url": "solutions/payments-operations/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/permit-license-management",
+    "agent_name": "@aibast-agents-library/permit-license-management",
+    "slug": "permit-license-management",
+    "display_name": "Permit Management Agent",
+    "quest_url": "solutions/permit-license-management/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/personalized-shopping-assistant",
+    "agent_name": "@aibast-agents-library/personalized-shopping-assistant",
+    "slug": "personalized-shopping-assistant",
+    "display_name": "Personalized Shopping Agent",
+    "quest_url": "solutions/personalized-shopping-assistant/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/proposal-generation",
+    "agent_name": "@aibast-agents-library/proposal-generation",
+    "slug": "proposal-generation",
+    "display_name": "Proposal Generation Agent",
+    "quest_url": "solutions/proposal-generation/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/store-associate-copilot",
+    "agent_name": "@aibast-agents-library/store-associate-copilot",
+    "slug": "store-associate-copilot",
+    "display_name": "Retail Store Associate Copilot",
+    "quest_url": "solutions/store-associate-copilot/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/sales-qualification",
+    "agent_name": "@aibast-agents-library/sales-qualification",
+    "slug": "sales-qualification",
+    "display_name": "Sales Qualification Agent",
+    "quest_url": "solutions/sales-qualification/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 18
+   },
+   {
+    "catalog_key": "@aibast-agents-library/asset-maintenance-forecast",
+    "agent_name": "@aibast-agents-library/asset-maintenance-forecast",
+    "slug": "asset-maintenance-forecast",
+    "display_name": "Asset Maintenance Forecast Agent",
+    "quest_url": "solutions/asset-maintenance-forecast/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 11,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 17
+   },
+   {
+    "catalog_key": "@aibast-agents-library/building-permit-processing",
+    "agent_name": "@aibast-agents-library/building-permit-processing",
+    "slug": "building-permit-processing",
+    "display_name": "Building Permit Processing Agent",
+    "quest_url": "solutions/building-permit-processing/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 11,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 1,
+    "usage_events": 17
+   },
+   {
+    "catalog_key": "@aibast-agents-library/cart-abandonment-recovery",
+    "agent_name": "@aibast-agents-library/cart-abandonment-recovery",
+    "slug": "cart-abandonment-recovery",
+    "display_name": "Cart Abandonment Recovery Agent",
+    "quest_url": "solutions/cart-abandonment-recovery/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 6,
+    "bundle_downloads": 11,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 17
    },
    {
     "catalog_key": "@aibast-agents-library/reporting-package-validation",
@@ -111833,12 +113051,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 13,
+    "bundle_downloads": 14,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 16
+    "usage_events": 17
    },
    {
     "catalog_key": "@aibast-agents-library/benefits-enrollment-assistant",
@@ -111852,12 +113070,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/claims-processing",
@@ -111871,12 +113089,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/client-health-score",
@@ -111890,12 +113108,31 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
+   },
+   {
+    "catalog_key": "@aibast-agents-library/clinical-notes-summarizer",
+    "agent_name": "@aibast-agents-library/clinical-notes-summarizer",
+    "slug": "clinical-notes-summarizer",
+    "display_name": "Clinical Notes Summarizer Agent",
+    "quest_url": "solutions/clinical-notes-summarizer/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 3,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/content-launch-clearance",
@@ -111909,12 +113146,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/contract-risk-review",
@@ -111928,12 +113165,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/cross-selling",
@@ -111947,12 +113184,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/procurement-support",
@@ -111966,12 +113203,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/inventory-rebalancing",
@@ -111985,12 +113222,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/inventory-visibility",
@@ -112004,12 +113241,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/loan-origination-assistant",
@@ -112023,12 +113260,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/ma-target-sourcing",
@@ -112042,12 +113279,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/maintenance-scheduling",
@@ -112061,12 +113298,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/order-entry-validation",
@@ -112080,12 +113317,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/patient-intake",
@@ -112099,12 +113336,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/personalized-marketing",
@@ -112118,12 +113355,31 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
+   },
+   {
+    "catalog_key": "@aibast-agents-library/production-line-optimization",
+    "agent_name": "@aibast-agents-library/production-line-optimization",
+    "slug": "product-line-optimization",
+    "display_name": "Product Line Optimization Agent",
+    "quest_url": "solutions/product-line-optimization/quest.html",
+    "source": "catalog",
+    "origin": null,
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 3,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": 0,
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/public-correspondence-response",
@@ -112137,12 +113393,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/fs-regulatory-compliance",
@@ -112156,12 +113412,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/energy-regulatory-reporting",
@@ -112175,12 +113431,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/resource-utilization",
@@ -112194,12 +113450,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/returns-complaints-resolution",
@@ -112213,12 +113469,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/solution-design-review",
@@ -112232,12 +113488,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/staffing-territory-planning",
@@ -112251,12 +113507,31 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
+   },
+   {
+    "catalog_key": "@aibast-agents-library/supplier-claim-engagement",
+    "agent_name": "@aibast-agents-library/supplier-claim-engagement",
+    "slug": "supplier-claim-engagement",
+    "display_name": "Supplier Claim Engagement Agent",
+    "quest_url": "solutions/supplier-claim-engagement/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 3,
+    "bundle_downloads": 12,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/supply-chain-disruption-alert",
@@ -112270,12 +113545,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/supplier-risk-monitoring",
@@ -112289,12 +113564,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/underwriting-support",
@@ -112308,12 +113583,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 1,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/utility-billing-assistance",
@@ -112327,12 +113602,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/warranty-registration",
@@ -112346,12 +113621,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 14
+    "usage_events": 15
    },
    {
     "catalog_key": "@aibast-agents-library/wealth-insights-generator",
@@ -112365,11 +113640,30 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 11,
+    "bundle_downloads": 12,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
+    "usage_events": 15
+   },
+   {
+    "catalog_key": "@aibast-agents-library/briefing-pack-builder",
+    "agent_name": "@aibast-agents-library/briefing-pack-builder",
+    "slug": "briefing-pack-builder",
+    "display_name": "Briefing Pack Builder Agent",
+    "quest_url": "solutions/briefing-pack-builder/quest.html",
+    "source": "field",
+    "origin": "both",
+    "views_14d": null,
+    "view_uniques_14d": null,
+    "view_observed": false,
+    "file_downloads": 3,
+    "bundle_downloads": 11,
+    "feedback_reports": 0,
+    "feedback_open": 0,
+    "feedback_closed": 0,
+    "agent_upvotes": null,
     "usage_events": 14
    },
    {
@@ -112384,12 +113678,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 10,
+    "bundle_downloads": 11,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 13
+    "usage_events": 14
    },
    {
     "catalog_key": "@aibast-agents-library/care-gap-closure",
@@ -112403,88 +113697,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 10,
+    "bundle_downloads": 11,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 1,
-    "usage_events": 13
-   },
-   {
-    "catalog_key": "@aibast-agents-library/clinical-notes-summarizer",
-    "agent_name": "@aibast-agents-library/clinical-notes-summarizer",
-    "slug": "clinical-notes-summarizer",
-    "display_name": "Clinical Notes Summarizer Agent",
-    "quest_url": "solutions/clinical-notes-summarizer/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 3,
-    "bundle_downloads": 10,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 13
-   },
-   {
-    "catalog_key": "@aibast-agents-library/production-line-optimization",
-    "agent_name": "@aibast-agents-library/production-line-optimization",
-    "slug": "product-line-optimization",
-    "display_name": "Product Line Optimization Agent",
-    "quest_url": "solutions/product-line-optimization/quest.html",
-    "source": "catalog",
-    "origin": null,
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 3,
-    "bundle_downloads": 10,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": 0,
-    "usage_events": 13
-   },
-   {
-    "catalog_key": "@aibast-agents-library/supplier-claim-engagement",
-    "agent_name": "@aibast-agents-library/supplier-claim-engagement",
-    "slug": "supplier-claim-engagement",
-    "display_name": "Supplier Claim Engagement Agent",
-    "quest_url": "solutions/supplier-claim-engagement/quest.html",
-    "source": "field",
-    "origin": "both",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 3,
-    "bundle_downloads": 10,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": null,
-    "usage_events": 13
-   },
-   {
-    "catalog_key": "@aibast-agents-library/briefing-pack-builder",
-    "agent_name": "@aibast-agents-library/briefing-pack-builder",
-    "slug": "briefing-pack-builder",
-    "display_name": "Briefing Pack Builder Agent",
-    "quest_url": "solutions/briefing-pack-builder/quest.html",
-    "source": "field",
-    "origin": "both",
-    "views_14d": null,
-    "view_uniques_14d": null,
-    "view_observed": false,
-    "file_downloads": 3,
-    "bundle_downloads": 9,
-    "feedback_reports": 0,
-    "feedback_open": 0,
-    "feedback_closed": 0,
-    "agent_upvotes": null,
-    "usage_events": 12
+    "usage_events": 14
    },
    {
     "catalog_key": "@aibast-agents-library/product-feedback-synthesizer",
@@ -112498,12 +113716,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 9,
+    "bundle_downloads": 10,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 12
+    "usage_events": 13
    },
    {
     "catalog_key": "@aibast-agents-library/time-entry-billing",
@@ -112517,12 +113735,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 3,
-    "bundle_downloads": 9,
+    "bundle_downloads": 10,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": 0,
-    "usage_events": 12
+    "usage_events": 13
    },
    {
     "catalog_key": "@aibast-agents-library/grid-asset-maintenance",
@@ -112536,12 +113754,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 7,
+    "bundle_downloads": 8,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 7
+    "usage_events": 8
    },
    {
     "catalog_key": "@aibast-agents-library/procurement-supplier-collaboration",
@@ -112555,12 +113773,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 7,
+    "bundle_downloads": 8,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 7
+    "usage_events": 8
    },
    {
     "catalog_key": "@aibast-agents-library/tiered-huddle-board",
@@ -112574,12 +113792,12 @@
     "view_uniques_14d": null,
     "view_observed": false,
     "file_downloads": 0,
-    "bundle_downloads": 7,
+    "bundle_downloads": 8,
     "feedback_reports": 0,
     "feedback_open": 0,
     "feedback_closed": 0,
     "agent_upvotes": null,
-    "usage_events": 7
+    "usage_events": 8
    }
   ],
   "usage_definition": "usage_events is the sum of counted GitHub popular-path page views, jsDelivr workshop file downloads, source-bundle downloads, and public workshop feedback reports. It is an event floor, not users or unique usage. The sources use mixed measurement windows, and one person or action can create multiple events.",
@@ -112588,7 +113806,7 @@
    "mixed_windows": true,
    "views": {
     "status": "live popular-path response",
-    "as_of": "2026-11-16T05:28:05Z",
+    "as_of": "2026-11-17T05:25:52Z",
     "censored": true,
     "diagnostics": {
      "duplicate_rows": 0,
@@ -112602,7 +113820,7 @@
    },
    "downloads": {
     "status": "complete paginated jsDelivr file response",
-    "as_of": "2026-11-16T05:28:05Z",
+    "as_of": "2026-11-17T05:25:52Z",
     "pages": 1,
     "pagination": "complete",
     "diagnostics": {
@@ -112615,7 +113833,7 @@
    },
    "feedback": {
     "status": "workshop-feedback label + body marker union",
-    "as_of": "2026-11-16T05:28:05Z",
+    "as_of": "2026-11-17T05:25:52Z",
     "issues_scanned": 0,
     "pages": 3,
     "diagnostics": {
@@ -112627,7 +113845,7 @@
    },
    "agent_upvotes": {
     "status": "partial",
-    "as_of": "2026-11-16T05:28:05Z",
+    "as_of": "2026-11-17T05:25:52Z",
     "scope": "Native upvotes on each primary agent's canonical rating Discussion. This preference signal is separate from usage_events and acquisition Discussions."
    }
   },
@@ -112663,311 +113881,311 @@
     "url": "https://microsoft.github.io/aibast-agents-library/registry.json"
    }
   ],
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "carried_forward": false
  },
  "solution_packages": {
   "available": true,
   "scope": "GitHub-recorded downloads of <slug>-cowork-plugin.zip and <slug>-copilot-studio-solution.zip on the rolling solution-bundles release. Counted from the day the packages were first published there.",
   "totals": {
-   "cowork_plugin": 289,
-   "copilot_solution": 290
+   "cowork_plugin": 361,
+   "copilot_solution": 362
   },
   "by_solution": {
    "account-intelligence": {
-    "cowork_plugin": 5,
-    "copilot_solution": 5
+    "cowork_plugin": 6,
+    "copilot_solution": 6
    },
    "ai-customer-assistant": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "ask-hr": {
-    "cowork_plugin": 3,
-    "copilot_solution": 4
-   },
-   "asset-maintenance-forecast": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "benefits-enrollment-assistant": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "briefing-pack-builder": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "build-materials-compliance": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "building-permit-processing": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "campaign-delivery-optimizer": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "care-gap-closure": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "cart-abandonment-recovery": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "claims-processing": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "client-health-score": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "clinical-notes-summarizer": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "content-launch-clearance": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "contract-risk-review": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "cross-selling": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "customer-loyalty-rewards": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "customer-sentiment-churn": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "deal-progression": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "emission-tracking": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "energy-regulatory-reporting": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "engineering-standards-advisor": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "field-permit-to-work": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "field-service-dispatch": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "financial-advisor-copilot": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "first-time-fix": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "fraud-detection-alert": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "fs-customer-onboarding": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "fs-regulatory-compliance": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "grid-asset-maintenance": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "inventory-rebalancing": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "inventory-visibility": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "license-renewal-expansion": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "live-event-launch-planner": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "loan-origination-assistant": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "ma-target-sourcing": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
-   },
-   "maintenance-scheduling": {
     "cowork_plugin": 5,
     "copilot_solution": 5
    },
-   "omnichannel-engagement": {
+   "ask-hr": {
     "cowork_plugin": 4,
-    "copilot_solution": 4
+    "copilot_solution": 5
+   },
+   "asset-maintenance-forecast": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "benefits-enrollment-assistant": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "briefing-pack-builder": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "build-materials-compliance": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "building-permit-processing": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "campaign-delivery-optimizer": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "care-gap-closure": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "cart-abandonment-recovery": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "claims-processing": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "client-health-score": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "clinical-notes-summarizer": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "content-launch-clearance": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "contract-risk-review": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "cross-selling": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "customer-loyalty-rewards": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "customer-sentiment-churn": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "deal-progression": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "emission-tracking": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "energy-regulatory-reporting": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "engineering-standards-advisor": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "field-permit-to-work": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "field-service-dispatch": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "financial-advisor-copilot": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "first-time-fix": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "fraud-detection-alert": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "fs-customer-onboarding": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "fs-regulatory-compliance": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "grid-asset-maintenance": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "inventory-rebalancing": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "inventory-visibility": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "license-renewal-expansion": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "live-event-launch-planner": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "loan-origination-assistant": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "ma-target-sourcing": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
+   },
+   "maintenance-scheduling": {
+    "cowork_plugin": 6,
+    "copilot_solution": 6
+   },
+   "omnichannel-engagement": {
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "order-entry-validation": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "order-status-communication": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "patient-intake": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "payments-operations": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "permit-license-management": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "personalized-marketing": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "personalized-shopping-assistant": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "portfolio-rebalancing": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "prior-authorization": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "procurement-agent": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "procurement-supplier-collaboration": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "procurement-support": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "product-feedback-synthesizer": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "product-line-optimization": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "proposal-generation": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "public-correspondence-response": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "reporting-package-validation": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "resource-utilization": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "returns-complaints-resolution": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "sales-qualification": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "solution-design-review": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "staffing-territory-planning": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "store-associate-copilot": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "supplier-claim-engagement": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "supplier-risk-monitoring": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "supply-chain-disruption-alert": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "tiered-huddle-board": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "time-entry-billing": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "underwriting-support": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "utility-billing-assistance": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "warranty-registration": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "wealth-insights-generator": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    },
    "win-loss-analysis": {
-    "cowork_plugin": 4,
-    "copilot_solution": 4
+    "cowork_plugin": 5,
+    "copilot_solution": 5
    }
   }
  },
  "achievements": {
   "schema": "aibast-achievements/2.0",
   "status": "available",
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "carried_forward": false,
   "caveat": "Verified achievement points are server-scored from opt-in public GitHub progress claims. Each explicitly claimed achievement has a fixed value: started 5, local-proof 15, draft-builder 20, preview-proven 25, workshop-completed 35, and hard-mode-completed 50, for at most 150 points per workshop. Re-syncing unions achievement IDs without duplicating points. Profiles are public by explicit submission consent. GitHub verification confirms authenticated issue authorship and canonical claim format only; achievement completion remains self-reported and is not independently proven. Verified public achievements remain separate from local self-paced state, repository stars, agent upvotes, downloads, and workshop usage events.",
   "totals": {
@@ -114662,7 +115880,7 @@
  "workshop_certification": {
   "schema": "aibast-workshop-certification/1.0",
   "status": "available",
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "carried_forward": false,
   "totals": {
    "cohort_submissions": 0,
@@ -115417,7 +116635,7 @@
  "ecosystem": {
   "schema": "aibast-ecosystem-metrics/1.0",
   "status": "available",
-  "as_of": "2026-11-16T05:28:05Z",
+  "as_of": "2026-11-17T05:25:52Z",
   "sources": {
    "aibast": {
     "status": "available",
@@ -115431,8 +116649,8 @@
   "totals": {
    "aibast_direct_agent_fetches": 976,
    "combined_agent_distribution_fetch_events": 976,
-   "distribution_entries": 94,
-   "logical_agents": 94,
+   "distribution_entries": 95,
+   "logical_agents": 95,
    "overlap_agents": 0
   },
   "agents": [
@@ -116359,6 +117577,16 @@
    {
     "logical_name": "@aibast-agents-library/procurement-supplier-collaboration",
     "display_name": "Procurement and Supplier Collaboration Agent",
+    "publisher": "@aibast-agents-library",
+    "channels": [
+     "aibast"
+    ],
+    "aibast_direct_agent_fetches": 0,
+    "combined_distribution_fetch_events": 0
+   },
+   {
+    "logical_name": "@aibast-agents-library/recorded-demo",
+    "display_name": "Recorded demo",
     "publisher": "@aibast-agents-library",
     "channels": [
      "aibast"
