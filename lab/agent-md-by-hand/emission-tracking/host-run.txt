@@ -1,10 +1,10 @@
  $ Shell Verify and inspect emissions agent capabilities 12 lines…
    workdir=$(mktemp -d ./emission-analysis.XXXXXX) && cd "$workdir" && curl -fsSLo basic_agent.py
-   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
-   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.py132485082/rapp_brainstem/agents/basic_agent.py]8;;]8;; && curl -fsSLo emission_tracking_agent.py ]8;;
-   ]8;id=md-okq21m;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
-   ]8;id=md-okq21m;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking]8;;
-   ]8;id=md-okq21m;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py_agent.py]8;;]8;; && python3 -c 'import hashlib,pathlib,sys; ]8;;
+   https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45
+   132485082/rapp_brainstem/agents/basic_agent.py && curl -fsSLo emission_tracking_agent.py 
+   https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45
+   132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking
+   _agent.py && python3 -c 'import hashlib,pathlib,sys; 
    expected={"basic_agent.py":"701488bc00d536a7b23295e7da99c62f24e9b00f233daa325886430c736b78eb","em
    ission_tracking_agent.py":"2b162ab6f3e844e31c646402037e7d88890ce3bb02ac66bba1579282d6ebcf26"};
    bad=[name for name,digest in expected.items() if
@@ -65,4 +65,3 @@ Next: want to see the top reduction opportunities?
 Changes    +0 -0
 AI Credits 4.19 (31s)
 Tokens     ↑ 49.8k (39.7k cached, 10.1k written) • ↓ 1.3k (115 reasoning)
-Resume     copilot --resume=029eecff-2867-42be-b2d2-10b625157b3f

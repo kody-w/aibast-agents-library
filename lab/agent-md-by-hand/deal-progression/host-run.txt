@@ -1,10 +1,10 @@
  $ Shell Download agent and verify SHA-256 checksums 6 lines…
    workdir=$(mktemp -d ./deal-review.XXXXXX) && cd "$workdir" && curl -fsSLo basic_agent.py
-   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
-   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.py132485082/rapp_brainstem/agents/basic_agent.py]8;;]8;; && curl -fsSLo deal_progression_agent.py ]8;;
-   ]8;id=md-lotjo7;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progression_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
-   ]8;id=md-lotjo7;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progression_agent.py132485082/agents/%40aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progressio]8;;
-   ]8;id=md-lotjo7;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progression_agent.pyn_agent.py]8;;]8;; && shasum -a 256 basic_agent.py deal_progression_agent.py && printf '\nFOLDER=%s\n' ]8;;
+   https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45
+   132485082/rapp_brainstem/agents/basic_agent.py && curl -fsSLo deal_progression_agent.py 
+   https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45
+   132485082/agents/%40aibast-agents-library/b2b_sales_stacks/deal_progression_stack/deal_progressio
+   n_agent.py && shasum -a 256 basic_agent.py deal_progression_agent.py && printf '\nFOLDER=%s\n' 
    "$PWD"
 
  $ Shell Read supported deal review operations 1 line…
@@ -47,4 +47,3 @@ Synthetic source model: [Salesforce + Activity Analytics]
 Changes    +0 -0
 AI Credits 4.49 (22s)
 Tokens     ↑ 61.6k (48.6k cached, 13.0k written) • ↓ 754 (41 reasoning)
-Resume     copilot --resume=fdca48ab-4b34-48e5-a9f3-82e1709c5cab
