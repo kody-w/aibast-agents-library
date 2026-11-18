@@ -1,0 +1,18 @@
+ ● DealProgressionAgent (MCP: deal-progression) · data_source: "synthet… **Pipeline Health Summary**
+
+**19 opportunities need attention** in the synthetic $18M pipeline: 12 stalled ($4.2M) and 7 at risk ($4.0M).
+
+Prioritize these stalled deals:
+- **TechCorp:** $890K; stalled 34 days.
+- **Global Manufacturing:** $720K; stalled 28 days.
+- **Apex Financial:** $580K; stalled 25 days.
+
+Across stalled deals, blockers are missing executive sponsors (5), competitor evaluations (4), and pending budgets (3). Focus reviews on resolving these blockers.
+
+**Forecast unchanged.** This was read-only analysis of synthetic data; no CRM updates or outreach occurred.
+
+
+
+Changes    +0 -0
+AI Credits 6.45 (29s)
+Tokens     ↑ 46.6k (22.4k cached, 23.6k written) • ↓ 193 (21 reasoning)

@@ -1,0 +1,24 @@
+ ● skill(deal-progression)
+
+ MD Read <a file beside the skill>
+
+ MD Read <a file beside the skill>
+
+ MD Read <a file beside the skill>
+
+**Pipeline Health Summary** — `pipeline_health`, fixed synthetic snapshot: 47 opportunities, $18M; 28 on track ($9.8M), 7 at risk ($4M), 12 stalled ($4.2M).
+
+Priority review:
+- **TechCorp:** $890K; 34 days in Proposal; executive change, champion silent.
+- **Global Manufacturing:** $720K; 28 days in Negotiation; legal review blocking progress.
+- **Apex Financial:** $580K; 25 days in Discovery; competitor evaluation.
+
+Draft options: review executive sponsorship, legal blockers, and competitive positioning with opportunity owners; leadership approval required before execution.
+
+**Evidence boundary:** All specifics are synthetic planning evidence, not commitments. No CRM, task, forecast, alert, pricing, outreach, or customer action occurred.
+
+
+
+Changes    +0 -0
+AI Credits 6.34 (41s)
+Tokens     ↑ 109.0k (89.3k cached, 19.7k written) • ↓ 524 (59 reasoning)

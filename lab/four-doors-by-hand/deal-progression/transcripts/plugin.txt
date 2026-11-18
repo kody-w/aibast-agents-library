@@ -1,0 +1,21 @@
+ ● skill(deal-progression)
+
+ ✗ skill(deal-progression-pipeline-health)
+   Skill not found: deal-progression-pipeline-health
+
+ MD Read <a file beside the skill>
+
+ MD Read <a file beside the skill>
+
+ ✗ skill(deal-progression-pipeline-health)
+   Skill not found: deal-progression-pipeline-health
+
+**Pipeline Health Summary:** Review blocked: the required pipeline-health skill could not be loaded after one retry. I cannot reliably identify opportunities needing attention.
+
+**Evidence boundary:** No forecast, CRM records, tasks, alerts, pricing, or customer communications were changed.
+
+
+
+Changes    +0 -0
+AI Credits 9.04 (41s)
+Tokens     ↑ 110.2k (78.5k cached, 31.7k written) • ↓ 341 (44 reasoning)

@@ -1,0 +1,9 @@
+{
+  "name": "deal-progression",
+  "displayName": "Deal Progression",
+  "version": "1.0.0",
+  "description": "Deal Progression Agent from the AI Agents Library (synthetic demo data).",
+  "author": {
+    "name": "AI Agents Library"
+  }
+}
