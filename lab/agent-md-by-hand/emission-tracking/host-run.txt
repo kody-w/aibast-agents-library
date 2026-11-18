@@ -1,0 +1,68 @@
+ $ Shell Verify and inspect emissions agent capabilities 12 lines…
+   workdir=$(mktemp -d ./emission-analysis.XXXXXX) && cd "$workdir" && curl -fsSLo basic_agent.py
+   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
+   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.py132485082/rapp_brainstem/agents/basic_agent.py]8;;]8;; && curl -fsSLo emission_tracking_agent.py ]8;;
+   ]8;id=md-okq21m;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
+   ]8;id=md-okq21m;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking]8;;
+   ]8;id=md-okq21m;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/energy_stacks/emission_tracking_stack/emission_tracking_agent.py_agent.py]8;;]8;; && python3 -c 'import hashlib,pathlib,sys; ]8;;
+   expected={"basic_agent.py":"701488bc00d536a7b23295e7da99c62f24e9b00f233daa325886430c736b78eb","em
+   ission_tracking_agent.py":"2b162ab6f3e844e31c646402037e7d88890ce3bb02ac66bba1579282d6ebcf26"};
+   bad=[name for name,digest in expected.items() if
+   hashlib.sha256(pathlib.Path(name).read_bytes()).hexdigest()!=digest]; print("SHA-256 mismatch:
+   "+", ".join(bad) if bad else "SHA-256 verified"); sys.exit(bool(bad))' && python3 -c 'import
+   json,sys; from emission_tracking_agent import EmissionTrackingAgent as A; a=A();
+   print(json.dumps(a.metadata) if len(sys.argv)<2 else a.perform(**json.loads(sys.argv[1])))' &&
+   pwd
+
+ $ Shell Run Northeast emissions dashboard 37 lines…
+   cd ./emission-analysis.IFpjNB && python3 -c 'import json,sys; from emission_tracking_agent import
+   EmissionTrackingAgent as A; a=A(); print(json.dumps(a.metadata) if len(sys.argv)<2 else
+   a.perform(**json.loads(sys.argv[1])))' '{"operation":"emissions_dashboard"}'
+
+ $ Shell Remove temporary analysis files No Content
+   rm -r ./emission-analysis.IFpjNB
+
+# Emissions Dashboard
+
+I've analyzed emissions across your 12 Northeast facilities. You're within the screening threshold with an 8% buffer, but Boston Hub needs attention.
+
+**Quarterly Emissions (47,340 MT CO2e)**
+
+| Scope | Emissions | % Total | YoY Change |
+|-------|-----------|---------|------------|
+| Scope 1 (Direct) | 28,150 MT | 59.4% | +8.2% |
+| Scope 2 (Electricity) | 14,680 MT | 31.0% | -12.1% |
+| Scope 3 (Supply Chain) | 4,510 MT | 9.5% | +3.4% |
+
+**Compliance:** EPA Northeast regional requirements met (47,340 of 51,450 MT screening threshold; screening, not a legal determination).
+
+**Alert:** Boston Hub methane emissions up 18% due to aging infrastructure. Current trajectory exceeds next-quarter allowances by 340 MT.
+**Action:** Accelerate leak detection and repair at Boston Hub - $85K cost avoids $127K in carbon credits.
+
+| Facility | Location | Scope 1 | Scope 2 | Scope 3 | Total |
+|----------|----------|---------|---------|---------|-------|
+| Boston Hub | Boston, MA | 4,200 | 1,900 | 600 | 6,700 |
+| Hartford Generating Station | Hartford, CT | 5,100 | 1,600 | 520 | 7,220 |
+| Providence Peaker Plant | Providence, RI | 3,600 | 900 | 300 | 4,800 |
+| Portland Fuel Terminal | Portland, ME | 2,300 | 1,100 | 410 | 3,810 |
+| Albany Substation Campus | Albany, NY | 1,900 | 2,400 | 380 | 4,680 |
+| Burlington Operations Center | Burlington, VT | 800 | 600 | 200 | 1,600 |
+| Manchester Service Center | Manchester, NH | 1,150 | 1,000 | 290 | 2,440 |
+| Worcester Compressor Station | Worcester, MA | 3,400 | 700 | 330 | 4,430 |
+| Springfield Fleet Depot | Springfield, MA | 1,250 | 1,200 | 360 | 2,810 |
+| New Haven Plant | New Haven, CT | 2,700 | 1,300 | 450 | 4,450 |
+| Syracuse Operations Center | Syracuse, NY | 950 | 1,280 | 270 | 2,500 |
+| Nashua Fleet Yard | Nashua, NH | 800 | 700 | 400 | 1,900 |
+
+Source: [Azure IoT Hub + MS Cloud for Sustainability] (synthetic)
+
+> Synthetic inventory, not verified emissions evidence. Validate boundaries, factors, units, and source records before making a claim.
+
+Next: want to see the top reduction opportunities?
+
+
+
+Changes    +0 -0
+AI Credits 4.19 (31s)
+Tokens     ↑ 49.8k (39.7k cached, 10.1k written) • ↓ 1.3k (115 reasoning)
+Resume     copilot --resume=029eecff-2867-42be-b2d2-10b625157b3f

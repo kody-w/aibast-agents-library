@@ -1,0 +1,26 @@
+ $ Shell Download agent and verify file hashes 3 lines…
+   workdir=$(mktemp -d ./care-gap-run.XXXXXX) && cd "$workdir" && curl -fsSLo basic_agent.py
+   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
+   ]8;id=md-qnkgw;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/rapp_brainstem/agents/basic_agent.py132485082/rapp_brainstem/agents/basic_agent.py]8;;]8;; && curl -fsSLo care_gap_closure_agent.py ]8;;
+   ]8;id=md-17j4491;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/healthcare_stacks/care_gap_closure_stack/care_gap_closure_agent.pyhttps://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45]8;;
+   ]8;id=md-17j4491;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/healthcare_stacks/care_gap_closure_stack/care_gap_closure_agent.py132485082/agents/%40aibast-agents-library/healthcare_stacks/care_gap_closure_stack/care_gap_closu]8;;
+   ]8;id=md-17j4491;https://raw.githubusercontent.com/microsoft/aibast-agents-library/55171d25128d1b1172201a2f5789c45132485082/agents/%40aibast-agents-library/healthcare_stacks/care_gap_closure_stack/care_gap_closure_agent.pyre_agent.py]8;;]8;; && shasum -a 256 basic_agent.py care_gap_closure_agent.py]8;;
+
+ $ Shell Read supported agent operations 1 line…
+   cd ./care-gap-run.* && python3 -c "import json,sys; from care_gap_closure_agent import
+   CareGapClosureAgent as A; a=A(); print(json.dumps(a.metadata) if len(sys.argv)<2 else
+   a.perform(**json.loads(sys.argv[1])))"
+
+ $ Shell Find largest synthetic evidence-review queue 23 lines…
+   cd ./care-gap-run.* && python3 -c "import json,sys; from care_gap_closure_agent import
+   CareGapClosureAgent as A; a=A(); print(json.dumps(a.metadata) if len(sys.argv)<2 else
+   a.perform(**json.loads(sys.argv[1])))" '{"operation":"gap_analysis"}'
+
+**Largest evidence-review queue:** SYN-COL — 182 records.
+
+
+
+Changes    +0 -0
+AI Credits 3.23 (32s)
+Tokens     ↑ 48.0k (38.4k cached, 9.5k written) • ↓ 459 (72 reasoning)
+Resume     copilot --resume=20863314-55f7-4cd4-bc02-56d969520964
