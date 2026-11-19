@@ -1,110 +1,110 @@
 {
   "schema": "aibast-site-traffic/1.0",
-  "as_of": "2026-11-16",
-  "days_collected": 39,
+  "as_of": "2026-11-19",
+  "days_collected": 42,
   "this_week": {
     "days": 7,
-    "page_visits": 262,
-    "staging_visits": 229,
-    "active_seconds_per_visit": 52,
+    "page_visits": 182,
+    "staging_visits": 159,
+    "active_seconds_per_visit": 57,
     "top_pages": [
       {
-        "page": "Library home",
-        "visits": 99
+        "page": "/solutions/_shared/m365-copilot-demo.html",
+        "visits": 68
       },
       {
-        "page": "/solutions/_shared/m365-copilot-demo.html",
-        "visits": 69
+        "page": "Library home",
+        "visits": 52
       },
       {
         "page": "/start.html",
-        "visits": 32
+        "visits": 30
       },
       {
         "page": "/docs/installer.html",
-        "visits": 15
+        "visits": 13
       },
       {
         "page": "/academy.html",
-        "visits": 11
-      },
-      {
-        "page": "/paths.html",
-        "visits": 4
+        "visits": 5
       },
       {
         "page": "/solutions/fs-regulatory-compliance/quest.html",
         "visits": 4
       },
       {
-        "page": "/solutions/account-intelligence/quest.html",
-        "visits": 3
-      },
-      {
-        "page": "/achievements.html",
+        "page": "/paths.html",
         "visits": 2
       },
       {
-        "page": "/metrics.html",
+        "page": "/solutions/ask-hr/quest.html",
         "visits": 2
+      },
+      {
+        "page": "/docs/practice/windows.html",
+        "visits": 1
+      },
+      {
+        "page": "/request-info.html",
+        "visits": 1
       }
     ],
     "friction": {
-      "DeadClickCount": 10,
-      "QuickbackClick": 21,
+      "DeadClickCount": 7,
+      "QuickbackClick": 16,
       "RageClickCount": 0
     }
   },
   "last_week": {
     "days": 7,
-    "page_visits": 121,
-    "staging_visits": 63,
-    "active_seconds_per_visit": 38,
+    "page_visits": 190,
+    "staging_visits": 142,
+    "active_seconds_per_visit": 34,
     "top_pages": [
       {
         "page": "Library home",
-        "visits": 51
+        "visits": 86
       },
       {
         "page": "/solutions/_shared/m365-copilot-demo.html",
+        "visits": 26
+      },
+      {
+        "page": "/docs/installer.html",
         "visits": 14
       },
       {
         "page": "/academy.html",
-        "visits": 7
-      },
-      {
-        "page": "/docs/installer.html",
-        "visits": 6
+        "visits": 13
       },
       {
         "page": "/solutions/account-intelligence/quest.html",
-        "visits": 6
+        "visits": 8
       },
       {
         "page": "/solutions/ai-customer-assistant/quest.html",
-        "visits": 5
-      },
-      {
-        "page": "/solutions/personalized-shopping-assistant/quest.html",
-        "visits": 5
-      },
-      {
-        "page": "/docs/rapp-guide.html",
         "visits": 4
       },
       {
-        "page": "/solutions/contract-risk-review/quest.html",
+        "page": "/start.html",
         "visits": 4
       },
       {
-        "page": "/solutions/personalized-shopping-assistant/field-guide.html",
+        "page": "/why.html",
+        "visits": 4
+      },
+      {
+        "page": "/reports/site-traffic.html",
+        "visits": 3
+      },
+      {
+        "page": "/request-info.html",
         "visits": 3
       }
     ],
     "friction": {
-      "DeadClickCount": 12,
-      "QuickbackClick": 19,
+      "DeadClickCount": 14,
+      "QuickbackClick": 25,
       "RageClickCount": 3
     }
   }
