@@ -76,3 +76,45 @@ jobs:
           curl -sf http://localhost:7071/api/health || { nohup "$HOME/.local/bin/communityrapp" start > "$RUNNER_TEMP/func.log" 2>&1 & }
           for i in $(seq 1 30); do curl -sf http://localhost:7071/api/health && break; sleep 5; done
           curl -sf http://localhost:7071/api/health || { tail -40 "$RUNNER_TEMP/func.log"; echo "::error::server did not answer /api/health"; exit 1; }
+
+  windows:
+    name: azure tier windows-latest
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preinstall Azure Functions Core Tools
+        run: npm install -g azure-functions-core-tools@4 --unsafe-perm true
+      - name: Install (blank answers take every default; "3" skips Azure OpenAI setup)
+        shell: pwsh
+        run: |
+          $answers = Join-Path $env:RUNNER_TEMP "answers.txt"
+          Set-Content $answers ("`n" * 20)
+          Get-Content $answers | pwsh -NoProfile -File rapp_ai/install.ps1
+          if ($LASTEXITCODE -ne 0) { throw "installer exited with $LASTEXITCODE" }
+      - name: Check the install
+        shell: pwsh
+        run: |
+          $S = Join-Path $env:USERPROFILE ".communityrapp\src"
+          if (-not (Test-Path (Join-Path $S "rapp_ai\function_app.py"))) { throw "rapp_ai was not installed" }
+          $origin = git -C $S remote get-url origin
+          if ($origin -ne $env:RAPP_AI_REPO_URL) { throw "wrong source repository: $origin" }
+          $log = Join-Path $env:RUNNER_TEMP "func.log"
+          Start-Process -FilePath (Join-Path $env:USERPROFILE ".local\bin\communityrapp.cmd") -RedirectStandardOutput $log -RedirectStandardError "$log.err" -WindowStyle Hidden
+          $ok = $false
+          foreach ($i in 1..36) {
+            try { $r = Invoke-WebRequest http://localhost:7071/api/health -UseBasicParsing -TimeoutSec 5; if ($r.StatusCode -eq 200) { $r.Content; $ok = $true; break } } catch { }
+            Start-Sleep 5
+          }
+          if (-not $ok) {
+            Get-Content $log, "$log.err" -Tail 40 -ErrorAction SilentlyContinue
+            $settings = Join-Path $S "rapp_ai\local.settings.json"
+            "--- settings first bytes: " + ((Get-Content $settings -AsByteStream -TotalCount 8) -join ' ')
+            Get-Content $settings
+            "--- folder"; Get-ChildItem (Join-Path $S "rapp_ai") -Force | Select-Object -ExpandProperty Name
+            "--- func"; func --version; (Get-Command func).Source
+            throw "server did not answer /api/health"
+          }
