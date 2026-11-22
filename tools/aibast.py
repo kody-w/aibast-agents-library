@@ -105,13 +105,20 @@ def fetch_bytes(url: str) -> bytes:
 
 
 def verify_live(base: str, play: bool, workers: int, parallel: int = 2,
-                report: str = "verify-live.json") -> int:
+                report: str = "verify-live.json", raw_base: str | None = None) -> int:
     from concurrent.futures import ThreadPoolExecutor
 
     site = base.rstrip("/") + "/"
-    raw = json.loads(fetch_bytes(site + "api/registry.json"))["raw"]
-    index = json.loads(fetch_bytes(site + "api/v1/media/index.json"))
-    items = [i for g in index["groups"] for i in json.loads(fetch_bytes(site + g["doc"]))["items"]]
+    # --raw pins the media check to one commit: the media map and every file come from raw at that
+    # commit, so the result does not drift when the Pages site moves on. Playback still drives the site.
+    if raw_base:
+        raw = raw_base.rstrip("/") + "/"
+        maps = raw
+    else:
+        raw = json.loads(fetch_bytes(site + "api/registry.json"))["raw"]
+        maps = site
+    index = json.loads(fetch_bytes(maps + "api/v1/media/index.json"))
+    items = [i for g in index["groups"] for i in json.loads(fetch_bytes(maps + g["doc"]))["items"]]
 
     def check(item: dict) -> str | None:
         try:
@@ -123,7 +130,7 @@ def verify_live(base: str, play: bool, workers: int, parallel: int = 2,
     with ThreadPoolExecutor(max(1, min(workers, 16))) as pool:
         media_failures = [f for f in pool.map(check, items) if f]
     print(f"media: {len(items) - len(media_failures)} of {len(items)} match their sha256 ({raw})")
-    doc: dict = {"site": site, "raw": raw,
+    doc: dict = {"site": site, "raw": raw, "pinned": bool(raw_base),
                  "media": {"checked": len(items), "passed": len(items) - len(media_failures),
                            "failures": media_failures},
                  "narration": None}
@@ -223,6 +230,8 @@ def main(argv: list[str] | None = None) -> int:
     live.add_argument("--base", required=True, help="the site address, for example a ring's Pages URL")
     live.add_argument("--play", action="store_true")
     live.add_argument("--workers", type=int, default=8, help="parallel media downloads (max 16)")
+    live.add_argument("--raw", help="pin the media check to a raw base, for example "
+                      "https://raw.githubusercontent.com/<owner>/<repo>/<sha>/")
     live.add_argument("--report", default="verify-live.json", help="JSON file listing every result")
     live.add_argument("--parallel", type=int, default=2, help="browsers at once for --play (max 4)")
     args = parser.parse_args(argv)
@@ -232,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.area == "media":
         return media_verify(args.live)
     if args.area == "verify":
-        return verify_live(args.base, args.play, args.workers, args.parallel, args.report)
+        return verify_live(args.base, args.play, args.workers, args.parallel, args.report, args.raw)
     if args.area == "pages":
         return pages_size()
     return demo_check(args.slug, args.base)
