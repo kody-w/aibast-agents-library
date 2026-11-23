@@ -49,9 +49,9 @@ jobs:
             for i in $(seq 1 240); do
               sleep 5
               if ! kill -0 "$pid" 2>/dev/null; then wait "$pid"; state="exited $?"; break; fi
-              size=$(wc -c < "out/$l.raw")
-              if [ "$size" = "$last" ]; then still=$((still+1)); else still=0; last=$size; fi
-              if [ "$still" -ge 9 ] && curl -sf -m 3 http://127.0.0.1:7071/health >/dev/null 2>&1; then state="serving, installer still in front"; break; fi
+              el=$(( $(date +%s) - start ))
+              if [ "$l" = run1 ] && curl -sf -m 3 http://127.0.0.1:7071/health >/dev/null 2>&1; then sleep 20; state="serving, installer still in front"; break; fi
+              if [ "$l" = run2 ] && [ "$el" -ge 480 ]; then state="still in front at the 8 minute cap"; break; fi
             done
             echo "$state after $(( $(date +%s) - start ))s" | tee "out/$l.state.txt"
             perl -pe 's/\e\[[0-9;?]*[a-zA-Z]//g; s/\r/\n/g' "out/$l.raw" > "out/$l.log"
@@ -65,6 +65,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
+          $ErrorActionPreference = 'Continue'
           New-Item -ItemType Directory -Force out | Out-Null
           Invoke-WebRequest -Uri $env:URL -UseBasicParsing -OutFile out\installer.ps1
           (Get-FileHash out\installer.ps1 -Algorithm SHA256).Hash | Tee-Object out\installer.sha
@@ -81,7 +82,7 @@ jobs:
                 Where-Object { $_.FullName -notmatch '\\(venv|\.git|__pycache__|node_modules)\\' } |
                 ForEach-Object { $_.FullName.Substring($bs.Length).Replace('\','/') } | Sort-Object | Out-File -Encoding utf8 "out\$l.tree.txt"
               $src = Join-Path $bs 'src'
-              & { git -C $src rev-parse HEAD; git -C $src remote -v; git -C $src branch --show-current; git -C $src sparse-checkout list } *>&1 | Out-File -Encoding utf8 "out\$l.git.txt"
+              & { git -C $src rev-parse HEAD; git -C $src remote -v; git -C $src branch --show-current; git -C $src sparse-checkout list } 2>$null | Out-File -Encoding utf8 "out\$l.git.txt"
               & { Get-ChildItem -Force $bs | Select-Object Name; "user PATH: " + [Environment]::GetEnvironmentVariable('Path','User') } *>&1 | Out-File -Encoding utf8 "out\$l.cli.txt"
             } else { 'no .brainstem folder' | Out-File "out\$l.tree.txt" }
             Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'brainstem|tui\.py' } | Select-Object ProcessId, CommandLine | Format-List | Out-File -Encoding utf8 "out\$l.procs.txt"
@@ -93,9 +94,9 @@ jobs:
             foreach ($i in 1..240) {
               Start-Sleep -Seconds 5
               if ($p.HasExited) { $state = "exited $($p.ExitCode)"; break }
-              $size = (Get-Item "out\$l.raw").Length
-              if ($size -eq $last) { $still++ } else { $still = 0; $last = $size }
-              if ($still -ge 9) { try { Invoke-WebRequest -Uri 'http://127.0.0.1:7071/health' -UseBasicParsing -TimeoutSec 3 | Out-Null; $state = 'serving, installer still in front'; break } catch {} }
+              $el = [int]((Get-Date) - $start).TotalSeconds
+              if ($l -eq 'run1') { try { Invoke-WebRequest -Uri 'http://127.0.0.1:7071/health' -UseBasicParsing -TimeoutSec 3 | Out-Null; Start-Sleep -Seconds 20; $state = 'serving, installer still in front'; break } catch {} }
+              if ($l -eq 'run2' -and $el -ge 480) { $state = 'still in front at the 8 minute cap'; break }
             }
             "$state after $([int]((Get-Date) - $start).TotalSeconds)s" | Tee-Object "out\$l.state.txt"
             (Get-Content -Raw "out\$l.raw") -replace "\x1b\[[0-9;?]*[a-zA-Z]", '' | Out-File -Encoding utf8 "out\$l.log"
