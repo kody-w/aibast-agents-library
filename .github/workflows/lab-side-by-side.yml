@@ -11,13 +11,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, windows-latest]
+        os: [macos-15, macos-14, windows-latest]
         who: [grail, aibast]
+        exclude:
+          - { who: aibast, os: windows-latest }
         include:
           - { who: grail,  os: macos-15,       url: 'https://kody-w.github.io/rapp-installer/install.sh' }
+          - { who: grail,  os: macos-14,       url: 'https://kody-w.github.io/rapp-installer/install.sh' }
           - { who: grail,  os: windows-latest, url: 'https://raw.githubusercontent.com/kody-w/rapp-installer/main/install.ps1' }
           - { who: aibast, os: macos-15,       url: 'https://github.com/microsoft/aibast-agents-library/releases/download/installers/install.sh' }
-          - { who: aibast, os: windows-latest, url: 'https://github.com/microsoft/aibast-agents-library/releases/download/installers/install.ps1' }
+          - { who: aibast, os: macos-14,       url: 'https://github.com/microsoft/aibast-agents-library/releases/download/installers/install.sh' }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     env:
@@ -90,10 +93,12 @@ jobs:
           function Go($l) {
             $start = Get-Date
             $p = Start-Process powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-Command',"irm $env:URL | iex" -RedirectStandardOutput "out\$l.raw" -RedirectStandardError "out\$l.err" -PassThru
-            $last = -1; $still = 0; $state = 'timeout'
+            $tries = 0; $state = 'timeout'
             foreach ($i in 1..240) {
               Start-Sleep -Seconds 5
-              if ($p.HasExited) { $state = "exited $($p.ExitCode)"; break }
+              if ($p.HasExited) {
+                if ((Get-Item "out\$l.raw").Length -eq 0 -and $tries -lt 4) { $tries++; Copy-Item "out\$l.err" "out\$l.download-fail-$tries.txt"; Start-Sleep -Seconds 30; $p = Start-Process powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-Command',"irm $env:URL | iex" -RedirectStandardOutput "out\$l.raw" -RedirectStandardError "out\$l.err" -PassThru; continue }
+                $state = "exited $($p.ExitCode), download failed $tries time(s) first"; break }
               $el = [int]((Get-Date) - $start).TotalSeconds
               if ($l -eq 'run1') { try { Invoke-WebRequest -Uri 'http://127.0.0.1:7071/health' -UseBasicParsing -TimeoutSec 3 | Out-Null; Start-Sleep -Seconds 20; $state = 'serving, installer still in front'; break } catch {} }
               if ($l -eq 'run2' -and $el -ge 480) { $state = 'still in front at the 8 minute cap'; break }
