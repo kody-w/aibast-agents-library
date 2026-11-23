@@ -1,0 +1,114 @@
+# Throwaway lab: run the Grail one-liner and the AIBAST one-liner side by side
+# on clean runners, exactly as a person would, and capture what each one does.
+name: Lab installer side by side
+on:
+  push:
+    branches: ['lab/installer-side-by-side']
+permissions:
+  contents: read
+jobs:
+  run:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, windows-latest]
+        who: [grail, aibast]
+        include:
+          - { who: grail,  os: macos-15,       url: 'https://kody-w.github.io/rapp-installer/install.sh' }
+          - { who: grail,  os: windows-latest, url: 'https://raw.githubusercontent.com/kody-w/rapp-installer/main/install.ps1' }
+          - { who: aibast, os: macos-15,       url: 'https://github.com/microsoft/aibast-agents-library/releases/download/installers/install.sh' }
+          - { who: aibast, os: windows-latest, url: 'https://github.com/microsoft/aibast-agents-library/releases/download/installers/install.ps1' }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      URL: ${{ matrix.url }}
+    steps:
+      - name: Mac, first run then second run
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p out
+          curl -fsSL "$URL" -o out/installer.sh; shasum -a 256 out/installer.sh | tee out/installer.sha
+          snap() {
+            l="$1"
+            curl -s -m 5 http://127.0.0.1:7071/health  > "out/$l.health.json"  2>&1 || echo "NO ANSWER" > "out/$l.health.json"
+            curl -s -m 5 http://127.0.0.1:7071/version > "out/$l.version.json" 2>&1 || true
+            curl -s -m 5 http://127.0.0.1:7071/agents  > "out/$l.agents.json"  2>&1 || true
+            curl -s -m 5 http://127.0.0.1:7071/ | wc -c > "out/$l.root.bytes" 2>&1 || true
+            lsof -nP -iTCP:7071 -sTCP:LISTEN > "out/$l.listen.txt" 2>&1 || true
+            ( cd "$HOME/.brainstem" 2>/dev/null && find . \( -name venv -o -name .git -o -name __pycache__ -o -name node_modules \) -prune -o -type f -print | sort ) > "out/$l.tree.txt" 2>&1
+            { git -C "$HOME/.brainstem/src" rev-parse HEAD; git -C "$HOME/.brainstem/src" remote -v; git -C "$HOME/.brainstem/src" branch --show-current; git -C "$HOME/.brainstem/src" sparse-checkout list; } > "out/$l.git.txt" 2>&1 || true
+            { ls -la "$HOME/.brainstem" "$HOME/.brainstem/bin" "$HOME/.local/bin" 2>&1; echo "which: $(PATH="$HOME/.local/bin:$HOME/.brainstem/bin:$PATH" command -v brainstem)"; grep -n -i brainstem "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.zprofile" "$HOME/.profile" 2>/dev/null; } > "out/$l.cli.txt" 2>&1 || true
+            pgrep -fl 'brainstem|tui.py' > "out/$l.procs.txt" 2>&1 || true
+          }
+          go() {
+            l="$1"; start=$(date +%s)
+            ( curl -fsSL "$URL" | bash ) > "out/$l.raw" 2>&1 &
+            pid=$!; last=-1; still=0; state=timeout
+            for i in $(seq 1 240); do
+              sleep 5
+              if ! kill -0 "$pid" 2>/dev/null; then wait "$pid"; state="exited $?"; break; fi
+              size=$(wc -c < "out/$l.raw")
+              if [ "$size" = "$last" ]; then still=$((still+1)); else still=0; last=$size; fi
+              if [ "$still" -ge 9 ] && curl -sf -m 3 http://127.0.0.1:7071/health >/dev/null 2>&1; then state="serving, installer still in front"; break; fi
+            done
+            echo "$state after $(( $(date +%s) - start ))s" | tee "out/$l.state.txt"
+            perl -pe 's/\e\[[0-9;?]*[a-zA-Z]//g; s/\r/\n/g' "out/$l.raw" > "out/$l.log"
+            snap "$l"
+            echo "::group::$l transcript"; cat "out/$l.log"; echo "::endgroup::"
+            echo "::group::$l health"; cat "out/$l.health.json"; echo; cat "out/$l.version.json"; echo "::endgroup::"
+          }
+          go run1
+          go run2
+      - name: Windows, first run then second run
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force out | Out-Null
+          Invoke-WebRequest -Uri $env:URL -UseBasicParsing -OutFile out\installer.ps1
+          (Get-FileHash out\installer.ps1 -Algorithm SHA256).Hash | Tee-Object out\installer.sha
+          $bs = Join-Path $env:USERPROFILE '.brainstem'
+          function Grab($u, $f) { try { (Invoke-WebRequest -Uri $u -UseBasicParsing -TimeoutSec 5).Content | Out-File -Encoding utf8 $f } catch { "NO ANSWER: $($_.Exception.Message)" | Out-File -Encoding utf8 $f } }
+          function Snap($l) {
+            Grab 'http://127.0.0.1:7071/health'  "out\$l.health.json"
+            Grab 'http://127.0.0.1:7071/version' "out\$l.version.json"
+            Grab 'http://127.0.0.1:7071/agents'  "out\$l.agents.json"
+            try { (Invoke-WebRequest -Uri 'http://127.0.0.1:7071/' -UseBasicParsing -TimeoutSec 5).Content.Length | Out-File "out\$l.root.bytes" } catch {}
+            try { Get-NetTCPConnection -LocalPort 7071 -State Listen -ErrorAction Stop | Format-Table -AutoSize | Out-File "out\$l.listen.txt" } catch { 'nothing listening' | Out-File "out\$l.listen.txt" }
+            if (Test-Path $bs) {
+              Get-ChildItem -Recurse -File -Force $bs -ErrorAction SilentlyContinue |
+                Where-Object { $_.FullName -notmatch '\\(venv|\.git|__pycache__|node_modules)\\' } |
+                ForEach-Object { $_.FullName.Substring($bs.Length).Replace('\','/') } | Sort-Object | Out-File -Encoding utf8 "out\$l.tree.txt"
+              $src = Join-Path $bs 'src'
+              & { git -C $src rev-parse HEAD; git -C $src remote -v; git -C $src branch --show-current; git -C $src sparse-checkout list } *>&1 | Out-File -Encoding utf8 "out\$l.git.txt"
+              & { Get-ChildItem -Force $bs | Select-Object Name; "user PATH: " + [Environment]::GetEnvironmentVariable('Path','User') } *>&1 | Out-File -Encoding utf8 "out\$l.cli.txt"
+            } else { 'no .brainstem folder' | Out-File "out\$l.tree.txt" }
+            Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'brainstem|tui\.py' } | Select-Object ProcessId, CommandLine | Format-List | Out-File -Encoding utf8 "out\$l.procs.txt"
+          }
+          function Go($l) {
+            $start = Get-Date
+            $p = Start-Process powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-Command',"irm $env:URL | iex" -RedirectStandardOutput "out\$l.raw" -RedirectStandardError "out\$l.err" -PassThru
+            $last = -1; $still = 0; $state = 'timeout'
+            foreach ($i in 1..240) {
+              Start-Sleep -Seconds 5
+              if ($p.HasExited) { $state = "exited $($p.ExitCode)"; break }
+              $size = (Get-Item "out\$l.raw").Length
+              if ($size -eq $last) { $still++ } else { $still = 0; $last = $size }
+              if ($still -ge 9) { try { Invoke-WebRequest -Uri 'http://127.0.0.1:7071/health' -UseBasicParsing -TimeoutSec 3 | Out-Null; $state = 'serving, installer still in front'; break } catch {} }
+            }
+            "$state after $([int]((Get-Date) - $start).TotalSeconds)s" | Tee-Object "out\$l.state.txt"
+            (Get-Content -Raw "out\$l.raw") -replace "\x1b\[[0-9;?]*[a-zA-Z]", '' | Out-File -Encoding utf8 "out\$l.log"
+            Snap $l
+            Write-Host "::group::$l transcript"; Get-Content "out\$l.log"; Get-Content "out\$l.err" -ErrorAction SilentlyContinue; Write-Host "::endgroup::"
+            Write-Host "::group::$l health"; Get-Content "out\$l.health.json"; Get-Content "out\$l.version.json"; Write-Host "::endgroup::"
+          }
+          Go run1
+          Go run2
+          exit 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.who }}-${{ matrix.os }}
+          path: out/
+          include-hidden-files: true
