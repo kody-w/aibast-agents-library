@@ -1,0 +1,71 @@
+# Throwaway lab: prove the runtime-only install source on clean runners.
+name: Lab installer runtime only
+on:
+  push:
+    branches: ['lab/installer-runtime-only']
+permissions:
+  contents: read
+env:
+  FIX_BRANCH: fix/installer-runtime-only-checkout
+jobs:
+  prove:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: fix/installer-runtime-only-checkout, fetch-depth: 0, persist-credentials: false }
+      - name: Render old and new installers to install this branch
+        shell: bash
+        run: |
+          git fetch -q origin staging
+          mkdir -p "$RUNNER_TEMP/r"
+          render() { sed -e "s#https://github.com/microsoft/aibast-agents-library.git#https://github.com/$GITHUB_REPOSITORY.git#" -e "s#raw.githubusercontent.com/microsoft/aibast-agents-library/main/rapp_brainstem/VERSION#raw.githubusercontent.com/$GITHUB_REPOSITORY/$FIX_BRANCH/rapp_brainstem/VERSION#" -e "s#BRAINSTEM_REPO_REF:-main}#BRAINSTEM_REPO_REF:-$FIX_BRANCH}#" -e "s#else { \"main\" }#else { \"$FIX_BRANCH\" }#"; }
+          render < install.sh  > "$RUNNER_TEMP/r/new.sh";  render < install.ps1  > "$RUNNER_TEMP/r/new.ps1"
+          git show origin/staging:install.sh  | render > "$RUNNER_TEMP/r/old.sh"
+          git show origin/staging:install.ps1 | render > "$RUNNER_TEMP/r/old.ps1"
+          grep -n "REPO_URL=\|REPO_REF=" "$RUNNER_TEMP/r/new.sh" | head -3; grep -c "no-cone" "$RUNNER_TEMP/r/new.sh" "$RUNNER_TEMP/r/old.sh" "$RUNNER_TEMP/r/new.ps1" "$RUNNER_TEMP/r/old.ps1" || true
+      - name: Mac proof
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -uo pipefail
+          src="$HOME/.brainstem/src"; fail=0
+          m() { echo "RESULT $1: files $(find "$src" -path "$src/.git" -prune -o -type f -print | wc -l | tr -d ' '), loose top-level $(find "$src" -mindepth 1 -maxdepth 1 ! -name .git ! -name rapp_brainstem | wc -l | tr -d ' '), src $(du -sk "$src" | cut -f1) KB, brainstem.py $([ -f "$src/rapp_brainstem/brainstem.py" ] && echo present || echo MISSING), cone=$(git -C "$src" config core.sparseCheckoutCone), git $(git --version | cut -d' ' -f3)"; }
+          want0() { [ "$(find "$src" -mindepth 1 -maxdepth 1 ! -name .git ! -name rapp_brainstem | wc -l | tr -d ' ')" = 0 ] && [ -f "$src/rapp_brainstem/brainstem.py" ] || { echo "::error::$1 left loose files or lost the runtime"; fail=1; }; }
+          bash "$RUNNER_TEMP/r/new.sh" --no-launch > "$RUNNER_TEMP/1.log" 2>&1; echo "exit $?"; tail -3 "$RUNNER_TEMP/1.log"; m "new, clean machine"; want0 "clean install"
+          port=18071; ( cd "$src/rapp_brainstem" && PORT=$port "$HOME/.brainstem/venv/bin/python" brainstem.py > "$RUNNER_TEMP/server.log" 2>&1 ) & sp=$!
+          ok=no; for i in $(seq 1 40); do b="$(curl -sf -m 3 http://127.0.0.1:$port/health 2>/dev/null)" && { ok=yes; break; }; sleep 2; done; echo "RESULT server from the new install: answered=$ok $b"; kill $sp 2>/dev/null || true; pkill -f brainstem.py || true; [ $ok = yes ] || fail=1
+          bash "$RUNNER_TEMP/r/new.sh" --no-launch > "$RUNNER_TEMP/2.log" 2>&1; echo "exit $?"; m "new, second run"; want0 "second run"
+          rm -rf "$HOME/.brainstem"
+          bash "$RUNNER_TEMP/r/old.sh" --no-launch > "$RUNNER_TEMP/3.log" 2>&1; echo "exit $?"; m "old installer, clean machine"
+          echo mine > "$src/rapp_brainstem/agents/my_own_agent.py"; echo 0.6.1 > "$src/rapp_brainstem/VERSION"
+          bash "$RUNNER_TEMP/r/new.sh" --no-launch > "$RUNNER_TEMP/4.log" 2>&1; echo "exit $?"; grep -a "Limiting\|Upgrade" "$RUNNER_TEMP/4.log" | head -4; m "new over old (upgrade)"; want0 "upgrade"
+          echo "RESULT own agent after upgrade: $(cat "$src/rapp_brainstem/agents/my_own_agent.py" 2>&1)"; [ "$(cat "$src/rapp_brainstem/agents/my_own_agent.py" 2>/dev/null)" = mine ] || fail=1
+          exit $fail
+      - name: Windows proof
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $src = Join-Path $env:USERPROFILE '.brainstem\src'; $script:fail = 0
+          function Loose { @(Get-ChildItem -Force $src | Where-Object { $_.Name -ne '.git' -and $_.Name -ne 'rapp_brainstem' }).Count }
+          function M($l) { $files = @(Get-ChildItem -Recurse -File -Force $src | Where-Object { $_.FullName -notmatch '\\\.git\\' }).Count; $bp = Test-Path (Join-Path $src 'rapp_brainstem\brainstem.py'); Write-Host "RESULT ${l}: files $files, loose top-level $(Loose), brainstem.py present=$bp, cone=$(git -C $src config core.sparseCheckoutCone), git $(git --version)" }
+          function Want0($l) { if ((Loose) -ne 0 -or -not (Test-Path (Join-Path $src 'rapp_brainstem\brainstem.py'))) { Write-Host "::error::$l left loose files or lost the runtime"; $script:fail = 1 } }
+          function Run($which, $log) { $c = Get-Content -Raw (Join-Path $env:RUNNER_TEMP "r\$which.ps1"); & ([scriptblock]::Create($c)) --no-launch *>&1 | Out-File -Encoding utf8 (Join-Path $env:RUNNER_TEMP $log); Get-Content (Join-Path $env:RUNNER_TEMP $log) -Tail 3 }
+          Run new 1.log; M 'new, clean machine'; Want0 'clean install'
+          $env:PORT = '18071'; $py = Join-Path $env:USERPROFILE '.brainstem\venv\Scripts\python.exe'
+          $server = Start-Process -FilePath $py -ArgumentList 'brainstem.py' -WorkingDirectory (Join-Path $src 'rapp_brainstem') -PassThru -RedirectStandardOutput (Join-Path $env:RUNNER_TEMP 's.log') -RedirectStandardError (Join-Path $env:RUNNER_TEMP 's.err')
+          $ok = $false; foreach ($i in 1..40) { try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:18071/health' -TimeoutSec 3; $ok = $true; break } catch { Start-Sleep -Seconds 2 } }
+          Write-Host "RESULT server from the new install: answered=$ok $($r | ConvertTo-Json -Compress)"; Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue; Remove-Item Env:PORT; if (-not $ok) { $script:fail = 1 }
+          Run new 2.log; M 'new, second run'; Want0 'second run'
+          Remove-Item -Recurse -Force (Join-Path $env:USERPROFILE '.brainstem')
+          Run old 3.log; M 'old installer, clean machine'
+          'mine' | Out-File -Encoding ascii (Join-Path $src 'rapp_brainstem\agents\my_own_agent.py'); '0.6.1' | Out-File -Encoding ascii (Join-Path $src 'rapp_brainstem\VERSION')
+          Run new 4.log; Select-String -Path (Join-Path $env:RUNNER_TEMP 4.log) -Pattern 'Limiting|Upgrade' | Select-Object -First 4 | ForEach-Object { $_.Line }; M 'new over old (upgrade)'; Want0 'upgrade'
+          $mine = (Get-Content (Join-Path $src 'rapp_brainstem\agents\my_own_agent.py') -ErrorAction SilentlyContinue | Select-Object -First 1)
+          Write-Host "RESULT own agent after upgrade: $mine"; if ("$mine".Trim() -ne 'mine') { $script:fail = 1 }
+          exit $script:fail
