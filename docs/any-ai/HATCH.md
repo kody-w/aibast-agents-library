@@ -44,7 +44,7 @@ When the person asks for something an agent could do:
 3. When it prints `"done"`, say the `response` to the person. Up to three rounds of agents a turn.
 
 Need an agent you do not have? `python hatch.py bring <agent name>` adds one from the library catalog,
-fingerprint-checked. The catalog: https://microsoft.github.io/aibast-agents-library/registry.json
+fingerprint-checked. Browse the catalog: https://microsoft.github.io/aibast-agents-library/
 
 ## What the person keeps
 

@@ -25,7 +25,7 @@ WAIT = "\x00hatch-waiting-for-the-model\x00"
 
 
 SOURCE = os.environ.get("HATCH_SOURCE", "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main")
-CATALOG = os.environ.get("HATCH_CATALOG", "https://microsoft.github.io/aibast-agents-library")
+CATALOG = os.environ.get("HATCH_CATALOG", "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main")
 PACKAGES = ["flask", "flask-cors", "requests", "python-dotenv"]
 
 
@@ -228,4 +228,8 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    try:
+        sys.exit(main(sys.argv))
+    except Exception as e:  # say what went wrong in one line the AI can act on, never a wall of trace
+        print(json.dumps({"status": "error", "error": f"{type(e).__name__}: {e}"}))
+        sys.exit(1)
