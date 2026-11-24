@@ -19,7 +19,8 @@ for (const pkg of ["requests", "markupsafe", "pycryptodome", "beautifulsoup4", "
   try { await py.loadPackage(pkg); report[pkg] = "ok"; } catch (e) { report[pkg] = String(e).slice(0, 160); }
 }
 console.log("carried packages:", JSON.stringify(report));
-py.globals.set("ARGV", py.toPy(["record", "/stage/kernel", "/stage/agents", "/stage/" + out, "--run-list", "/stage/" + runList]));
+py.globals.set("ARGV", py.toPy(["record", "/stage/kernel", "/stage/agents", "/stage/" + out, "--run-list", "/stage/" + runList,
+  "--plug", "/stage/plug.py", "--chat-list", "/stage/chat-list.txt"]));
 await py.runPythonAsync(`
 import os, sys, runpy
 os.environ["HOME"] = "/home/pyodide/h"

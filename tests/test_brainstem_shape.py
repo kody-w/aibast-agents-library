@@ -76,3 +76,66 @@ def test_command_line_exit_codes(tmp_path):
     b.write_text(json.dumps(bad))
     run = lambda *x: subprocess.run([sys.executable, str(ROOT / "scripts" / "brainstem_shape.py"), "compare", *map(str, x)], capture_output=True, text=True)
     assert run(a, a).returncode == 0 and run(a, b).returncode == 1
+
+
+# ── the model plug: the AI that hatched the Brainstem is its model ────────────
+pspec = importlib.util.spec_from_file_location("brainstem_plug", ROOT / "docs" / "any-ai" / "plug.py")
+plug = importlib.util.module_from_spec(pspec)
+pspec.loader.exec_module(plug)
+
+
+class FakeKernel:
+    def call_copilot(self, messages, tools=None):
+        return "original", "original"
+
+    def call_copilot_stream(self, messages, tools=None, model=None):
+        yield ("done", {})
+
+
+TOOLS = [{"type": "function", "function": {"name": "Pipe", "description": "", "parameters": {}}},
+         {"type": "function", "function": {"name": "PipeLong", "description": "", "parameters": {}}}]
+
+
+def test_plug_swaps_both_model_calls_and_undo_puts_them_back():
+    k = FakeKernel()
+    before = (k.call_copilot, k.call_copilot_stream)
+    undo = plug.use(k, lambda m, t: "hi", "me")
+    resp, model = k.call_copilot([{"role": "user", "content": "x"}])
+    assert model == "me" and resp["choices"][0]["message"] == {"role": "assistant", "content": "hi"}
+    assert resp["choices"][0]["finish_reason"] == "stop"
+    assert list(k.call_copilot_stream([])) == [("delta", "hi"), ("done", {"message": {"role": "assistant", "content": "hi"}, "model": "me", "finish_reason": "stop"})]
+    undo()
+    assert (k.call_copilot, k.call_copilot_stream) == before
+
+
+def test_plug_shapes_a_tool_call_the_way_the_kernel_reads_it():
+    k = FakeKernel()
+    plug.use(k, lambda m, t: {"tool_calls": [{"function": {"name": "Pipe", "arguments": {"a": 1}}}]})
+    resp, _ = k.call_copilot([], TOOLS)
+    choice = resp["choices"][0]
+    call = choice["message"]["tool_calls"][0]
+    assert choice["finish_reason"] == "tool_calls" and choice["message"]["content"] is None
+    assert call == {"id": "call_1", "type": "function", "function": {"name": "Pipe", "arguments": '{"a": 1}'}}
+
+
+def test_stand_in_model_is_fixed_and_picks_the_longest_matching_agent():
+    ask = lambda words: plug.scripted([{"role": "user", "content": words}], TOOLS)
+    assert ask("use PipeLong")["tool_calls"][0]["function"]["name"] == "PipeLong"
+    assert ask("use pipe")["tool_calls"][0]["function"]["name"] == "Pipe"
+    assert ask("hello") == ask("hello") == {"content": "Stand-in model. You said: hello"}
+    said = plug.scripted([{"role": "user", "content": "use Pipe"}, {"role": "tool", "content": "42"}], TOOLS)
+    assert said == {"content": "The agent answered:\n42"}
+
+
+def test_a_chat_that_differs_fails_and_one_the_reference_does_not_repeat_is_set_aside():
+    chat = lambda words: {"chat": {"status": 200, "body": {"response": words}}, "stream": {"status": 200, "body": words}}
+    ref, body, again = rec(), rec(), rec()
+    for r in (ref, body, again):
+        r["chats"] = {"no agent": chat("a"), "A": chat("b")}
+    assert verdict(ref, body, again)[0] and "2 of 2 repeatable" in verdict(ref, body, again)[1]
+    body["chats"]["A"] = chat("B")
+    ok, text = verdict(ref, body, again)
+    assert not ok and "chat 'A'" in text
+    again["chats"]["A"] = chat("clock")
+    ok, text = verdict(ref, body, again)
+    assert ok and "1 of 1 repeatable" in text

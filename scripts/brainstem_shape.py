@@ -5,11 +5,14 @@ unchanged kernel does with every agent file in one body (installed Python, or Py
 inside a web page) and compares two records. Same record, same Brainstem.
 
     python scripts/brainstem_shape.py record  <kernel dir> <agents dir> <out.json> [--run-list <file>]
+                                              [--plug <plug.py> --chat-list <file of agent names>]
     python scripts/brainstem_shape.py compare <reference.json> <body.json> [--again <reference2.json>] [--known <list.json>]
 
 record   runs inside the body under test. It loads each agent file through the kernel's own loader,
          keeps the tool description the model would see, and for files named in the run list keeps
          what perform() returns. It also calls /health through the kernel's own app, with no socket.
+         With --plug it puts a scripted stand-in model in the kernel's model slot and records whole
+         chats through /chat and /chat/stream: ask, pick an agent, run it, answer.
 compare  fails when a tool description, a repeatable perform() answer, or /health differs. An answer
          the reference itself does not repeat (a clock, a random number) is reported, never compared.
          Record the reference before and after the body so a clock that ticks in between is caught.
@@ -19,7 +22,30 @@ compare  fails when a tool description, a repeatable perform() answer, or /healt
 import hashlib, io, json, os, sys, contextlib, traceback
 
 
-def record(kernel_dir, agents_dir, run_names):
+def chats(kernel, plug_file, names):
+    """Whole chats through the kernel's own /chat and /chat/stream, with a scripted stand-in model in
+    the model slot. No sign-in, no network. Returns one row per chat."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("brainstem_plug", plug_file)
+    plug = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(plug)
+    undo = plug.use(kernel, plug.scripted, "stand-in")
+    rows, client = {}, kernel.app.test_client()
+    try:
+        asks = [("no agent", "hello there")] + [(n, f"use {n}") for n in names]
+        for label, words in asks:
+            row = {}
+            r = client.post("/chat", json={"user_input": words, "session_id": "shape"})
+            row["chat"] = {"status": r.status_code, "body": r.get_json()}
+            r = client.post("/chat/stream", json={"user_input": words, "session_id": "shape"})
+            row["stream"] = {"status": r.status_code, "body": r.get_data(as_text=True)}
+            rows[label] = row
+    finally:
+        undo()
+    return rows
+
+
+def record(kernel_dir, agents_dir, run_names, plug_file=None, chat_names=()):
     os.environ["AGENTS_PATH"] = agents_dir
     os.environ.setdefault("PORT", "7071")
     sys.path.insert(0, kernel_dir)
@@ -66,6 +92,12 @@ def record(kernel_dir, agents_dir, run_names):
         out["agents_route"] = {"status": a.status_code}
     except BaseException as e:
         out["health"] = {"error": f"{type(e).__name__}: {e}"}
+    if plug_file:
+        try:
+            with contextlib.redirect_stdout(noise), contextlib.redirect_stderr(noise):
+                out["chats"] = chats(kernel, plug_file, list(chat_names))
+        except BaseException as e:
+            out["chats"] = {"error": f"{type(e).__name__}: {e}", "trace": traceback.format_exc()[-1200:]}
     return out
 
 
@@ -74,7 +106,9 @@ def record_main(argv):
     run_names = set()
     if "--run-list" in argv:
         run_names = set(open(argv[argv.index("--run-list") + 1]).read().split())
-    out = record(kernel_dir, agents_dir, run_names)
+    plug_file = os.path.abspath(argv[argv.index("--plug") + 1]) if "--plug" in argv else None
+    chat_names = open(argv[argv.index("--chat-list") + 1]).read().split() if "--chat-list" in argv else []
+    out = record(kernel_dir, agents_dir, run_names, plug_file, chat_names)
     with open(dest, "w") as f:
         json.dump(out, f, indent=1, sort_keys=True, default=str)
     return out
@@ -119,6 +153,23 @@ def compare(ref, body, again=None, known=None):
         lines.append(f"FAIL {f}: the answer differs from the reference")
     if loose:
         lines.append(f"not compared, the reference does not repeat itself: {len(loose)} ({', '.join(loose[:6])})")
+    if "chats" in ref or "chats" in body:
+        RC, BC = ref.get("chats") or {}, body.get("chats") or {}
+        AC = (again or {}).get("chats") or RC
+        if "error" in RC or "error" in BC:
+            bad += 1
+            lines.append(f"FAIL whole chats could not be recorded: {RC.get('error') or BC.get('error')}")
+        else:
+            asked = sorted(RC)
+            firm = [k for k in asked if RC[k] == AC.get(k)]
+            diff = [k for k in firm if RC[k] != BC.get(k)]
+            bad += len(diff)
+            lines.append(f"whole chats identical (/chat and /chat/stream): {len(firm) - len(diff)} of {len(firm)} repeatable")
+            for k in diff:
+                which = [w for w in ("chat", "stream") if RC[k].get(w) != (BC.get(k) or {}).get(w)]
+                lines.append(f"FAIL chat '{k}': {' and '.join(which)} differ from the reference")
+            if len(firm) < len(asked):
+                lines.append(f"not compared, the reference does not repeat itself: {len(asked) - len(firm)} chat(s)")
     stale = sorted(f for f in known if f in files and f not in tool_diff and R[f].get("perform") == B[f].get("perform"))
     if stale:
         bad += len(stale)
