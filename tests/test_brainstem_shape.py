@@ -139,3 +139,37 @@ def test_a_chat_that_differs_fails_and_one_the_reference_does_not_repeat_is_set_
     again["chats"]["A"] = chat("clock")
     ok, text = verdict(ref, body, again)
     assert ok and "1 of 1 repeatable" in text
+
+
+# ── hatch: a chat AI drives the real /chat from outside, as its model ─────────
+def test_hatch_manifest_is_current():
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "build_hatch_manifest.py"), "--check"], capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+
+
+def test_hatch_turn_runs_the_agent_once_and_records_it(tmp_path):
+    import pytest
+    pytest.importorskip("flask"); pytest.importorskip("flask_cors"); pytest.importorskip("dotenv"); pytest.importorskip("requests")
+    import os, shutil
+    kernel = tmp_path / "rapp_brainstem"
+    shutil.copytree(ROOT / "rapp_brainstem", kernel, ignore=shutil.ignore_patterns("tests", "__pycache__", ".env"))
+    agents = tmp_path / "agents"; agents.mkdir()
+    shutil.copy(ROOT / "rapp_brainstem" / "agents" / "basic_agent.py", agents)
+    (agents / "count_agent.py").write_text(
+        "from agents.basic_agent import BasicAgent\nimport pathlib\n"
+        "class CountAgent(BasicAgent):\n"
+        "    def __init__(self):\n        self.name='Count'; self.metadata={'name':'Count','description':'counts','parameters':{'type':'object','properties':{}}}\n"
+        "    def perform(self, **kw):\n        p=pathlib.Path(__file__).with_name('runs.txt'); p.write_text(p.read_text()+'x' if p.exists() else 'x'); return 'ran '+p.read_text()\n")
+    env = dict(os.environ, BRAINSTEM_HOME=str(kernel), AGENTS_PATH=str(agents), HOME=str(tmp_path), USERPROFILE=str(tmp_path))
+    hatch = lambda *a: json.loads(subprocess.run([sys.executable, str(ROOT / "docs" / "any-ai" / "hatch.py"), *a],
+                                                 capture_output=True, text=True, cwd=tmp_path, env=env).stdout)
+    first = hatch("ask", "count please")
+    assert first["new_messages"][-1] == {"role": "user", "content": "count please"}
+    assert [a["name"] for a in first["agents_you_may_call"]] == ["Count"]
+    second = hatch("answer", json.dumps({"tool_calls": [{"function": {"name": "Count", "arguments": {}}}]}))
+    assert second["new_messages"][-1]["role"] == "tool" and second["new_messages"][-1]["content"] == "ran x"
+    assert "waiting" not in json.dumps(second)
+    last = hatch("answer", "It ran once.")
+    assert last["done"]["response"] == "It ran once." and last["done"]["agent_logs"] == "[Count] ran x"
+    assert last["agents_that_ran"] == ["Count"] and (agents / "runs.txt").read_text() == "x"   # never run twice
+    assert hatch("chat")["agents_that_ran"] == ["Count"]
