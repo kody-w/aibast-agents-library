@@ -1,0 +1,3 @@
+{
+ "extract_sharepoint_document_url_agent.py": "needs the msal and openai packages, which the in-page body does not carry yet"
+}
