@@ -16,8 +16,9 @@ FILES = ["brainstem.py", "local_storage.py", "soul.md", "VERSION", "requirements
 
 def build():
     files = {f: hashlib.sha256((KERNEL / f).read_bytes()).hexdigest() for f in FILES}
+    helpers = {f: hashlib.sha256((OUT.parent / f).read_bytes()).hexdigest() for f in ("hatch.py", "plug.py")}
     return json.dumps({"schema": "aibast-hatch-manifest/1.0", "kernel_version": (KERNEL / "VERSION").read_text().strip(),
-                       "files": files}, indent=1, sort_keys=True) + "\n"
+                       "files": files, "helpers": helpers}, indent=1, sort_keys=True) + "\n"
 
 
 if __name__ == "__main__":

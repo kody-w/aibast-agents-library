@@ -11,6 +11,10 @@
   "requirements.txt": "6bc9a8d661873b4cfd6681f8c94b0a347cfcf6fb3a463b19c45bdc4a9cb165ef",
   "soul.md": "601f29b5b0f121c81e8c6703604d8f0f44af3dd8e039a7d92afcf7c8a8da94d2"
  },
+ "helpers": {
+  "hatch.py": "451701e4f61aa907360e2a83c4efaf99e2cc9824afe427489eeca2f28b216d57",
+  "plug.py": "ef62cf6cdaea2c4adb17ec8f5eee4d17292693cbf575f9c2c708f8e18e8d4031"
+ },
  "kernel_version": "0.6.17",
  "schema": "aibast-hatch-manifest/1.0"
 }

@@ -25,11 +25,14 @@ WAIT = "\x00hatch-waiting-for-the-model\x00"
 
 
 SOURCE = os.environ.get("HATCH_SOURCE", "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main")
-CATALOG = os.environ.get("HATCH_CATALOG", "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main")
+# One setting moves everything: agents come from the same place as the Brainstem unless HATCH_CATALOG says otherwise.
+CATALOG = os.environ.get("HATCH_CATALOG") or SOURCE
 PACKAGES = ["flask", "flask-cors", "requests", "python-dotenv"]
 
 
 def _fetch(url):
+    if "://" not in url:                      # a folder carried along: nothing leaves this place
+        return Path(urllib.request.unquote(url)).read_bytes()
     return urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "brainstem-hatch"}), timeout=60).read()
 
 
@@ -168,6 +171,7 @@ def _finish(turn, out):
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     ran = [a for rnd in turn["rounds"] for a in rnd["agents"] if a]
     chat["exported_at"], chat["model"] = now, body.get("model")
+    chat["python"], chat["body"] = sys.version.split()[0], sys.platform   # numbers can differ between Python versions
     chat["turns"].append({"role": "user", "content": turn["words"], "timestamp": now})
     chat["turns"].append({"role": "assistant", "content": body.get("response", ""), "timestamp": now,
                           "agents": ran, "agent_logs": body.get("agent_logs", "")})
