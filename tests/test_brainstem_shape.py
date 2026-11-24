@@ -173,3 +173,8 @@ def test_hatch_turn_runs_the_agent_once_and_records_it(tmp_path):
     assert last["done"]["response"] == "It ran once." and last["done"]["agent_logs"] == "[Count] ran x"
     assert last["agents_that_ran"] == ["Count"] and (agents / "runs.txt").read_text() == "x"   # never run twice
     assert hatch("chat")["agents_that_ran"] == ["Count"]
+    # an agent the Brainstem does not have is answered honestly and is not recorded as having run
+    hatch("ask", "use a missing one")
+    miss = hatch("answer", json.dumps({"tool_calls": [{"function": {"name": "Nope", "arguments": {}}}]}))
+    assert "not found" in miss["new_messages"][-1]["content"]
+    assert hatch("answer", "I do not have that agent.")["agents_that_ran"] == []

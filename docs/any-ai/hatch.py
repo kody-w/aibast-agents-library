@@ -135,7 +135,7 @@ def _run(turn):
             return turn["rounds"][i]["results"], turn["rounds"][i]["logs"]
         results, logs = real_tools(tool_calls, agents, session_id=session_id)
         turn["rounds"].append({"results": results, "logs": logs,
-                               "agents": [c.get("function", {}).get("name") for c in tool_calls]})
+                               "agents": [n for n in (c.get("function", {}).get("name") for c in tool_calls) if n in agents]})
         return results, logs
 
     undo = plug.use(kernel, answer, turn.get("model") or "host-ai")
