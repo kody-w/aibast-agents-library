@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PINS = ["flask==3.1.2", "flask-cors==6.0.1", "requests==2.32.5", "python-dotenv==1.1.1"]
-MAIN = '''"""The Brainstem in one file. Run:  python brainstem.pyz tools | ask "<words>" | answer '<answer>' | bring <agent> | chat"""
+MAIN = '''"""The Brainstem in one file. Run:  python brainstem.pyz tools | ask "<words>" | answer '<answer>' | bring <agent> | chat | thaw <snapshot> | freeze"""
 import os, sys, zipfile, contextlib, io
 from pathlib import Path
 here = Path(os.environ.get("BRAINSTEM_CARRY", "brainstem_carry")).resolve()
@@ -30,7 +30,7 @@ os.environ.setdefault("HATCH_SOURCE", str(here))
 sys.path[:0] = [str(here / "site"), str(here / "docs" / "any-ai")]
 sys.dont_write_bytecode = True
 import hatch
-if not Path("rapp_brainstem", "brainstem.py").exists():
+if not Path("rapp_brainstem", "brainstem.py").exists() and sys.argv[1:2] != ["thaw"]:
     code, out = hatch.get()
     if code:
         import json; print(json.dumps(out)); sys.exit(code)
@@ -38,7 +38,7 @@ sys.exit(hatch.main(["brainstem.pyz", *sys.argv[1:]]))
 '''
 
 
-def build(out):
+def build(out, brainfreeze=None):
     manifest = json.loads((ROOT / "docs/any-ai/hatch-manifest.json").read_text())
     registry = json.loads((ROOT / "registry.json").read_text())
     files = {"registry.json": ROOT / "registry.json", "docs/any-ai/hatch-manifest.json": ROOT / "docs/any-ai/hatch-manifest.json"}
@@ -59,6 +59,9 @@ def build(out):
         for f in sorted(site.rglob("*")):
             if f.is_file():
                 files["site/" + f.relative_to(site).as_posix()] = f
+        if brainfreeze:        # the freezer rides along, unchanged, so a Brainstem can be thawed and frozen with no network
+            for f in sorted(Path(brainfreeze).rglob("*.py")) + sorted(Path(brainfreeze).rglob("*.json")):
+                files["site/brainfreeze/" + f.relative_to(brainfreeze).as_posix()] = f
         digest = hashlib.sha256()
         with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
             for name in sorted(files):
@@ -72,4 +75,6 @@ def build(out):
 
 
 if __name__ == "__main__":
-    print(json.dumps(build(Path(sys.argv[1] if len(sys.argv) > 1 else "brainstem.pyz")), indent=1))
+    args = [a for a in sys.argv[1:] if not a.startswith("--brainfreeze=")]
+    freezer = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--brainfreeze=")), None)
+    print(json.dumps(build(Path(args[0] if args else "brainstem.pyz"), freezer), indent=1))

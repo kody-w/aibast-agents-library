@@ -86,6 +86,80 @@ def bring(name):
     return 0, {"status": "ok", "agent": Path(a["_file"]).name, "sha256": a["_sha256"], "message": "It is on offer from the next turn."}
 
 
+def _brainfreeze():
+    try:
+        import brainfreeze
+        from brainfreeze import bundle
+        return brainfreeze, bundle
+    except ImportError:
+        return None, None
+
+
+def thaw(snapshot=""):
+    """Wake a frozen Brainstem (a brainfreeze snapshot) here, with you as its model. Every file is checked against
+    the snapshot's own list before anything is used. No sign-in, no server, no network."""
+    import tarfile
+    bf, bundle = _brainfreeze()
+    snap = Path(snapshot)
+    if not bf:
+        return 1, {"status": "error", "error": "thaw needs brainfreeze beside the Brainstem; the one-file Brainstem carries it"}
+    if not snap.is_file():
+        return 1, {"status": "error", "error": f"no snapshot at {snapshot!r}"}
+    if Path("rapp_brainstem").exists() or STATE.exists():
+        return 1, {"status": "error", "error": "a Brainstem is already awake in this folder; thaw into an empty folder"}
+    stage = Path(".thaw")
+    with tarfile.open(snap, "r:gz") as tar:
+        for m in tar.getmembers():          # the same refusals brainfreeze itself makes
+            n = m.name
+            if (n.startswith("/") or ".." in Path(n).parts or m.issym() or m.islnk()
+                    or not (n in ("state.json", "bundle.json", "bundle.sig", "bundle.signer")
+                            or n.startswith(("rapp_brainstem", "sidecars/")) or n == "sidecars")):
+                return 1, {"status": "error", "error": f"snapshot has an unsafe entry: {n}"}
+        tar.extractall(stage)
+    checked = "no list in this snapshot (frozen before bundle.json)"
+    if (stage / "bundle.json").is_file():
+        try:
+            bundle.verify(stage, json.loads((stage / "bundle.json").read_text()))
+            checked = "every file matches the snapshot's list"
+        except bundle.BundleError as e:
+            import shutil
+            shutil.rmtree(stage)
+            return 1, {"status": "error", "error": f"refusing to wake it: {e}"}
+    state = json.loads((stage / "state.json").read_text())
+    (stage / "rapp_brainstem").rename("rapp_brainstem")
+    history = [m for m in state.get("history", []) if m.get("role") in ("user", "assistant")]
+    sha = hashlib.sha256(snap.read_bytes()).hexdigest()
+    _save("history.json", history[-40:])
+    _save("chat.json", {"session_id": state.get("session_id") or "hatch-" + time.strftime("%Y%m%d%H%M%S", time.gmtime()),
+                        "turns": [dict(m) for m in history], "thawed_from": {"snapshot_sha256": sha}})
+    signed = "signed by " + (stage / "bundle.signer").read_text().strip() + " (signature not checked here)" if (stage / "bundle.sig").is_file() else "unsigned"
+    import shutil
+    shutil.rmtree(stage)
+    return 0, {"status": "ok", "frozen": state.get("created"), "brainstem": state.get("brainstem", {}).get("version"),
+               "messages_restored": len(history), "checked": checked, "signature": signed, "snapshot_sha256": sha,
+               "settings_the_agents_may_need": state.get("settings_needed", []),
+               "message": "Awake. Run tools, then carry on with ask."}
+
+
+def freeze(out=""):
+    """Freeze this Brainstem into a standard brainfreeze snapshot: agents, soul, memory, the conversation, and a
+    pointer to the snapshot it was woken from. Sign-in files and keys never travel. Any brainfreeze can resume it."""
+    bf, _ = _brainfreeze()
+    if not bf:
+        return 1, {"status": "error", "error": "freeze needs brainfreeze beside the Brainstem; the one-file Brainstem carries it"}
+    chat = _load("chat.json", {"turns": []})
+    out = Path(out or "brainstem-" + time.strftime("%Y%m%d-%H%M%S", time.gmtime()) + ".snapshot.tar.gz")
+    history = [{"role": t["role"], "content": t.get("content", "")} for t in chat["turns"]]
+    extra = {"woken_by": {"model": chat.get("model") or "host-ai", "python": sys.version.split()[0]}}
+    if chat.get("thawed_from"):
+        extra["parent"] = chat["thawed_from"]
+    with contextlib.redirect_stdout(io.StringIO()):
+        bf.freeze(_home(), out, history=history, session_id=chat.get("session_id"), model=chat.get("model") or "host-ai", extra=extra)
+    return 0, {"status": "ok", "file": str(out.resolve()), "bytes": out.stat().st_size, "messages": len(history),
+               "parent": extra.get("parent"), "sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
+               "message": "This is a standard brainfreeze snapshot. Wake it in any AI with thaw, or on any computer with brainfreeze."}
+
+
 def _home():
     for c in (os.environ.get("BRAINSTEM_HOME"), "rapp_brainstem", HERE / "rapp_brainstem", HERE.parent.parent / "rapp_brainstem"):
         if c and (Path(c) / "brainstem.py").exists():
@@ -187,8 +261,9 @@ def _finish(turn, out):
 
 def main(argv):
     cmd = argv[1] if len(argv) > 1 else ""
-    if cmd in ("get", "bring"):
-        code, out = get() if cmd == "get" else bring(" ".join(argv[2:]))
+    if cmd in ("get", "bring", "thaw", "freeze"):
+        code, out = {"get": get, "bring": lambda: bring(" ".join(argv[2:])), "thaw": lambda: thaw(*argv[2:3]),
+                     "freeze": lambda: freeze(*argv[2:3])}[cmd]()
         print(json.dumps(out, indent=1))
         return code
     if cmd == "tools":
