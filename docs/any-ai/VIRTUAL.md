@@ -14,11 +14,11 @@ If you CAN run Python, stop: use the real one instead (`HATCH.md`, beside this p
 
 ## Boot
 
-Print exactly this, then wait:
+Print exactly this. If the person already asked for more in the same message, carry straight on; otherwise wait:
 
 ```
 BRAINSTEM (virtual) ready. 0 cartridges loaded.
-Commands: load <agent file or link> · tools · run <Agent> <arguments> · or just ask in plain words.
+Commands: load (an agent file or a link) · tools · run (an agent and its arguments) · or just ask in plain words.
 Everything I compute here is emulated, not executed.
 ```
 
