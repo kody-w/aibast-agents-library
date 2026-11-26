@@ -449,33 +449,41 @@
   "2026-11-22": {
    "count": 230,
    "uniques": 64
+  },
+  "2026-11-23": {
+   "count": 308,
+   "uniques": 76
+  },
+  "2026-11-24": {
+   "count": 179,
+   "uniques": 38
   }
  },
  "installer_assets": {
   "community_rapp-install.ps1": {
-   "all_time": 105,
-   "last": 31
+   "all_time": 107,
+   "last": 33
   },
   "community_rapp-install.sh": {
-   "all_time": 101,
-   "last": 30
+   "all_time": 103,
+   "last": 32
   },
   "install.ps1": {
-   "all_time": 124,
-   "last": 29
+   "all_time": 129,
+   "last": 34
   },
   "install.sh": {
-   "all_time": 27,
-   "last": 27
+   "all_time": 34,
+   "last": 34
   }
  },
  "last_known": {
-  "at": "2026-11-24T05:26:42Z",
-  "clone_uniques_14d": 867,
-  "clones_14d": 5798,
+  "at": "2026-11-26T05:31:04Z",
+  "clone_uniques_14d": 838,
+  "clones_14d": 5596,
   "paths": [
    {
-    "count": 41,
+    "count": 42,
     "path": "/microsoft/aibast-agents-library",
     "title": "Overview",
     "uniques": 32
@@ -487,9 +495,9 @@
     "uniques": 7
    },
    {
-    "count": 5,
-    "path": "/microsoft/aibast-agents-library/discussions/categories/announcements",
-    "title": "/discussions/categories/announcements",
+    "count": 6,
+    "path": "/microsoft/aibast-agents-library/discussions/categories/ideas",
+    "title": "/discussions/categories/ideas",
     "uniques": 5
    },
    {
@@ -500,20 +508,20 @@
    },
    {
     "count": 5,
-    "path": "/microsoft/aibast-agents-library/discussions/categories/ideas",
-    "title": "/discussions/categories/ideas",
+    "path": "/microsoft/aibast-agents-library/discussions/categories/show-and-tell",
+    "title": "/discussions/categories/show-and-tell",
+    "uniques": 5
+   },
+   {
+    "count": 4,
+    "path": "/microsoft/aibast-agents-library/discussions/categories/announcements",
+    "title": "/discussions/categories/announcements",
     "uniques": 4
    },
    {
     "count": 4,
     "path": "/microsoft/aibast-agents-library/discussions/categories/general",
     "title": "/discussions/categories/general",
-    "uniques": 4
-   },
-   {
-    "count": 4,
-    "path": "/microsoft/aibast-agents-library/discussions/categories/show-and-tell",
-    "title": "/discussions/categories/show-and-tell",
     "uniques": 4
    },
    {
@@ -530,27 +538,27 @@
    },
    {
     "count": 3,
-    "path": "/microsoft/aibast-agents-library/discussions",
-    "title": "/discussions",
-    "uniques": 3
+    "path": "/microsoft/aibast-agents-library/compare/main...kody-w:aibast-agents-library:staging",
+    "title": "/compare/main...kody-w:aibast-agents-library:staging",
+    "uniques": 2
    }
   ],
-  "paths_at": "2026-11-24T05:26:42Z",
+  "paths_at": "2026-11-26T05:31:04Z",
   "referrers": [
    {
-    "count": 38,
+    "count": 43,
     "referrer": "github.com",
-    "uniques": 22
-   },
-   {
-    "count": 7,
-    "referrer": "microsoft.github.io",
-    "uniques": 5
+    "uniques": 23
    },
    {
     "count": 6,
     "referrer": "Google",
     "uniques": 5
+   },
+   {
+    "count": 5,
+    "referrer": "microsoft.github.io",
+    "uniques": 4
    },
    {
     "count": 3,
@@ -564,6 +572,11 @@
    },
    {
     "count": 1,
+    "referrer": "Bing",
+    "uniques": 1
+   },
+   {
+    "count": 1,
     "referrer": "DuckDuckGo",
     "uniques": 1
    },
@@ -573,8 +586,8 @@
     "uniques": 1
    }
   ],
-  "view_uniques_14d": 90,
-  "views_14d": 203
+  "view_uniques_14d": 95,
+  "views_14d": 222
  },
  "snapshots": [
   {
@@ -2974,6 +2987,72 @@
    "installer_release_downloads_all_time": 357,
    "view_uniques_all_time": 465,
    "views_all_time": 1516
+  },
+  {
+   "at": "2026-11-25T05:11:13Z",
+   "cdn_all_time": 537,
+   "clone_uniques_all_time": 4510,
+   "clones_all_time": 32089,
+   "days_tracked": 111,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 363,
+   "view_uniques_all_time": 475,
+   "views_all_time": 1528
+  },
+  {
+   "at": "2026-11-25T05:21:08Z",
+   "cdn_all_time": 537,
+   "clone_uniques_all_time": 4510,
+   "clones_all_time": 32089,
+   "days_tracked": 111,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 367,
+   "view_uniques_all_time": 475,
+   "views_all_time": 1528
+  },
+  {
+   "at": "2026-11-25T05:26:53Z",
+   "cdn_all_time": 537,
+   "clone_uniques_all_time": 4510,
+   "clones_all_time": 32089,
+   "days_tracked": 111,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 367,
+   "view_uniques_all_time": 475,
+   "views_all_time": 1528
+  },
+  {
+   "at": "2026-11-26T05:12:31Z",
+   "cdn_all_time": 537,
+   "clone_uniques_all_time": 4548,
+   "clones_all_time": 32268,
+   "days_tracked": 112,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 369,
+   "view_uniques_all_time": 484,
+   "views_all_time": 1552
+  },
+  {
+   "at": "2026-11-26T05:20:13Z",
+   "cdn_all_time": 537,
+   "clone_uniques_all_time": 4548,
+   "clones_all_time": 32268,
+   "days_tracked": 112,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 373,
+   "view_uniques_all_time": 484,
+   "views_all_time": 1552
+  },
+  {
+   "at": "2026-11-26T05:30:48Z",
+   "cdn_all_time": 537,
+   "clone_uniques_all_time": 4548,
+   "clones_all_time": 32268,
+   "days_tracked": 112,
+   "first_day": "2026-07-26",
+   "installer_release_downloads_all_time": 373,
+   "view_uniques_all_time": 484,
+   "views_all_time": 1552
   }
  ],
  "solution_bundle_assets": {
@@ -3845,11 +3924,11 @@
   }
  },
  "tracking": {
-  "cdn_last": "2026-11-24",
+  "cdn_last": "2026-11-26",
   "cdn_since": "2026-08-06",
-  "clones_last": "2026-11-24",
+  "clones_last": "2026-11-26",
   "clones_since": "2026-07-26",
-  "views_last": "2026-11-24",
+  "views_last": "2026-11-26",
   "views_since": "2026-07-26"
  },
  "views": {
@@ -4292,6 +4371,14 @@
   "2026-11-22": {
    "count": 21,
    "uniques": 12
+  },
+  "2026-11-23": {
+   "count": 12,
+   "uniques": 10
+  },
+  "2026-11-24": {
+   "count": 24,
+   "uniques": 9
   }
  }
 }

@@ -1,17 +1,17 @@
 {
  "schema": "aibast-metrics/1.0",
- "generated_at": "2026-11-24T05:26:28Z",
+ "generated_at": "2026-11-26T05:30:48Z",
  "repo": {
   "stars": 10,
   "forks": 9,
   "watchers": 0,
-  "open_issues": 17,
-  "size_kb": 5810382,
+  "open_issues": 16,
+  "size_kb": 5840914,
   "created_at": "2025-10-17T16:17:53Z",
-  "pushed_at": "2026-11-24T05:21:06Z",
+  "pushed_at": "2026-11-26T05:20:32Z",
   "description": "Main repository for AI BAST Specialist Teal AI Agents Library",
   "homepage": null,
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "carried_forward": false,
   "owner": "microsoft",
   "name": "aibast-agents-library",
@@ -19,27 +19,27 @@
   "site": "https://microsoft.github.io/aibast-agents-library/"
  },
  "totals": {
-  "downloads": 35028,
-  "clones": 31781,
+  "downloads": 35532,
+  "clones": 32268,
   "cdn_hits": 537,
-  "release_downloads": 2710,
-  "agent_file_downloads": 1178,
-  "installer_downloads": 370,
+  "release_downloads": 2727,
+  "agent_file_downloads": 1179,
+  "installer_downloads": 386,
   "skill_downloads": 116,
   "cowork_plugin_downloads": 731,
   "copilot_solution_downloads": 723,
   "agent_upvotes": null,
   "agent_acquisitions": null,
-  "clones_excluding_ci_estimate": 31781,
+  "clones_excluding_ci_estimate": 32268,
   "ci_clone_estimate": 0,
-  "page_views": 1516,
-  "clone_uniques_14d": 867,
-  "view_uniques_14d": 90,
-  "clone_uniques_daily_sum": 4434,
-  "view_uniques_daily_sum": 465,
-  "days_tracked": 110,
+  "page_views": 1552,
+  "clone_uniques_14d": 838,
+  "view_uniques_14d": 95,
+  "clone_uniques_daily_sum": 4548,
+  "view_uniques_daily_sum": 484,
+  "days_tracked": 112,
   "tracking_since": "2026-07-26",
-  "global_agent_distribution_fetch_events": 1178,
+  "global_agent_distribution_fetch_events": 1179,
   "agents": 95,
   "stacks": 73,
   "solutions": 72,
@@ -50,20 +50,6 @@
   "total_kb": 2631.7
  },
  "daily": [
-  {
-   "date": "2026-08-15",
-   "clones": 56,
-   "clone_uniques": 33,
-   "views": 37,
-   "cdn": 0
-  },
-  {
-   "date": "2026-08-16",
-   "clones": 25,
-   "clone_uniques": 16,
-   "views": 14,
-   "cdn": 0
-  },
   {
    "date": "2026-08-17",
    "clones": 87,
@@ -679,6 +665,20 @@
    "clone_uniques": 64,
    "views": 21,
    "cdn": 0
+  },
+  {
+   "date": "2026-11-23",
+   "clones": 308,
+   "clone_uniques": 76,
+   "views": 12,
+   "cdn": 0
+  },
+  {
+   "date": "2026-11-24",
+   "clones": 179,
+   "clone_uniques": 38,
+   "views": 24,
+   "cdn": 0
   }
  ],
  "traffic": {
@@ -686,7 +686,7 @@
    {
     "path": "/microsoft/aibast-agents-library",
     "title": "Overview",
-    "count": 41,
+    "count": 42,
     "uniques": 32
    },
    {
@@ -696,9 +696,9 @@
     "uniques": 7
    },
    {
-    "path": "/microsoft/aibast-agents-library/discussions/categories/announcements",
-    "title": "/discussions/categories/announcements",
-    "count": 5,
+    "path": "/microsoft/aibast-agents-library/discussions/categories/ideas",
+    "title": "/discussions/categories/ideas",
+    "count": 6,
     "uniques": 5
    },
    {
@@ -708,20 +708,20 @@
     "uniques": 5
    },
    {
-    "path": "/microsoft/aibast-agents-library/discussions/categories/ideas",
-    "title": "/discussions/categories/ideas",
+    "path": "/microsoft/aibast-agents-library/discussions/categories/show-and-tell",
+    "title": "/discussions/categories/show-and-tell",
     "count": 5,
+    "uniques": 5
+   },
+   {
+    "path": "/microsoft/aibast-agents-library/discussions/categories/announcements",
+    "title": "/discussions/categories/announcements",
+    "count": 4,
     "uniques": 4
    },
    {
     "path": "/microsoft/aibast-agents-library/discussions/categories/general",
     "title": "/discussions/categories/general",
-    "count": 4,
-    "uniques": 4
-   },
-   {
-    "path": "/microsoft/aibast-agents-library/discussions/categories/show-and-tell",
-    "title": "/discussions/categories/show-and-tell",
     "count": 4,
     "uniques": 4
    },
@@ -738,27 +738,27 @@
     "uniques": 1
    },
    {
-    "path": "/microsoft/aibast-agents-library/discussions",
-    "title": "/discussions",
+    "path": "/microsoft/aibast-agents-library/compare/main...kody-w:aibast-agents-library:staging",
+    "title": "/compare/main...kody-w:aibast-agents-library:staging",
     "count": 3,
-    "uniques": 3
+    "uniques": 2
    }
   ],
   "referrers": [
    {
     "referrer": "github.com",
-    "count": 38,
-    "uniques": 22
-   },
-   {
-    "referrer": "microsoft.github.io",
-    "count": 7,
-    "uniques": 5
+    "count": 43,
+    "uniques": 23
    },
    {
     "referrer": "Google",
     "count": 6,
     "uniques": 5
+   },
+   {
+    "referrer": "microsoft.github.io",
+    "count": 5,
+    "uniques": 4
    },
    {
     "referrer": "teams.public.onecdn.static.microsoft",
@@ -768,6 +768,11 @@
    {
     "referrer": "xuelangyun.feishu.cn",
     "count": 3,
+    "uniques": 1
+   },
+   {
+    "referrer": "Bing",
+    "count": 1,
     "uniques": 1
    },
    {
@@ -781,23 +786,23 @@
     "uniques": 1
    }
   ],
-  "clones_14d": 5798,
-  "views_14d": 203,
+  "clones_14d": 5596,
+  "views_14d": 222,
   "live": true,
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "unavailable_reason": null,
   "carried_forward": false
  },
  "cdn": {
-  "total_hits": 1264,
+  "total_hits": 1459,
   "bandwidth": 408352,
   "rank": null,
-  "agent_hits": 1178,
-  "installer_hits": 370,
+  "agent_hits": 1179,
+  "installer_hits": 386,
   "files": [
    {
     "file": "/registry.json",
-    "hits": 691,
+    "hits": 886,
     "agent": null,
     "workshop": null,
     "kind": "catalog"
@@ -1076,12 +1081,12 @@
     "kind": "agent"
    }
   ],
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "carried_forward": false
  },
  "releases": {
   "available": true,
-  "total_downloads": 2710,
+  "total_downloads": 2727,
   "count": 6,
   "releases": [
    {
@@ -2176,26 +2181,26 @@
     "tag": "installers",
     "name": "AIBAST Installers",
     "published_at": "2026-09-02T01:31:52Z",
-    "downloads": 117,
+    "downloads": 133,
     "assets": [
      {
       "name": "community_rapp-install.ps1",
-      "downloads": 31,
+      "downloads": 33,
       "size": 11392
      },
      {
       "name": "community_rapp-install.sh",
-      "downloads": 30,
+      "downloads": 32,
       "size": 9345
      },
      {
       "name": "install.ps1",
-      "downloads": 29,
+      "downloads": 34,
       "size": 80395
      },
      {
       "name": "install.sh",
-      "downloads": 27,
+      "downloads": 34,
       "size": 59864
      }
     ]
@@ -2218,11 +2223,11 @@
     "tag": "agent-downloads",
     "name": "AIBAST Agent Downloads",
     "published_at": "2026-08-12T19:44:15Z",
-    "downloads": 760,
+    "downloads": 761,
     "assets": [
      {
       "name": "account_intelligence_orchestrator__a21f50d0b417_agent.py",
-      "downloads": 10,
+      "downloads": 11,
       "size": 21285
      },
      {
@@ -2990,7 +2995,7 @@
     "assets": []
    }
   ],
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "carried_forward": false
  },
  "leaderboards": {
@@ -4000,7 +4005,7 @@
     "path": "agents/@aibast-agents-library/b2b_sales_stacks/account_intelligence_stack",
     "agents": 9,
     "lines": 4074,
-    "downloads": 136
+    "downloads": 137
    },
    {
     "name": "building_permit_processing",
@@ -4169,7 +4174,7 @@
    {
     "name": "b2b_sales",
     "agents": 23,
-    "downloads": 322,
+    "downloads": 323,
     "lines": 10753
    },
    {
@@ -4249,7 +4254,7 @@
    {
     "name": "b2b_sales",
     "agents": 23,
-    "downloads": 322,
+    "downloads": 323,
     "stacks": 5
    },
    {
@@ -4347,7 +4352,7 @@
   {
    "name": "@aibast-agents-library/account-intelligence-orchestrator",
    "display_name": "Account Intelligence Orchestrator",
-   "downloads": 10,
+   "downloads": 11,
    "upvotes": 0,
    "acquisitions": 0,
    "upvote_discussion_url": "https://github.com/microsoft/aibast-agents-library/discussions/21",
@@ -5569,7 +5574,7 @@
  ],
  "agent_discussion_coverage": {
   "status": "partial",
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "pages": 2,
   "discussions_scanned": 144,
   "diagnostics": {
@@ -5596,7 +5601,7 @@
  },
  "agent_upvote_coverage": {
   "status": "partial",
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
@@ -5613,7 +5618,7 @@
  },
  "agent_acquisition_coverage": {
   "status": "partial",
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "pages": 2,
   "discussions_scanned": 144,
   "discussions": 72,
@@ -5631,12 +5636,12 @@
  "file_metrics": {
   "schema": "aibast-file-metrics/1.0",
   "source_status": "complete",
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "carried_forward": false,
   "totals": {
    "files": 13337,
    "observed_files": 13337,
-   "downloads": 1247,
+   "downloads": 1442,
    "by_kind": {
     "agent": {
      "files": 95,
@@ -5671,7 +5676,7 @@
     "catalog": {
      "files": 6,
      "observed_files": 6,
-     "downloads": 694
+     "downloads": 889
     },
     "code": {
      "files": 424,
@@ -28163,7 +28168,7 @@
     "kind": "catalog",
     "agent_name": null,
     "workshop_slug": null,
-    "downloads": 691,
+    "downloads": 886,
     "status": "observed"
    },
    {
@@ -113801,7 +113806,7 @@
    "mixed_windows": true,
    "views": {
     "status": "live popular-path response",
-    "as_of": "2026-11-24T05:26:28Z",
+    "as_of": "2026-11-26T05:30:48Z",
     "censored": true,
     "diagnostics": {
      "duplicate_rows": 0,
@@ -113815,7 +113820,7 @@
    },
    "downloads": {
     "status": "complete paginated jsDelivr file response",
-    "as_of": "2026-11-24T05:26:28Z",
+    "as_of": "2026-11-26T05:30:48Z",
     "pages": 1,
     "pagination": "complete",
     "diagnostics": {
@@ -113828,7 +113833,7 @@
    },
    "feedback": {
     "status": "workshop-feedback label + body marker union",
-    "as_of": "2026-11-24T05:26:28Z",
+    "as_of": "2026-11-26T05:30:48Z",
     "issues_scanned": 0,
     "pages": 3,
     "diagnostics": {
@@ -113840,7 +113845,7 @@
    },
    "agent_upvotes": {
     "status": "partial",
-    "as_of": "2026-11-24T05:26:28Z",
+    "as_of": "2026-11-26T05:30:48Z",
     "scope": "Native upvotes on each primary agent's canonical rating Discussion. This preference signal is separate from usage_events and acquisition Discussions."
    }
   },
@@ -113876,7 +113881,7 @@
     "url": "https://microsoft.github.io/aibast-agents-library/registry.json"
    }
   ],
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "carried_forward": false
  },
  "solution_packages": {
@@ -114180,7 +114185,7 @@
  "achievements": {
   "schema": "aibast-achievements/2.0",
   "status": "available",
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "carried_forward": false,
   "caveat": "Verified achievement points are server-scored from opt-in public GitHub progress claims. Each explicitly claimed achievement has a fixed value: started 5, local-proof 15, draft-builder 20, preview-proven 25, workshop-completed 35, and hard-mode-completed 50, for at most 150 points per workshop. Re-syncing unions achievement IDs without duplicating points. Profiles are public by explicit submission consent. GitHub verification confirms authenticated issue authorship and canonical claim format only; achievement completion remains self-reported and is not independently proven. Verified public achievements remain separate from local self-paced state, repository stars, agent upvotes, downloads, and workshop usage events.",
   "totals": {
@@ -115875,7 +115880,7 @@
  "workshop_certification": {
   "schema": "aibast-workshop-certification/1.0",
   "status": "available",
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "carried_forward": false,
   "totals": {
    "cohort_submissions": 0,
@@ -116630,7 +116635,7 @@
  "ecosystem": {
   "schema": "aibast-ecosystem-metrics/1.0",
   "status": "available",
-  "as_of": "2026-11-24T05:26:28Z",
+  "as_of": "2026-11-26T05:30:48Z",
   "sources": {
    "aibast": {
     "status": "available",
@@ -116642,8 +116647,8 @@
    }
   },
   "totals": {
-   "aibast_direct_agent_fetches": 1178,
-   "combined_agent_distribution_fetch_events": 1178,
+   "aibast_direct_agent_fetches": 1179,
+   "combined_agent_distribution_fetch_events": 1179,
    "distribution_entries": 95,
    "logical_agents": 95,
    "overlap_agents": 0
@@ -117340,8 +117345,8 @@
     "combined_distribution_fetch_events": 12
    },
    {
-    "logical_name": "@aibast-agents-library/field-permit-to-work",
-    "display_name": "Field Permit to Work Agent",
+    "logical_name": "@aibast-agents-library/account-intelligence-orchestrator",
+    "display_name": "Account Intelligence Orchestrator",
     "publisher": "@aibast-agents-library",
     "channels": [
      "aibast"
@@ -117350,14 +117355,14 @@
     "combined_distribution_fetch_events": 11
    },
    {
-    "logical_name": "@aibast-agents-library/account-intelligence-orchestrator",
-    "display_name": "Account Intelligence Orchestrator",
+    "logical_name": "@aibast-agents-library/field-permit-to-work",
+    "display_name": "Field Permit to Work Agent",
     "publisher": "@aibast-agents-library",
     "channels": [
      "aibast"
     ],
-    "aibast_direct_agent_fetches": 10,
-    "combined_distribution_fetch_events": 10
+    "aibast_direct_agent_fetches": 11,
+    "combined_distribution_fetch_events": 11
    },
    {
     "logical_name": "@aibast-agents-library/benefits-enrollment-assistant",

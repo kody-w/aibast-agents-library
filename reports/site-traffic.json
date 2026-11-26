@@ -1,40 +1,40 @@
 {
   "schema": "aibast-site-traffic/1.0",
-  "as_of": "2026-11-24",
-  "days_collected": 47,
+  "as_of": "2026-11-26",
+  "days_collected": 49,
   "this_week": {
     "days": 7,
-    "page_visits": 86,
-    "staging_visits": 34,
-    "active_seconds_per_visit": 66,
+    "page_visits": 66,
+    "staging_visits": 0,
+    "active_seconds_per_visit": 68,
     "top_pages": [
       {
         "page": "Library home",
-        "visits": 23
+        "visits": 20
       },
       {
         "page": "/solutions/_shared/m365-copilot-demo.html",
-        "visits": 22
-      },
-      {
-        "page": "/docs/installer.html",
-        "visits": 17
+        "visits": 14
       },
       {
         "page": "/docs/rapp-guide.html",
-        "visits": 9
+        "visits": 12
       },
       {
-        "page": "/academy.html",
-        "visits": 4
-      },
-      {
-        "page": "/start.html",
-        "visits": 4
+        "page": "/docs/installer.html",
+        "visits": 11
       },
       {
         "page": "/solutions/fs-regulatory-compliance/quest.html",
+        "visits": 3
+      },
+      {
+        "page": "/start.html",
         "visits": 2
+      },
+      {
+        "page": "/academy.html",
+        "visits": 1
       },
       {
         "page": "/metrics",
@@ -45,66 +45,66 @@
         "visits": 1
       },
       {
-        "page": "/solutions/account-intelligence/quest.html",
+        "page": "/why.html",
         "visits": 1
       }
     ],
     "friction": {
       "DeadClickCount": 9,
-      "QuickbackClick": 19,
+      "QuickbackClick": 15,
       "RageClickCount": 0
     }
   },
   "last_week": {
     "days": 7,
-    "page_visits": 213,
-    "staging_visits": 178,
-    "active_seconds_per_visit": 54,
+    "page_visits": 182,
+    "staging_visits": 159,
+    "active_seconds_per_visit": 57,
     "top_pages": [
       {
-        "page": "Library home",
-        "visits": 74
+        "page": "/solutions/_shared/m365-copilot-demo.html",
+        "visits": 68
       },
       {
-        "page": "/solutions/_shared/m365-copilot-demo.html",
-        "visits": 63
+        "page": "Library home",
+        "visits": 52
       },
       {
         "page": "/start.html",
-        "visits": 32
+        "visits": 30
       },
       {
         "page": "/docs/installer.html",
-        "visits": 14
+        "visits": 13
       },
       {
         "page": "/academy.html",
         "visits": 5
       },
       {
-        "page": "/paths.html",
-        "visits": 4
-      },
-      {
         "page": "/solutions/fs-regulatory-compliance/quest.html",
         "visits": 4
       },
       {
-        "page": "/pitch-playbook.html",
+        "page": "/paths.html",
         "visits": 2
       },
       {
-        "page": "/solutions/account-intelligence/quest.html",
+        "page": "/solutions/ask-hr/quest.html",
         "visits": 2
       },
       {
         "page": "/docs/practice/windows.html",
         "visits": 1
+      },
+      {
+        "page": "/request-info.html",
+        "visits": 1
       }
     ],
     "friction": {
-      "DeadClickCount": 8,
-      "QuickbackClick": 17,
+      "DeadClickCount": 7,
+      "QuickbackClick": 16,
       "RageClickCount": 0
     }
   }
