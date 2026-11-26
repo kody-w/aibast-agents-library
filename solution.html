@@ -422,8 +422,12 @@ async function init() {
   const agent = (reg?.agents || []).find(a => a.name === sol.repo_agent);
 
   // samples/ is not part of the Pages artifact; the raw file is the only copy, so it stays the source here.
-  if (sol.sample_output) SAMPLE = await getJSON([RAW + '/' + sol.sample_output]);
+  // Draw the page now; the sample comes from another host, so it fills in when it arrives.
   render(sol, agent, sols);
+  if (sol.sample_output) {
+    SAMPLE = await getJSON([RAW + '/' + sol.sample_output]);
+    if (SAMPLE) render(sol, agent, sols);
+  }
 }
 
 // The skill sits beside this page, so the line works on whichever site serves the page.
