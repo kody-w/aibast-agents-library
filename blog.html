@@ -158,6 +158,7 @@ html[data-theme="dark"] {
     scroll-behavior: auto !important;
   }
 }
+  p a, .muted a { text-decoration: underline; text-underline-offset: 2px; }
 </style>
 <!-- aibast-design:end -->
 <style>
@@ -591,7 +592,7 @@ html[data-theme="dark"] {
         mechanism in ~500 lines:
       </p>
 
-<pre>const eventSource = createEventSource({
+<pre tabindex="0">const eventSource = createEventSource({
   url,
   headers: {
     Authorization: `Bearer ${token}`,
@@ -635,7 +636,7 @@ for await (const { data, event } of eventSource) {
         text accumulation:
       </p>
 
-<pre>if (id && sequence) {
+<pre tabindex="0">if (id && sequence) {
   if (streamMap.has(id)) {
     streamMap.get(id).push({ text, sequence });
   } else {
@@ -736,7 +737,7 @@ for await (const { data, event } of eventSource) {
         and tells the client <code>{"status": "pending"}</code>. Forever.
       </p>
 
-      <div class="diagram">Background thread          Client poll (/login/poll)
+      <div class="diagram" tabindex="0">Background thread          Client poll (/login/poll)
        │                              │
        ├── poll_device_code() ────┐   │
        │   ✓ got token            │   │
@@ -779,7 +780,7 @@ for await (const { data, event } of eventSource) {
         so no locks are needed.
       </p>
 
-<pre>_login_result = {}  # Written by bg thread only
+<pre tabindex="0">_login_result = {}  # Written by bg thread only
 
 def _bg_poll_loop():
     token = poll_device_code()
@@ -918,7 +919,7 @@ def login_poll():
         A single file — <code>rapp_brainstem/VERSION</code> — contains the semver string. That's it. No package registry, no GitHub releases API, no <code>git describe</code> parsing.
       </p>
 
-<pre>$ cat rapp_brainstem/VERSION
+<pre tabindex="0">$ cat rapp_brainstem/VERSION
 0.1.0</pre>
 
       <p>
@@ -951,7 +952,7 @@ def login_poll():
         The version is available at <code>GET /version</code> and included in the <code>GET /health</code> response. The startup banner prints it too. Everything reads from the same <code>VERSION</code> file — there's exactly one place to update.
       </p>
 
-<pre>$ curl -s localhost:7071/health | python3 -m json.tool
+<pre tabindex="0">$ curl -s localhost:7071/health | python3 -m json.tool
 {
     "status": "ok",
     "version": "0.1.0",
