@@ -1229,6 +1229,8 @@ FOOTER_LINKS = (
 
 # The vault is a full-window reader app with its own grid; it keeps its own frame.
 SHELL_SKIP_ROOTS = (PurePosixPath("solutions/_shared"), PurePosixPath("beta"), PurePosixPath("docs/vault"))
+# Shared pages people open as pages (not frames) still get the shared header and footer.
+SHELL_FRAMED_SHARED = frozenset({PurePosixPath("solutions/_shared/workshop-settings.html")})
 
 
 def shell_applies(path: PurePosixPath) -> bool:
@@ -1238,6 +1240,8 @@ def shell_applies(path: PurePosixPath) -> bool:
         return False
     if len(path.parts) == 1 and path.parts[0] in SHELL_SKIP:
         return False
+    if path in SHELL_FRAMED_SHARED:
+        return True
     return not any(root in path.parents for root in SHELL_SKIP_ROOTS)
 
 
