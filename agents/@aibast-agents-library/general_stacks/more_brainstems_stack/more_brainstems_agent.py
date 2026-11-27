@@ -29,6 +29,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates"))
 try:
     from agents.basic_agent import BasicAgent
 except ImportError:
@@ -236,3 +237,7 @@ class MoreBrainstemsAgent(BasicAgent):
             shutil.rmtree(entry["folder"], ignore_errors=True)
         self._save(brainstems)
         return json.dumps({"ok": True, "name": name, "stopped": True, "removed": bool(kw.get("remove"))})
+
+
+if __name__ == "__main__":
+    print(MoreBrainstemsAgent().perform(action="list"))
