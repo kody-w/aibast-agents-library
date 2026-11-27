@@ -5,6 +5,9 @@ Starts more Brainstems beside the one you are chatting with, each on its own
 port on this computer, each with its own agents folder. Then it talks to them
 the only way a Brainstem is ever driven: a message to its /chat.
 
+Each one serves the same chat page as your main Brainstem at its own address, with
+the agent registry, drag-and-drop install and hot loading already built in.
+
 Use it to give a repository its own Brainstem, to split a big job into small
 helpers that each report back, or to try an agent without touching your own
 Brainstem. Every helper is stopped with one ask, and its folder can be kept or
@@ -161,7 +164,7 @@ class MoreBrainstemsAgent(BasicAgent):
     def _list(self):
         brainstems = self._load()
         rows = [
-            {"name": n, "port": e["port"], "running": self._alive(e), "folder": e["folder"]}
+            {"name": n, "port": e["port"], "chat_url": f"http://127.0.0.1:{e['port']}/", "running": self._alive(e), "folder": e["folder"]}
             for n, e in sorted(brainstems.items())
         ]
         return json.dumps({"ok": True, "helpers": rows})
@@ -210,7 +213,8 @@ class MoreBrainstemsAgent(BasicAgent):
             return json.dumps({"ok": False, "error": "Helper did not answer within 30 seconds."})
         brainstems[name] = entry
         self._save(brainstems)
-        return json.dumps({"ok": True, "name": name, "port": port, "agents_copied": copied})
+        return json.dumps({"ok": True, "name": name, "port": port,
+                           "chat_url": f"http://127.0.0.1:{port}/", "agents_copied": copied})
 
     def _chat(self, kw):
         name = _slug(kw.get("name"))
