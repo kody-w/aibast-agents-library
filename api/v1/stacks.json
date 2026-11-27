@@ -353,6 +353,15 @@
       ]
     },
     {
+      "stack": "more_brainstems",
+      "vertical": "general",
+      "display_name": "More Brainstems",
+      "path": "agents/@aibast-agents-library/general_stacks/more_brainstems_stack",
+      "agents": [
+        "@aibast-agents-library/more-brainstems"
+      ]
+    },
+    {
       "stack": "omnichannel_engagement",
       "vertical": "b2c_sales",
       "display_name": "Omnichannel Engagement",

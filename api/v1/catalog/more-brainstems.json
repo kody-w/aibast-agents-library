@@ -1,0 +1,22 @@
+{
+  "schema": "aibast-library-agent/1.0",
+  "name": "@aibast-agents-library/more-brainstems",
+  "display_name": "More Brainstems",
+  "description": "Start, message and stop helper Brainstems on this computer, each with its own agents, driven only through /chat.",
+  "version": "1.0.0",
+  "kind": "component",
+  "category": "general",
+  "tags": [
+    "brainstem",
+    "helpers",
+    "local"
+  ],
+  "dependencies": [
+    "@rapp/basic-agent"
+  ],
+  "stack": "more_brainstems",
+  "synthetic_data": false,
+  "file": "agents/@aibast-agents-library/general_stacks/more_brainstems_stack/more_brainstems_agent.py",
+  "sha256": "fec5a72cc29da66adf45dadbfd70499456c5113b5cec8b93d79f3da51e5847d6",
+  "install_filename": "more_brainstems__fec5a72cc29d_agent.py"
+}

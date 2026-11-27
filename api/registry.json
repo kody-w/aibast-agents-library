@@ -1,14 +1,14 @@
 {
   "schema": "aibast-library-api/1.0",
-  "generated": "2026-11-20T15:22:48Z",
+  "generated": "2026-11-27T18:00:23Z",
   "spec": "rapp-static-api/1.1",
   "name": "aibast-library-api",
   "pages": "https://microsoft.github.io/aibast-agents-library/",
   "raw": "https://raw.githubusercontent.com/microsoft/aibast-agents-library/main/",
   "summary": {
     "solutions": 72,
-    "agents": 97,
-    "stacks": 73,
+    "agents": 98,
+    "stacks": 74,
     "scenarios": 394,
     "recorded": 384,
     "surfaces": 3,
@@ -404,6 +404,13 @@
       "version": "api/versions/catalog/meeting-prep/3582dac4fd85.json"
     },
     {
+      "name": "catalog/more-brainstems",
+      "path": "api/v1/catalog/more-brainstems.json",
+      "sha256": "0434fe831105eb886aa0245e0244413bfb6fa13ab0c9c94da1315e4b1042b281",
+      "sha8": "0434fe831105",
+      "version": "api/versions/catalog/more-brainstems/0434fe831105.json"
+    },
+    {
       "name": "catalog/next-best-action",
       "path": "api/v1/catalog/next-best-action.json",
       "sha256": "479da53ebad23a2cea49673639fcff7b864f9b8c25ab84c0fddb9f0d201d8a17",
@@ -707,9 +714,9 @@
     {
       "name": "index",
       "path": "api/v1/index.json",
-      "sha256": "757896e2a1f60b64cf298d63f6b50f89dbbda4d327f0c30fa100c74fc383bbc4",
-      "sha8": "757896e2a1f6",
-      "version": "api/versions/index/757896e2a1f6.json"
+      "sha256": "4c015d0d14a9d7e476d70697d8eb60c518aef3745b87eb81214b15198d9ac01c",
+      "sha8": "4c015d0d14a9",
+      "version": "api/versions/index/4c015d0d14a9.json"
     },
     {
       "name": "media/account-intelligence",
@@ -4809,16 +4816,16 @@
     {
       "name": "stacks",
       "path": "api/v1/stacks.json",
-      "sha256": "825a84a9507301a60307d9e08a9472fdc40bb695e178f78dc057a860e640b600",
-      "sha8": "825a84a95073",
-      "version": "api/versions/stacks/825a84a95073.json"
+      "sha256": "271eb637ced6c0e6b746bb93e81f92982d3d8168905f0caa60e1d79e272d5c95",
+      "sha8": "271eb637ced6",
+      "version": "api/versions/stacks/271eb637ced6.json"
     },
     {
       "name": "status",
       "path": "api/v1/status.json",
-      "sha256": "3ee6a490b72d2426d95efc5d06656c0b1372c959949812ef6457aa9314bd5725",
-      "sha8": "3ee6a490b72d",
-      "version": "api/versions/status/3ee6a490b72d.json"
+      "sha256": "6afa0b287e658da1ded8c44037ebb68283281dff679b957f7ee82091bfd33c85",
+      "sha8": "6afa0b287e65",
+      "version": "api/versions/status/6afa0b287e65.json"
     },
     {
       "name": "surfaces/cowork",
