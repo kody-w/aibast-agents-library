@@ -1,6 +1,6 @@
 {
   "schema": "aibast-library-api/1.0",
-  "generated": "2026-11-27T18:01:27Z",
+  "generated": "2026-11-27T18:23:04Z",
   "spec": "rapp-static-api/1.1",
   "name": "aibast-library-api",
   "pages": "https://microsoft.github.io/aibast-agents-library/",
@@ -406,9 +406,9 @@
     {
       "name": "catalog/more-brainstems",
       "path": "api/v1/catalog/more-brainstems.json",
-      "sha256": "c0a2c3e4e1cef1985625ba41ef39be9635a684a8fa6e5b841bae0feb9d753083",
-      "sha8": "c0a2c3e4e1ce",
-      "version": "api/versions/catalog/more-brainstems/c0a2c3e4e1ce.json"
+      "sha256": "f68ef55c6729bcdc3305017da8b73c5d93782370fb6d0605fc0eb2afff7f5a3a",
+      "sha8": "f68ef55c6729",
+      "version": "api/versions/catalog/more-brainstems/f68ef55c6729.json"
     },
     {
       "name": "catalog/next-best-action",

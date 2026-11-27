@@ -102,20 +102,23 @@ class MoreBrainstemsAgent(BasicAgent):
         self.metadata = {
             "name": self.name,
             "description": (
-                "Runs helper Brainstems on this computer. action=start makes a named helper "
-                "(optionally copying agent files into it), action=list shows them, action=chat "
-                "sends a helper a message and returns its answer, action=stop stops one "
-                "(remove=true also deletes its folder)."
+                "Runs and manages more Brainstems on this computer, all from chat; the person "
+                "never has to open their pages. action=start makes a named Brainstem (agents= "
+                "names or files of agents to give it), action=add_agents gives a running one more "
+                "agents (they load on its next message, no restart), action=list shows them, "
+                "action=chat sends one a message and returns its answer, action=ask_all sends "
+                "the same message to every running one and returns every answer, action=stop "
+                "stops one (remove=true also deletes its folder)."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "action": {"type": "string", "enum": ["start", "list", "chat", "stop"]},
+                    "action": {"type": "string", "enum": ["start", "add_agents", "list", "chat", "ask_all", "stop"]},
                     "name": {"type": "string", "description": "Helper name, e.g. the repository it serves."},
                     "message": {"type": "string", "description": "What to say to the helper (action=chat)."},
-                    "agent_files": {
+                    "agents": {
                         "type": "array", "items": {"type": "string"},
-                        "description": "Paths of *_agent.py files to copy into the helper (action=start).",
+                        "description": "Agents to give it: a name from this Brainstem's agents (e.g. HackerNews or hacker_news) or a path to a *_agent.py file.",
                     },
                     "remove": {"type": "boolean", "description": "Delete the helper's folder on stop."},
                 },
@@ -153,8 +156,12 @@ class MoreBrainstemsAgent(BasicAgent):
         try:
             if action == "start":
                 return self._start(kwargs)
+            if action == "add_agents":
+                return self._add_agents(kwargs)
             if action == "chat":
                 return self._chat(kwargs)
+            if action == "ask_all":
+                return self._ask_all(kwargs)
             if action == "stop":
                 return self._stop(kwargs)
             return self._list()
@@ -185,12 +192,7 @@ class MoreBrainstemsAgent(BasicAgent):
         base = brainstem.parent / "agents" / "basic_agent.py"
         if base.is_file():
             shutil.copy2(base, agents / "basic_agent.py")
-        copied = []
-        for item in kw.get("agent_files") or []:
-            src = Path(str(item)).expanduser()
-            if src.is_file() and src.name.endswith("_agent.py"):
-                shutil.copy2(src, agents / src.name)
-                copied.append(src.name)
+        copied, missing = self._copy_agents(kw, agents, brainstem)
         port = _free_port()
         env = dict(os.environ)
         env.update({"PORT": str(port), "AGENTS_PATH": str(agents), "BRAINSTEM_LAN_MODE": "0"})
@@ -214,7 +216,57 @@ class MoreBrainstemsAgent(BasicAgent):
         brainstems[name] = entry
         self._save(brainstems)
         return json.dumps({"ok": True, "name": name, "port": port,
-                           "chat_url": f"http://127.0.0.1:{port}/", "agents_copied": copied})
+                           "chat_url": f"http://127.0.0.1:{port}/", "agents_added": copied,
+                           "agents_not_found": missing})
+
+    @staticmethod
+    def _copy_agents(kw, agents: Path, brainstem: Path):
+        wanted = kw.get("agents") or kw.get("agent_files") or []
+        if isinstance(wanted, str):
+            wanted = [w.strip() for w in wanted.split(",") if w.strip()]
+        own = brainstem.parent / "agents"
+        copied, missing = [], []
+        for item in wanted:
+            src = Path(str(item)).expanduser()
+            if not src.is_file():
+                key = re.sub(r"[^a-z0-9]", "", str(item).lower()).removesuffix("agent")
+                src = next((f for f in sorted(own.glob("*_agent.py"))
+                            if re.sub(r"[^a-z0-9]", "", f.stem.lower()).removesuffix("agent") == key), None)
+            if src is not None and src.is_file() and src.name.endswith("_agent.py"):
+                shutil.copy2(src, agents / src.name)
+                copied.append(src.name)
+            else:
+                missing.append(str(item))
+        return copied, missing
+
+    def _add_agents(self, kw):
+        name = _slug(kw.get("name"))
+        entry = self._load().get(name)
+        brainstem = _brainstem_file()
+        if not entry or brainstem is None:
+            return json.dumps({"ok": False, "error": f"No running Brainstem named {name!r}."})
+        copied, missing = self._copy_agents(kw, Path(entry["folder"]) / "agents", brainstem)
+        return json.dumps({"ok": bool(copied), "name": name, "agents_added": copied,
+                           "agents_not_found": missing, "note": "loaded on its next message"})
+
+    def _ask_all(self, kw):
+        from concurrent.futures import ThreadPoolExecutor
+        message = str(kw.get("message") or "").strip()
+        if not message:
+            return json.dumps({"ok": False, "error": "Say what to send."})
+        live = {n: e for n, e in self._load().items() if self._alive(e)}
+
+        def one(item):
+            n, e = item
+            try:
+                r = _post(f"http://127.0.0.1:{e['port']}/chat", {"user_input": message}, timeout=300)
+                return n, r.get("response", "")
+            except Exception as exc:  # one slow Brainstem never sinks the rest
+                return n, f"(no answer: {exc})"
+
+        with ThreadPoolExecutor(max_workers=max(1, min(8, len(live)))) as pool:
+            answers = dict(pool.map(one, live.items()))
+        return json.dumps({"ok": True, "asked": len(live), "answers": answers})
 
     def _chat(self, kw):
         name = _slug(kw.get("name"))
