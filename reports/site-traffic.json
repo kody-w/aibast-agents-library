@@ -1,40 +1,40 @@
 {
   "schema": "aibast-site-traffic/1.0",
-  "as_of": "2026-11-24",
-  "days_collected": 47,
+  "as_of": "2026-11-27",
+  "days_collected": 50,
   "this_week": {
     "days": 7,
-    "page_visits": 86,
-    "staging_visits": 34,
-    "active_seconds_per_visit": 66,
+    "page_visits": 62,
+    "staging_visits": 0,
+    "active_seconds_per_visit": 63,
     "top_pages": [
       {
         "page": "Library home",
-        "visits": 23
+        "visits": 21
       },
       {
         "page": "/solutions/_shared/m365-copilot-demo.html",
-        "visits": 22
-      },
-      {
-        "page": "/docs/installer.html",
-        "visits": 17
+        "visits": 14
       },
       {
         "page": "/docs/rapp-guide.html",
+        "visits": 10
+      },
+      {
+        "page": "/docs/installer.html",
         "visits": 9
-      },
-      {
-        "page": "/academy.html",
-        "visits": 4
-      },
-      {
-        "page": "/start.html",
-        "visits": 4
       },
       {
         "page": "/solutions/fs-regulatory-compliance/quest.html",
         "visits": 2
+      },
+      {
+        "page": "/start.html",
+        "visits": 2
+      },
+      {
+        "page": "/academy.html",
+        "visits": 1
       },
       {
         "page": "/metrics",
@@ -45,66 +45,66 @@
         "visits": 1
       },
       {
+        "page": "/why.html",
+        "visits": 1
+      }
+    ],
+    "friction": {
+      "DeadClickCount": 5,
+      "QuickbackClick": 16,
+      "RageClickCount": 0
+    }
+  },
+  "last_week": {
+    "days": 7,
+    "page_visits": 119,
+    "staging_visits": 107,
+    "active_seconds_per_visit": 69,
+    "top_pages": [
+      {
+        "page": "/solutions/_shared/m365-copilot-demo.html",
+        "visits": 46
+      },
+      {
+        "page": "Library home",
+        "visits": 33
+      },
+      {
+        "page": "/docs/installer.html",
+        "visits": 12
+      },
+      {
+        "page": "/start.html",
+        "visits": 12
+      },
+      {
+        "page": "/academy.html",
+        "visits": 4
+      },
+      {
+        "page": "/solutions/fs-regulatory-compliance/quest.html",
+        "visits": 3
+      },
+      {
+        "page": "/docs/rapp-guide.html",
+        "visits": 2
+      },
+      {
+        "page": "/solutions/ask-hr/quest.html",
+        "visits": 2
+      },
+      {
+        "page": "/paths.html",
+        "visits": 1
+      },
+      {
         "page": "/solutions/account-intelligence/quest.html",
         "visits": 1
       }
     ],
     "friction": {
       "DeadClickCount": 9,
-      "QuickbackClick": 19,
-      "RageClickCount": 0
-    }
-  },
-  "last_week": {
-    "days": 7,
-    "page_visits": 213,
-    "staging_visits": 178,
-    "active_seconds_per_visit": 54,
-    "top_pages": [
-      {
-        "page": "Library home",
-        "visits": 74
-      },
-      {
-        "page": "/solutions/_shared/m365-copilot-demo.html",
-        "visits": 63
-      },
-      {
-        "page": "/start.html",
-        "visits": 32
-      },
-      {
-        "page": "/docs/installer.html",
-        "visits": 14
-      },
-      {
-        "page": "/academy.html",
-        "visits": 5
-      },
-      {
-        "page": "/paths.html",
-        "visits": 4
-      },
-      {
-        "page": "/solutions/fs-regulatory-compliance/quest.html",
-        "visits": 4
-      },
-      {
-        "page": "/pitch-playbook.html",
-        "visits": 2
-      },
-      {
-        "page": "/solutions/account-intelligence/quest.html",
-        "visits": 2
-      },
-      {
-        "page": "/docs/practice/windows.html",
-        "visits": 1
-      }
-    ],
-    "friction": {
-      "DeadClickCount": 8,
-      "QuickbackClick": 17,
+      "QuickbackClick": 15,
       "RageClickCount": 0
     }
   }
