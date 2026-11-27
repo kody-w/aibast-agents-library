@@ -1,14 +1,14 @@
 {
   "schema": "rapp-registry/1.0",
   "version": "1.0.0",
-  "generated_at": "2026-11-20T15:46:13.654587+00:00",
+  "generated_at": "2026-11-27T17:17:31.384715+00:00",
   "stats": {
-    "total_agents": 97,
+    "total_agents": 98,
     "publishers": 1,
     "categories": 13,
-    "total_stacks": 73,
+    "total_stacks": 74,
     "total_multi_agent_stacks": 2,
-    "total_solution_containers": 71,
+    "total_solution_containers": 72,
     "total_verticals": 13,
     "advertised_solutions": 72,
     "demo_proven_agents": 73,
@@ -16,8 +16,8 @@
     "curated_copy_solutions": 72,
     "solution_onepagers": 72,
     "solution_demo_videos": 64,
-    "total_lines": 53063,
-    "total_kb": 2682.5,
+    "total_lines": 53307,
+    "total_kb": 2692.0,
     "total_first_party": 22,
     "first_party_available": 13,
     "first_party_preview": 9,
@@ -64,8 +64,8 @@
     ],
     "tier_counts": {
       "verified": 92,
-      "pilot": 3,
-      "community": 2
+      "community": 3,
+      "pilot": 3
     }
   },
   "stacks": [
@@ -457,6 +457,17 @@
       "path": "agents/@aibast-agents-library/general_stacks/cross_selling_opportunities_stack",
       "agents": [
         "@aibast-agents-library/cross-selling"
+      ],
+      "agent_count": 1,
+      "stack_type": "solution_container"
+    },
+    {
+      "stack": "more_brainstems",
+      "vertical": "general",
+      "display_name": "More Brainstems",
+      "path": "agents/@aibast-agents-library/general_stacks/more_brainstems_stack",
+      "agents": [
+        "@aibast-agents-library/more-brainstems"
       ],
       "agent_count": 1,
       "stack_type": "solution_container"
@@ -10294,6 +10305,37 @@
         "Synthetic data",
         "Production pattern"
       ]
+    },
+    {
+      "schema": "rapp-agent/1.0",
+      "name": "@aibast-agents-library/more-brainstems",
+      "version": "1.0.0",
+      "display_name": "More Brainstems",
+      "description": "Start, message and stop helper Brainstems on this computer, each with its own agents, driven only through /chat.",
+      "author": "AIBAST",
+      "tags": [
+        "brainstem",
+        "helpers",
+        "local"
+      ],
+      "category": "general",
+      "quality_tier": "community",
+      "requires_env": [],
+      "dependencies": [
+        "@rapp/basic-agent"
+      ],
+      "_file": "agents/@aibast-agents-library/general_stacks/more_brainstems_stack/more_brainstems_agent.py",
+      "_size_kb": 9.5,
+      "_lines": 244,
+      "_sha256": "fec5a72cc29da66adf45dadbfd70499456c5113b5cec8b93d79f3da51e5847d6",
+      "_install_prefix": "more_brainstems__",
+      "_install_filename": "more_brainstems__fec5a72cc29d_agent.py",
+      "_stack": "more_brainstems",
+      "_stack_vertical": "general",
+      "_synthetic_data": false,
+      "_added_at": "2026-11-27T12:15:21-05:00",
+      "_catalog_kind": "component",
+      "_readiness": []
     },
     {
       "schema": "rapp-agent/1.0",
